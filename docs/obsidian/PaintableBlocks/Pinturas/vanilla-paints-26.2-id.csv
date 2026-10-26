@@ -1,0 +1,338 @@
+paint_id;block_id;name_es;name_en
+1;minecraft:acacia_log;Tronco de acacia;Acacia Log
+2;minecraft:acacia_planks;Tablones de acacia;Acacia Planks
+3;minecraft:acacia_wood;Leño de acacia;Acacia Wood
+4;minecraft:amethyst_block;Bloque de amatista;Block of Amethyst
+5;minecraft:ancient_debris;Escombros ancestrales;Ancient Debris
+6;minecraft:andesite;Andesita;Andesite
+7;minecraft:bamboo_block;Bloque de bambú;Block of Bamboo
+8;minecraft:bamboo_mosaic;Mosaico de bambú;Bamboo Mosaic
+9;minecraft:bamboo_planks;Tablones de bambú;Bamboo Planks
+10;minecraft:basalt;Basalto;Basalt
+11;minecraft:bedrock;Piedra base;Bedrock
+12;minecraft:birch_log;Tronco de abedul;Birch Log
+13;minecraft:birch_planks;Tablones de abedul;Birch Planks
+14;minecraft:birch_wood;Leño de abedul;Birch Wood
+15;minecraft:black_concrete;Hormigón negro;Black Concrete
+16;minecraft:black_concrete_powder;Cemento negro;Black Concrete Powder
+17;minecraft:black_glazed_terracotta;Azulejo negro;Black Glazed Terracotta
+18;minecraft:black_terracotta;Terracota negra;Black Terracotta
+19;minecraft:black_wool;Lana negra;Black Wool
+20;minecraft:blackstone;Piedra negra;Blackstone
+21;minecraft:blue_concrete;Hormigón azul;Blue Concrete
+22;minecraft:blue_concrete_powder;Cemento azul;Blue Concrete Powder
+23;minecraft:blue_glazed_terracotta;Azulejo azul;Blue Glazed Terracotta
+24;minecraft:blue_ice;Hielo azul;Blue Ice
+25;minecraft:blue_terracotta;Terracota azul;Blue Terracotta
+26;minecraft:blue_wool;Lana azul;Blue Wool
+27;minecraft:bone_block;Bloque de huesos;Bone Block
+28;minecraft:bookshelf;Librería;Bookshelf
+29;minecraft:brain_coral_block;Bloque de coral de cerebro;Brain Coral Block
+30;minecraft:bricks;Ladrillos;Bricks
+31;minecraft:brown_concrete;Hormigón marrón;Brown Concrete
+32;minecraft:brown_concrete_powder;Cemento marrón;Brown Concrete Powder
+33;minecraft:brown_glazed_terracotta;Azulejo marrón;Brown Glazed Terracotta
+34;minecraft:brown_mushroom_block;Bloque de champiñón marrón;Brown Mushroom Block
+35;minecraft:brown_terracotta;Terracota marrón;Brown Terracotta
+36;minecraft:brown_wool;Lana marrón;Brown Wool
+37;minecraft:bubble_coral_block;Bloque de coral de burbuja;Bubble Coral Block
+38;minecraft:budding_amethyst;Brotador de amatista;Budding Amethyst
+39;minecraft:calcite;Calcita;Calcite
+40;minecraft:cartography_table;Mesa de cartografía;Cartography Table
+41;minecraft:carved_pumpkin;Calabaza tallada;Carved Pumpkin
+42;minecraft:cherry_log;Tronco de cerezo;Cherry Log
+43;minecraft:cherry_planks;Tablones de cerezo;Cherry Planks
+44;minecraft:cherry_wood;Leño de cerezo;Cherry Wood
+45;minecraft:chiseled_cinnabar;Cinabrio cincelado;Chiseled Cinnabar
+46;minecraft:chiseled_copper;Cobre cincelado;Chiseled Copper
+47;minecraft:chiseled_deepslate;Pizarra profunda cincelada;Chiseled Deepslate
+48;minecraft:chiseled_nether_bricks;Ladrillos del Nether cincelados;Chiseled Nether Bricks
+49;minecraft:chiseled_polished_blackstone;Piedra negra pulida cincelada;Chiseled Polished Blackstone
+50;minecraft:chiseled_quartz_block;Cuarzo cincelado;Chiseled Quartz Block
+51;minecraft:chiseled_red_sandstone;Arenisca roja cincelada;Chiseled Red Sandstone
+52;minecraft:chiseled_resin_bricks;Ladrillos de resina cincelados;Chiseled Resin Bricks
+53;minecraft:chiseled_sandstone;Arenisca cincelada;Chiseled Sandstone
+54;minecraft:chiseled_stone_bricks;Ladrillos de piedra cincelados;Chiseled Stone Bricks
+55;minecraft:chiseled_sulfur;Azufre cincelado;Chiseled Sulfur
+56;minecraft:chiseled_tuff;Toba cincelada;Chiseled Tuff
+57;minecraft:chiseled_tuff_bricks;Ladrillos de toba cincelados;Chiseled Tuff Bricks
+58;minecraft:cinnabar;Cinabrio;Cinnabar
+59;minecraft:cinnabar_bricks;Ladrillos de cinabrio;Cinnabar Bricks
+60;minecraft:clay;Bloque de arcilla;Clay
+61;minecraft:coal_block;Bloque de carbón;Block of Coal
+62;minecraft:coal_ore;Mena de carbón;Coal Ore
+63;minecraft:coarse_dirt;Tierra estéril;Coarse Dirt
+64;minecraft:cobbled_deepslate;Pizarra profunda rocosa;Cobbled Deepslate
+65;minecraft:cobblestone;Roca;Cobblestone
+66;minecraft:copper_block;Bloque de cobre;Block of Copper
+67;minecraft:copper_bulb;Lámpara de cobre;Copper Bulb
+68;minecraft:copper_ore;Mena de cobre;Copper Ore
+69;minecraft:cracked_deepslate_bricks;Ladrillos de pizarra profunda agrietados;Cracked Deepslate Bricks
+70;minecraft:cracked_deepslate_tiles;Baldosas de pizarra profunda agrietadas;Cracked Deepslate Tiles
+71;minecraft:cracked_nether_bricks;Ladrillos del Nether agrietados;Cracked Nether Bricks
+72;minecraft:cracked_polished_blackstone_bricks;Ladrillos de piedra negra pulida agrietados;Cracked Polished Blackstone Bricks
+73;minecraft:cracked_stone_bricks;Ladrillos de piedra agrietados;Cracked Stone Bricks
+74;minecraft:crafting_table;Mesa de trabajo;Crafting Table
+75;minecraft:crimson_hyphae;Hifas carmesí;Crimson Hyphae
+76;minecraft:crimson_nylium;Necelio carmesí;Crimson Nylium
+77;minecraft:crimson_planks;Tablones carmesí;Crimson Planks
+78;minecraft:crimson_stem;Tallo carmesí;Crimson Stem
+79;minecraft:crying_obsidian;Obsidiana llorosa;Crying Obsidian
+80;minecraft:cut_copper;Cobre cortado;Cut Copper
+81;minecraft:cut_red_sandstone;Arenisca roja cortada;Cut Red Sandstone
+82;minecraft:cut_sandstone;Arenisca cortada;Cut Sandstone
+83;minecraft:cyan_concrete;Hormigón cian;Cyan Concrete
+84;minecraft:cyan_concrete_powder;Cemento cian;Cyan Concrete Powder
+85;minecraft:cyan_glazed_terracotta;Azulejo cian;Cyan Glazed Terracotta
+86;minecraft:cyan_terracotta;Terracota cian;Cyan Terracotta
+87;minecraft:cyan_wool;Lana cian;Cyan Wool
+88;minecraft:dark_oak_log;Tronco de roble oscuro;Dark Oak Log
+89;minecraft:dark_oak_planks;Tablones de roble oscuro;Dark Oak Planks
+90;minecraft:dark_oak_wood;Leño de roble oscuro;Dark Oak Wood
+91;minecraft:dark_prismarine;Prismarina oscura;Dark Prismarine
+92;minecraft:dead_brain_coral_block;Bloque de coral de cerebro muerto;Dead Brain Coral Block
+93;minecraft:dead_bubble_coral_block;Bloque de coral de burbuja muerto;Dead Bubble Coral Block
+94;minecraft:dead_fire_coral_block;Bloque de coral de fuego muerto;Dead Fire Coral Block
+95;minecraft:dead_horn_coral_block;Bloque de coral de cuerno muerto;Dead Horn Coral Block
+96;minecraft:dead_tube_coral_block;Bloque de coral de tubo muerto;Dead Tube Coral Block
+97;minecraft:deepslate;Pizarra profunda;Deepslate
+98;minecraft:deepslate_bricks;Ladrillos de pizarra profunda;Deepslate Bricks
+99;minecraft:deepslate_coal_ore;Mena de carbón de pizarra profunda;Deepslate Coal Ore
+100;minecraft:deepslate_copper_ore;Mena de cobre de pizarra profunda;Deepslate Copper Ore
+101;minecraft:deepslate_diamond_ore;Mena de diamante de pizarra profunda;Deepslate Diamond Ore
+102;minecraft:deepslate_emerald_ore;Mena de esmeralda de pizarra profunda;Deepslate Emerald Ore
+103;minecraft:deepslate_gold_ore;Mena de oro de pizarra profunda;Deepslate Gold Ore
+104;minecraft:deepslate_iron_ore;Mena de hierro de pizarra profunda;Deepslate Iron Ore
+105;minecraft:deepslate_lapis_ore;Mena de lapislázuli de pizarra profunda;Deepslate Lapis Lazuli Ore
+106;minecraft:deepslate_redstone_ore;Mena de redstone de pizarra profunda;Deepslate Redstone Ore
+107;minecraft:deepslate_tiles;Baldosas de pizarra profunda;Deepslate Tiles
+108;minecraft:diamond_block;Bloque de diamante;Block of Diamond
+109;minecraft:diamond_ore;Mena de diamante;Diamond Ore
+110;minecraft:diorite;Diorita;Diorite
+111;minecraft:dirt;Tierra;Dirt
+112;minecraft:dried_kelp_block;Bloque de algas secas;Dried Kelp Block
+113;minecraft:dripstone_block;Bloque de caliza;Dripstone Block
+114;minecraft:emerald_block;Bloque de esmeralda;Block of Emerald
+115;minecraft:emerald_ore;Mena de esmeralda;Emerald Ore
+116;minecraft:end_stone;Piedra del End;End Stone
+117;minecraft:end_stone_bricks;Ladrillos de piedra del End;End Stone Bricks
+118;minecraft:exposed_chiseled_copper;Cobre cincelado expuesto;Exposed Chiseled Copper
+119;minecraft:exposed_copper;Cobre expuesto;Exposed Copper
+120;minecraft:exposed_copper_bulb;Lámpara de cobre expuesto;Exposed Copper Bulb
+121;minecraft:exposed_cut_copper;Cobre cortado expuesto;Exposed Cut Copper
+122;minecraft:fire_coral_block;Bloque de coral de fuego;Fire Coral Block
+123;minecraft:fletching_table;Mesa de flechas;Fletching Table
+124;minecraft:gilded_blackstone;Piedra negra áurea;Gilded Blackstone
+125;minecraft:glowstone;Piedra luminosa;Glowstone
+126;minecraft:gold_block;Bloque de oro;Block of Gold
+127;minecraft:gold_ore;Mena de oro;Gold Ore
+128;minecraft:granite;Granito;Granite
+129;minecraft:grass_block;Césped;Grass Block
+130;minecraft:gravel;Grava;Gravel
+131;minecraft:gray_concrete;Hormigón gris;Gray Concrete
+132;minecraft:gray_concrete_powder;Cemento gris;Gray Concrete Powder
+133;minecraft:gray_glazed_terracotta;Azulejo gris;Gray Glazed Terracotta
+134;minecraft:gray_terracotta;Terracota gris;Gray Terracotta
+135;minecraft:gray_wool;Lana gris;Gray Wool
+136;minecraft:green_concrete;Hormigón verde;Green Concrete
+137;minecraft:green_concrete_powder;Cemento verde;Green Concrete Powder
+138;minecraft:green_glazed_terracotta;Azulejo verde;Green Glazed Terracotta
+139;minecraft:green_terracotta;Terracota verde;Green Terracotta
+140;minecraft:green_wool;Lana verde;Green Wool
+141;minecraft:hay_block;Bala de heno;Hay Bale
+142;minecraft:honeycomb_block;Bloque de panal;Honeycomb Block
+143;minecraft:horn_coral_block;Bloque de coral de cuerno;Horn Coral Block
+144;minecraft:iron_block;Bloque de hierro;Block of Iron
+145;minecraft:iron_ore;Mena de hierro;Iron Ore
+146;minecraft:jack_o_lantern;Calabaza de Halloween;Jack o'Lantern
+147;minecraft:jungle_log;Tronco de jungla;Jungle Log
+148;minecraft:jungle_planks;Tablones de jungla;Jungle Planks
+149;minecraft:jungle_wood;Leño de jungla;Jungle Wood
+150;minecraft:lapis_block;Bloque de lapislázuli;Block of Lapis Lazuli
+151;minecraft:lapis_ore;Mena de lapislázuli;Lapis Lazuli Ore
+152;minecraft:light_blue_concrete;Hormigón azul claro;Light Blue Concrete
+153;minecraft:light_blue_concrete_powder;Cemento azul claro;Light Blue Concrete Powder
+154;minecraft:light_blue_glazed_terracotta;Azulejo azul claro;Light Blue Glazed Terracotta
+155;minecraft:light_blue_terracotta;Terracota azul claro;Light Blue Terracotta
+156;minecraft:light_blue_wool;Lana azul claro;Light Blue Wool
+157;minecraft:light_gray_concrete;Hormigón gris claro;Light Gray Concrete
+158;minecraft:light_gray_concrete_powder;Cemento gris claro;Light Gray Concrete Powder
+159;minecraft:light_gray_glazed_terracotta;Azulejo gris claro;Light Gray Glazed Terracotta
+160;minecraft:light_gray_terracotta;Terracota gris claro;Light Gray Terracotta
+161;minecraft:light_gray_wool;Lana gris claro;Light Gray Wool
+162;minecraft:lime_concrete;Hormigón verde lima;Lime Concrete
+163;minecraft:lime_concrete_powder;Cemento verde lima;Lime Concrete Powder
+164;minecraft:lime_glazed_terracotta;Azulejo verde lima;Lime Glazed Terracotta
+165;minecraft:lime_terracotta;Terracota verde lima;Lime Terracotta
+166;minecraft:lime_wool;Lana verde lima;Lime Wool
+167;minecraft:lodestone;Magnetita;Lodestone
+168;minecraft:loom;Telar;Loom
+169;minecraft:magenta_concrete;Hormigón magenta;Magenta Concrete
+170;minecraft:magenta_concrete_powder;Cemento magenta;Magenta Concrete Powder
+171;minecraft:magenta_glazed_terracotta;Azulejo magenta;Magenta Glazed Terracotta
+172;minecraft:magenta_terracotta;Terracota magenta;Magenta Terracotta
+173;minecraft:magenta_wool;Lana magenta;Magenta Wool
+174;minecraft:magma_block;Bloque de magma;Magma Block
+175;minecraft:mangrove_log;Tronco de mangle;Mangrove Log
+176;minecraft:mangrove_planks;Tablones de mangle;Mangrove Planks
+177;minecraft:mangrove_wood;Leño de mangle;Mangrove Wood
+178;minecraft:melon;Sandía;Melon
+179;minecraft:moss_block;Bloque de musgo;Moss Block
+180;minecraft:mossy_cobblestone;Roca musgosa;Mossy Cobblestone
+181;minecraft:mossy_stone_bricks;Ladrillos de piedra musgosos;Mossy Stone Bricks
+182;minecraft:mud;Barro;Mud
+183;minecraft:mud_bricks;Ladrillos de adobe;Mud Bricks
+184;minecraft:muddy_mangrove_roots;Raíces de mangle embarradas;Muddy Mangrove Roots
+185;minecraft:mushroom_stem;Tallo de champiñón;Mushroom Stem
+186;minecraft:mycelium;Micelio;Mycelium
+187;minecraft:nether_bricks;Ladrillos del Nether;Nether Bricks
+188;minecraft:nether_gold_ore;Mena de oro del Nether;Nether Gold Ore
+189;minecraft:nether_quartz_ore;Mena de cuarzo del Nether;Nether Quartz Ore
+190;minecraft:nether_wart_block;Bloque de verrugas del Nether;Nether Wart Block
+191;minecraft:netherite_block;Bloque de netherita;Block of Netherite
+192;minecraft:netherrack;Netherrack;Netherrack
+193;minecraft:note_block;Bloque musical;Note Block
+194;minecraft:oak_log;Tronco de roble;Oak Log
+195;minecraft:oak_planks;Tablones de roble;Oak Planks
+196;minecraft:oak_wood;Leño de roble;Oak Wood
+197;minecraft:observer;Observador;Observer
+198;minecraft:obsidian;Obsidiana;Obsidian
+199;minecraft:ochre_froglight;Ranaluz ocre;Ochre Froglight
+200;minecraft:orange_concrete;Hormigón naranja;Orange Concrete
+201;minecraft:orange_concrete_powder;Cemento naranja;Orange Concrete Powder
+202;minecraft:orange_glazed_terracotta;Azulejo naranja;Orange Glazed Terracotta
+203;minecraft:orange_terracotta;Terracota naranja;Orange Terracotta
+204;minecraft:orange_wool;Lana naranja;Orange Wool
+205;minecraft:oxidized_chiseled_copper;Cobre cincelado oxidado;Oxidized Chiseled Copper
+206;minecraft:oxidized_copper;Cobre oxidado;Oxidized Copper
+207;minecraft:oxidized_copper_bulb;Lámpara de cobre oxidado;Oxidized Copper Bulb
+208;minecraft:oxidized_cut_copper;Cobre cortado oxidado;Oxidized Cut Copper
+209;minecraft:packed_ice;Hielo compacto;Packed Ice
+210;minecraft:packed_mud;Adobe;Packed Mud
+211;minecraft:pale_moss_block;Bloque de musgo pálido;Pale Moss Block
+212;minecraft:pale_oak_log;Tronco de roble pálido;Pale Oak Log
+213;minecraft:pale_oak_planks;Tablones de roble pálido;Pale Oak Planks
+214;minecraft:pale_oak_wood;Leño de roble pálido;Pale Oak Wood
+215;minecraft:pearlescent_froglight;Ranaluz nacarada;Pearlescent Froglight
+216;minecraft:pink_concrete;Hormigón rosa;Pink Concrete
+217;minecraft:pink_concrete_powder;Cemento rosa;Pink Concrete Powder
+218;minecraft:pink_glazed_terracotta;Azulejo rosa;Pink Glazed Terracotta
+219;minecraft:pink_terracotta;Terracota rosa;Pink Terracotta
+220;minecraft:pink_wool;Lana rosa;Pink Wool
+221;minecraft:podzol;Podsol;Podzol
+222;minecraft:polished_andesite;Andesita pulida;Polished Andesite
+223;minecraft:polished_basalt;Basalto pulido;Polished Basalt
+224;minecraft:polished_blackstone;Piedra negra pulida;Polished Blackstone
+225;minecraft:polished_blackstone_bricks;Ladrillos de piedra negra pulida;Polished Blackstone Bricks
+226;minecraft:polished_cinnabar;Cinabrio pulido;Polished Cinnabar
+227;minecraft:polished_deepslate;Pizarra profunda pulida;Polished Deepslate
+228;minecraft:polished_diorite;Diorita pulida;Polished Diorite
+229;minecraft:polished_granite;Granito pulido;Polished Granite
+230;minecraft:polished_sulfur;Azufre pulido;Polished Sulfur
+231;minecraft:polished_tuff;Toba pulida;Polished Tuff
+232;minecraft:powder_snow;Nieve polvo;Powder Snow
+233;minecraft:prismarine;Prismarina;Prismarine
+234;minecraft:prismarine_bricks;Ladrillos de prismarina;Prismarine Bricks
+235;minecraft:pumpkin;Calabaza;Pumpkin
+236;minecraft:purple_concrete;Hormigón morado;Purple Concrete
+237;minecraft:purple_concrete_powder;Cemento morado;Purple Concrete Powder
+238;minecraft:purple_glazed_terracotta;Azulejo morado;Purple Glazed Terracotta
+239;minecraft:purple_terracotta;Terracota morada;Purple Terracotta
+240;minecraft:purple_wool;Lana morada;Purple Wool
+241;minecraft:purpur_block;Bloque de purpur;Purpur Block
+242;minecraft:purpur_pillar;Pilar de purpur;Purpur Pillar
+243;minecraft:quartz_block;Cuarzo;Block of Quartz
+244;minecraft:quartz_bricks;Ladrillos de cuarzo;Quartz Bricks
+245;minecraft:quartz_pillar;Pilar de cuarzo;Quartz Pillar
+246;minecraft:raw_copper_block;Bloque de cobre en bruto;Block of Raw Copper
+247;minecraft:raw_gold_block;Bloque de oro en bruto;Block of Raw Gold
+248;minecraft:raw_iron_block;Bloque de hierro en bruto;Block of Raw Iron
+249;minecraft:red_concrete;Hormigón rojo;Red Concrete
+250;minecraft:red_concrete_powder;Cemento rojo;Red Concrete Powder
+251;minecraft:red_glazed_terracotta;Azulejo rojo;Red Glazed Terracotta
+252;minecraft:red_mushroom_block;Bloque de champiñón rojo;Red Mushroom Block
+253;minecraft:red_nether_bricks;Ladrillos del Nether rojos;Red Nether Bricks
+254;minecraft:red_sand;Arena roja;Red Sand
+255;minecraft:red_sandstone;Arenisca roja;Red Sandstone
+256;minecraft:red_terracotta;Terracota roja;Red Terracotta
+257;minecraft:red_wool;Lana roja;Red Wool
+258;minecraft:redstone_block;Bloque de redstone;Block of Redstone
+259;minecraft:redstone_lamp;Lámpara de redstone;Redstone Lamp
+260;minecraft:redstone_ore;Mena de redstone;Redstone Ore
+261;minecraft:reinforced_deepslate;Pizarra profunda reforzada;Reinforced Deepslate
+262;minecraft:resin_block;Bloque de resina;Block of Resin
+263;minecraft:resin_bricks;Ladrillos de resina;Resin Bricks
+264;minecraft:respawn_anchor;Nexo de reaparición;Respawn Anchor
+265;minecraft:rooted_dirt;Tierra enraizada;Rooted Dirt
+266;minecraft:sand;Arena;Sand
+267;minecraft:sandstone;Arenisca;Sandstone
+268;minecraft:sculk;Sculk;Sculk
+269;minecraft:sea_lantern;Linterna marina;Sea Lantern
+270;minecraft:shroomlight;Brillongo;Shroomlight
+271;minecraft:smithing_table;Mesa de herrería;Smithing Table
+272;minecraft:smooth_basalt;Basalto liso;Smooth Basalt
+273;minecraft:smooth_quartz;Bloque de cuarzo liso;Smooth Quartz Block
+274;minecraft:smooth_red_sandstone;Arenisca roja lisa;Smooth Red Sandstone
+275;minecraft:smooth_sandstone;Arenisca lisa;Smooth Sandstone
+276;minecraft:smooth_stone;Piedra lisa;Smooth Stone
+277;minecraft:snow_block;Bloque de nieve;Snow Block
+278;minecraft:soul_sand;Arena de almas;Soul Sand
+279;minecraft:soul_soil;Tierra de almas;Soul Soil
+280;minecraft:sponge;Esponja;Sponge
+281;minecraft:spruce_log;Tronco de abeto;Spruce Log
+282;minecraft:spruce_planks;Tablones de abeto;Spruce Planks
+283;minecraft:spruce_wood;Leño de abeto;Spruce Wood
+284;minecraft:stone;Piedra;Stone
+285;minecraft:stone_bricks;Ladrillos de piedra;Stone Bricks
+286;minecraft:stripped_acacia_log;Tronco de acacia sin corteza;Stripped Acacia Log
+287;minecraft:stripped_acacia_wood;Leño de acacia sin corteza;Stripped Acacia Wood
+288;minecraft:stripped_bamboo_block;Bloque de bambú pelado;Block of Stripped Bamboo
+289;minecraft:stripped_birch_log;Tronco de abedul sin corteza;Stripped Birch Log
+290;minecraft:stripped_birch_wood;Leño de abedul sin corteza;Stripped Birch Wood
+291;minecraft:stripped_cherry_log;Tronco de cerezo sin corteza;Stripped Cherry Log
+292;minecraft:stripped_cherry_wood;Leño de cerezo sin corteza;Stripped Cherry Wood
+293;minecraft:stripped_crimson_hyphae;Hifas carmesí peladas;Stripped Crimson Hyphae
+294;minecraft:stripped_crimson_stem;Tallo carmesí pelado;Stripped Crimson Stem
+295;minecraft:stripped_dark_oak_log;Tronco de roble oscuro sin corteza;Stripped Dark Oak Log
+296;minecraft:stripped_dark_oak_wood;Leño de roble oscuro sin corteza;Stripped Dark Oak Wood
+297;minecraft:stripped_jungle_log;Tronco de jungla sin corteza;Stripped Jungle Log
+298;minecraft:stripped_jungle_wood;Leño de jungla sin corteza;Stripped Jungle Wood
+299;minecraft:stripped_mangrove_log;Tronco de mangle sin corteza;Stripped Mangrove Log
+300;minecraft:stripped_mangrove_wood;Leño de mangle sin corteza;Stripped Mangrove Wood
+301;minecraft:stripped_oak_log;Tronco de roble sin corteza;Stripped Oak Log
+302;minecraft:stripped_oak_wood;Leño de roble sin corteza;Stripped Oak Wood
+303;minecraft:stripped_pale_oak_log;Tronco de roble pálido sin corteza;Stripped Pale Oak Log
+304;minecraft:stripped_pale_oak_wood;Leño de roble pálido sin corteza;Stripped Pale Oak Wood
+305;minecraft:stripped_spruce_log;Tronco de abeto sin corteza;Stripped Spruce Log
+306;minecraft:stripped_spruce_wood;Leño de abeto sin corteza;Stripped Spruce Wood
+307;minecraft:stripped_warped_hyphae;Hifas distorsionadas peladas;Stripped Warped Hyphae
+308;minecraft:stripped_warped_stem;Tallo distorsionado pelado;Stripped Warped Stem
+309;minecraft:sulfur;Azufre;Sulfur
+310;minecraft:sulfur_bricks;Ladrillos de azufre;Sulfur Bricks
+311;minecraft:target;Diana;Target
+312;minecraft:terracotta;Terracota;Terracotta
+313;minecraft:tnt;Dinamita;TNT
+314;minecraft:tube_coral_block;Bloque de coral de tubo;Tube Coral Block
+315;minecraft:tuff;Toba;Tuff
+316;minecraft:tuff_bricks;Ladrillos de toba;Tuff Bricks
+317;minecraft:verdant_froglight;Ranaluz verde;Verdant Froglight
+318;minecraft:warped_hyphae;Hifas distorsionadas;Warped Hyphae
+319;minecraft:warped_nylium;Necelio distorsionado;Warped Nylium
+320;minecraft:warped_planks;Tablones distorsionados;Warped Planks
+321;minecraft:warped_stem;Tallo distorsionado;Warped Stem
+322;minecraft:warped_wart_block;Bloque de verrugas distorsionadas;Warped Wart Block
+323;minecraft:weathered_chiseled_copper;Cobre cincelado degradado;Weathered Chiseled Copper
+324;minecraft:weathered_copper;Cobre degradado;Weathered Copper
+325;minecraft:weathered_copper_bulb;Lámpara de cobre degradado;Weathered Copper Bulb
+326;minecraft:weathered_cut_copper;Cobre cortado degradado;Weathered Cut Copper
+327;minecraft:wet_sponge;Esponja mojada;Wet Sponge
+328;minecraft:white_concrete;Hormigón blanco;White Concrete
+329;minecraft:white_concrete_powder;Cemento blanco;White Concrete Powder
+330;minecraft:white_glazed_terracotta;Azulejo blanco;White Glazed Terracotta
+331;minecraft:white_terracotta;Terracota blanca;White Terracotta
+332;minecraft:white_wool;Lana blanca;White Wool
+333;minecraft:yellow_concrete;Hormigón amarillo;Yellow Concrete
+334;minecraft:yellow_concrete_powder;Cemento amarillo;Yellow Concrete Powder
+335;minecraft:yellow_glazed_terracotta;Azulejo amarillo;Yellow Glazed Terracotta
+336;minecraft:yellow_terracotta;Terracota amarilla;Yellow Terracotta
+337;minecraft:yellow_wool;Lana amarilla;Yellow Wool
