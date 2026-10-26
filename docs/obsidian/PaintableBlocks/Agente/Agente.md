@@ -1,0 +1,5 @@
+[[Plan de Fases]]
+[[Arquitectura]]
+[[Criterios de División]]
+[[Decisiones Pendientes]]
+[[Modelos y Texturas]]
