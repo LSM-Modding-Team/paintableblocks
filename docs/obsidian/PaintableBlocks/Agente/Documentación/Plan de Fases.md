@@ -58,3 +58,13 @@ La variedad depende de las dependencias reales: no inventar alternativas disponi
 Cada tarea elegida usa objetivo, dependencias, estado, criterio de cierre, evidencia y opciones desbloqueadas. Registrar por separado implementación y comprobaciones en ejecución. Un script estático no sustituye pruebas dentro del juego.
 
 No compilar ni iniciar Minecraft sin petición expresa. Publicar commits directamente online en `26.2`, nunca mediante commits locales. Los modelos y texturas se siguen por recurso en [[Modelos y Texturas]].
+
+## Primera ejecución: Base del mod
+
+El usuario eligió únicamente **Base del mod**. Se preparó el esqueleto de arranque común/cliente y los contenedores de registro, sin contenido jugable. Se reservaron archivos Java vacíos para los demás frentes; una reserva no cambia su estado a en desarrollo o implementado.
+
+Estado de esta tarea: **implementada como esqueleto**, con revisión estática y compilación/carga en Minecraft pendientes de verificación. La investigación de APIs cubre las mecánicas previstas, sin ejecutarlas ni implementar sus algoritmos.
+
+Evidencia y alcance: [registro de cambios](../../../../../CHANGELOG.md), [mapa del esqueleto](../../../../technical/skeleton.md) e [investigación NeoForge 26.2](../../../../technical/neoforge-26.2.md).
+
+Próximas alternativas elegibles: catálogo/balance, datos de diseño y preparaciones independientes de ítems o recetas con requisitos completos. Las integraciones de geometría, herramientas, pintura e interfaces siguen requiriendo las dependencias de la tabla. No se inició otro frente en esta entrega.
