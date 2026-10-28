@@ -108,3 +108,9 @@ Se conservan las versiones fijadas, se conecta el arranque común a los contened
 Las texturas definitivas de todas las herramientas se generan después de sus funciones. Aquí no se crean modelos, texturas, recetas, catálogo ejecutable ni sistemas de datos. `unpainted.png` no se recrea. Las carpetas vacías no constituyen contenido registrado.
 
 Estado: **esqueleto implementado y revisado estáticamente**. Compilación, arranque de cliente/servidor y comportamiento dentro de Minecraft siguen **sin verificar**. Los commits se crean directamente online en `26.2`, sin commits locales.
+
+## Continuidad: grupo 1
+
+La base descrita arriba es la primera entrega histórica. Posteriormente se preparó el [grupo 1](group1.md), contrastando firmas con el cliente oficial de Minecraft 26.2 leído como ZIP y con fuentes/access transformers de NeoForge 26.2.0.88. No se ejecutó el cliente ni Java.
+
+El cliente oficial consultado tiene SHA-1 `2dc72797acbc1b63fc16a11c4ac393605f453754`. Se revisaron los cambios de `BakedQuad`, materiales, modelos de ítem y contornos/HUD sin portar directamente firmas de versiones anteriores.

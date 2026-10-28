@@ -1,0 +1,2024 @@
+[
+  {
+    "paintId": 1,
+    "blockId": "minecraft:acacia_log",
+    "nameEs": "Tronco de acacia",
+    "nameEn": "Acacia Log"
+  },
+  {
+    "paintId": 2,
+    "blockId": "minecraft:acacia_planks",
+    "nameEs": "Tablones de acacia",
+    "nameEn": "Acacia Planks"
+  },
+  {
+    "paintId": 3,
+    "blockId": "minecraft:acacia_wood",
+    "nameEs": "Leño de acacia",
+    "nameEn": "Acacia Wood"
+  },
+  {
+    "paintId": 4,
+    "blockId": "minecraft:amethyst_block",
+    "nameEs": "Bloque de amatista",
+    "nameEn": "Block of Amethyst"
+  },
+  {
+    "paintId": 5,
+    "blockId": "minecraft:ancient_debris",
+    "nameEs": "Escombros ancestrales",
+    "nameEn": "Ancient Debris"
+  },
+  {
+    "paintId": 6,
+    "blockId": "minecraft:andesite",
+    "nameEs": "Andesita",
+    "nameEn": "Andesite"
+  },
+  {
+    "paintId": 7,
+    "blockId": "minecraft:bamboo_block",
+    "nameEs": "Bloque de bambú",
+    "nameEn": "Block of Bamboo"
+  },
+  {
+    "paintId": 8,
+    "blockId": "minecraft:bamboo_mosaic",
+    "nameEs": "Mosaico de bambú",
+    "nameEn": "Bamboo Mosaic"
+  },
+  {
+    "paintId": 9,
+    "blockId": "minecraft:bamboo_planks",
+    "nameEs": "Tablones de bambú",
+    "nameEn": "Bamboo Planks"
+  },
+  {
+    "paintId": 10,
+    "blockId": "minecraft:basalt",
+    "nameEs": "Basalto",
+    "nameEn": "Basalt"
+  },
+  {
+    "paintId": 11,
+    "blockId": "minecraft:bedrock",
+    "nameEs": "Piedra base",
+    "nameEn": "Bedrock"
+  },
+  {
+    "paintId": 12,
+    "blockId": "minecraft:birch_log",
+    "nameEs": "Tronco de abedul",
+    "nameEn": "Birch Log"
+  },
+  {
+    "paintId": 13,
+    "blockId": "minecraft:birch_planks",
+    "nameEs": "Tablones de abedul",
+    "nameEn": "Birch Planks"
+  },
+  {
+    "paintId": 14,
+    "blockId": "minecraft:birch_wood",
+    "nameEs": "Leño de abedul",
+    "nameEn": "Birch Wood"
+  },
+  {
+    "paintId": 15,
+    "blockId": "minecraft:black_concrete",
+    "nameEs": "Hormigón negro",
+    "nameEn": "Black Concrete"
+  },
+  {
+    "paintId": 16,
+    "blockId": "minecraft:black_concrete_powder",
+    "nameEs": "Cemento negro",
+    "nameEn": "Black Concrete Powder"
+  },
+  {
+    "paintId": 17,
+    "blockId": "minecraft:black_glazed_terracotta",
+    "nameEs": "Azulejo negro",
+    "nameEn": "Black Glazed Terracotta"
+  },
+  {
+    "paintId": 18,
+    "blockId": "minecraft:black_terracotta",
+    "nameEs": "Terracota negra",
+    "nameEn": "Black Terracotta"
+  },
+  {
+    "paintId": 19,
+    "blockId": "minecraft:black_wool",
+    "nameEs": "Lana negra",
+    "nameEn": "Black Wool"
+  },
+  {
+    "paintId": 20,
+    "blockId": "minecraft:blackstone",
+    "nameEs": "Piedra negra",
+    "nameEn": "Blackstone"
+  },
+  {
+    "paintId": 21,
+    "blockId": "minecraft:blue_concrete",
+    "nameEs": "Hormigón azul",
+    "nameEn": "Blue Concrete"
+  },
+  {
+    "paintId": 22,
+    "blockId": "minecraft:blue_concrete_powder",
+    "nameEs": "Cemento azul",
+    "nameEn": "Blue Concrete Powder"
+  },
+  {
+    "paintId": 23,
+    "blockId": "minecraft:blue_glazed_terracotta",
+    "nameEs": "Azulejo azul",
+    "nameEn": "Blue Glazed Terracotta"
+  },
+  {
+    "paintId": 24,
+    "blockId": "minecraft:blue_ice",
+    "nameEs": "Hielo azul",
+    "nameEn": "Blue Ice"
+  },
+  {
+    "paintId": 25,
+    "blockId": "minecraft:blue_terracotta",
+    "nameEs": "Terracota azul",
+    "nameEn": "Blue Terracotta"
+  },
+  {
+    "paintId": 26,
+    "blockId": "minecraft:blue_wool",
+    "nameEs": "Lana azul",
+    "nameEn": "Blue Wool"
+  },
+  {
+    "paintId": 27,
+    "blockId": "minecraft:bone_block",
+    "nameEs": "Bloque de huesos",
+    "nameEn": "Bone Block"
+  },
+  {
+    "paintId": 28,
+    "blockId": "minecraft:bookshelf",
+    "nameEs": "Librería",
+    "nameEn": "Bookshelf"
+  },
+  {
+    "paintId": 29,
+    "blockId": "minecraft:brain_coral_block",
+    "nameEs": "Bloque de coral de cerebro",
+    "nameEn": "Brain Coral Block"
+  },
+  {
+    "paintId": 30,
+    "blockId": "minecraft:bricks",
+    "nameEs": "Ladrillos",
+    "nameEn": "Bricks"
+  },
+  {
+    "paintId": 31,
+    "blockId": "minecraft:brown_concrete",
+    "nameEs": "Hormigón marrón",
+    "nameEn": "Brown Concrete"
+  },
+  {
+    "paintId": 32,
+    "blockId": "minecraft:brown_concrete_powder",
+    "nameEs": "Cemento marrón",
+    "nameEn": "Brown Concrete Powder"
+  },
+  {
+    "paintId": 33,
+    "blockId": "minecraft:brown_glazed_terracotta",
+    "nameEs": "Azulejo marrón",
+    "nameEn": "Brown Glazed Terracotta"
+  },
+  {
+    "paintId": 34,
+    "blockId": "minecraft:brown_mushroom_block",
+    "nameEs": "Bloque de champiñón marrón",
+    "nameEn": "Brown Mushroom Block"
+  },
+  {
+    "paintId": 35,
+    "blockId": "minecraft:brown_terracotta",
+    "nameEs": "Terracota marrón",
+    "nameEn": "Brown Terracotta"
+  },
+  {
+    "paintId": 36,
+    "blockId": "minecraft:brown_wool",
+    "nameEs": "Lana marrón",
+    "nameEn": "Brown Wool"
+  },
+  {
+    "paintId": 37,
+    "blockId": "minecraft:bubble_coral_block",
+    "nameEs": "Bloque de coral de burbuja",
+    "nameEn": "Bubble Coral Block"
+  },
+  {
+    "paintId": 38,
+    "blockId": "minecraft:budding_amethyst",
+    "nameEs": "Brotador de amatista",
+    "nameEn": "Budding Amethyst"
+  },
+  {
+    "paintId": 39,
+    "blockId": "minecraft:calcite",
+    "nameEs": "Calcita",
+    "nameEn": "Calcite"
+  },
+  {
+    "paintId": 40,
+    "blockId": "minecraft:cartography_table",
+    "nameEs": "Mesa de cartografía",
+    "nameEn": "Cartography Table"
+  },
+  {
+    "paintId": 41,
+    "blockId": "minecraft:carved_pumpkin",
+    "nameEs": "Calabaza tallada",
+    "nameEn": "Carved Pumpkin"
+  },
+  {
+    "paintId": 42,
+    "blockId": "minecraft:cherry_log",
+    "nameEs": "Tronco de cerezo",
+    "nameEn": "Cherry Log"
+  },
+  {
+    "paintId": 43,
+    "blockId": "minecraft:cherry_planks",
+    "nameEs": "Tablones de cerezo",
+    "nameEn": "Cherry Planks"
+  },
+  {
+    "paintId": 44,
+    "blockId": "minecraft:cherry_wood",
+    "nameEs": "Leño de cerezo",
+    "nameEn": "Cherry Wood"
+  },
+  {
+    "paintId": 45,
+    "blockId": "minecraft:chiseled_cinnabar",
+    "nameEs": "Cinabrio cincelado",
+    "nameEn": "Chiseled Cinnabar"
+  },
+  {
+    "paintId": 46,
+    "blockId": "minecraft:chiseled_copper",
+    "nameEs": "Cobre cincelado",
+    "nameEn": "Chiseled Copper"
+  },
+  {
+    "paintId": 47,
+    "blockId": "minecraft:chiseled_deepslate",
+    "nameEs": "Pizarra profunda cincelada",
+    "nameEn": "Chiseled Deepslate"
+  },
+  {
+    "paintId": 48,
+    "blockId": "minecraft:chiseled_nether_bricks",
+    "nameEs": "Ladrillos del Nether cincelados",
+    "nameEn": "Chiseled Nether Bricks"
+  },
+  {
+    "paintId": 49,
+    "blockId": "minecraft:chiseled_polished_blackstone",
+    "nameEs": "Piedra negra pulida cincelada",
+    "nameEn": "Chiseled Polished Blackstone"
+  },
+  {
+    "paintId": 50,
+    "blockId": "minecraft:chiseled_quartz_block",
+    "nameEs": "Cuarzo cincelado",
+    "nameEn": "Chiseled Quartz Block"
+  },
+  {
+    "paintId": 51,
+    "blockId": "minecraft:chiseled_red_sandstone",
+    "nameEs": "Arenisca roja cincelada",
+    "nameEn": "Chiseled Red Sandstone"
+  },
+  {
+    "paintId": 52,
+    "blockId": "minecraft:chiseled_resin_bricks",
+    "nameEs": "Ladrillos de resina cincelados",
+    "nameEn": "Chiseled Resin Bricks"
+  },
+  {
+    "paintId": 53,
+    "blockId": "minecraft:chiseled_sandstone",
+    "nameEs": "Arenisca cincelada",
+    "nameEn": "Chiseled Sandstone"
+  },
+  {
+    "paintId": 54,
+    "blockId": "minecraft:chiseled_stone_bricks",
+    "nameEs": "Ladrillos de piedra cincelados",
+    "nameEn": "Chiseled Stone Bricks"
+  },
+  {
+    "paintId": 55,
+    "blockId": "minecraft:chiseled_sulfur",
+    "nameEs": "Azufre cincelado",
+    "nameEn": "Chiseled Sulfur"
+  },
+  {
+    "paintId": 56,
+    "blockId": "minecraft:chiseled_tuff",
+    "nameEs": "Toba cincelada",
+    "nameEn": "Chiseled Tuff"
+  },
+  {
+    "paintId": 57,
+    "blockId": "minecraft:chiseled_tuff_bricks",
+    "nameEs": "Ladrillos de toba cincelados",
+    "nameEn": "Chiseled Tuff Bricks"
+  },
+  {
+    "paintId": 58,
+    "blockId": "minecraft:cinnabar",
+    "nameEs": "Cinabrio",
+    "nameEn": "Cinnabar"
+  },
+  {
+    "paintId": 59,
+    "blockId": "minecraft:cinnabar_bricks",
+    "nameEs": "Ladrillos de cinabrio",
+    "nameEn": "Cinnabar Bricks"
+  },
+  {
+    "paintId": 60,
+    "blockId": "minecraft:clay",
+    "nameEs": "Bloque de arcilla",
+    "nameEn": "Clay"
+  },
+  {
+    "paintId": 61,
+    "blockId": "minecraft:coal_block",
+    "nameEs": "Bloque de carbón",
+    "nameEn": "Block of Coal"
+  },
+  {
+    "paintId": 62,
+    "blockId": "minecraft:coal_ore",
+    "nameEs": "Mena de carbón",
+    "nameEn": "Coal Ore"
+  },
+  {
+    "paintId": 63,
+    "blockId": "minecraft:coarse_dirt",
+    "nameEs": "Tierra estéril",
+    "nameEn": "Coarse Dirt"
+  },
+  {
+    "paintId": 64,
+    "blockId": "minecraft:cobbled_deepslate",
+    "nameEs": "Pizarra profunda rocosa",
+    "nameEn": "Cobbled Deepslate"
+  },
+  {
+    "paintId": 65,
+    "blockId": "minecraft:cobblestone",
+    "nameEs": "Roca",
+    "nameEn": "Cobblestone"
+  },
+  {
+    "paintId": 66,
+    "blockId": "minecraft:copper_block",
+    "nameEs": "Bloque de cobre",
+    "nameEn": "Block of Copper"
+  },
+  {
+    "paintId": 67,
+    "blockId": "minecraft:copper_bulb",
+    "nameEs": "Lámpara de cobre",
+    "nameEn": "Copper Bulb"
+  },
+  {
+    "paintId": 68,
+    "blockId": "minecraft:copper_ore",
+    "nameEs": "Mena de cobre",
+    "nameEn": "Copper Ore"
+  },
+  {
+    "paintId": 69,
+    "blockId": "minecraft:cracked_deepslate_bricks",
+    "nameEs": "Ladrillos de pizarra profunda agrietados",
+    "nameEn": "Cracked Deepslate Bricks"
+  },
+  {
+    "paintId": 70,
+    "blockId": "minecraft:cracked_deepslate_tiles",
+    "nameEs": "Baldosas de pizarra profunda agrietadas",
+    "nameEn": "Cracked Deepslate Tiles"
+  },
+  {
+    "paintId": 71,
+    "blockId": "minecraft:cracked_nether_bricks",
+    "nameEs": "Ladrillos del Nether agrietados",
+    "nameEn": "Cracked Nether Bricks"
+  },
+  {
+    "paintId": 72,
+    "blockId": "minecraft:cracked_polished_blackstone_bricks",
+    "nameEs": "Ladrillos de piedra negra pulida agrietados",
+    "nameEn": "Cracked Polished Blackstone Bricks"
+  },
+  {
+    "paintId": 73,
+    "blockId": "minecraft:cracked_stone_bricks",
+    "nameEs": "Ladrillos de piedra agrietados",
+    "nameEn": "Cracked Stone Bricks"
+  },
+  {
+    "paintId": 74,
+    "blockId": "minecraft:crafting_table",
+    "nameEs": "Mesa de trabajo",
+    "nameEn": "Crafting Table"
+  },
+  {
+    "paintId": 75,
+    "blockId": "minecraft:crimson_hyphae",
+    "nameEs": "Hifas carmesí",
+    "nameEn": "Crimson Hyphae"
+  },
+  {
+    "paintId": 76,
+    "blockId": "minecraft:crimson_nylium",
+    "nameEs": "Necelio carmesí",
+    "nameEn": "Crimson Nylium"
+  },
+  {
+    "paintId": 77,
+    "blockId": "minecraft:crimson_planks",
+    "nameEs": "Tablones carmesí",
+    "nameEn": "Crimson Planks"
+  },
+  {
+    "paintId": 78,
+    "blockId": "minecraft:crimson_stem",
+    "nameEs": "Tallo carmesí",
+    "nameEn": "Crimson Stem"
+  },
+  {
+    "paintId": 79,
+    "blockId": "minecraft:crying_obsidian",
+    "nameEs": "Obsidiana llorosa",
+    "nameEn": "Crying Obsidian"
+  },
+  {
+    "paintId": 80,
+    "blockId": "minecraft:cut_copper",
+    "nameEs": "Cobre cortado",
+    "nameEn": "Cut Copper"
+  },
+  {
+    "paintId": 81,
+    "blockId": "minecraft:cut_red_sandstone",
+    "nameEs": "Arenisca roja cortada",
+    "nameEn": "Cut Red Sandstone"
+  },
+  {
+    "paintId": 82,
+    "blockId": "minecraft:cut_sandstone",
+    "nameEs": "Arenisca cortada",
+    "nameEn": "Cut Sandstone"
+  },
+  {
+    "paintId": 83,
+    "blockId": "minecraft:cyan_concrete",
+    "nameEs": "Hormigón cian",
+    "nameEn": "Cyan Concrete"
+  },
+  {
+    "paintId": 84,
+    "blockId": "minecraft:cyan_concrete_powder",
+    "nameEs": "Cemento cian",
+    "nameEn": "Cyan Concrete Powder"
+  },
+  {
+    "paintId": 85,
+    "blockId": "minecraft:cyan_glazed_terracotta",
+    "nameEs": "Azulejo cian",
+    "nameEn": "Cyan Glazed Terracotta"
+  },
+  {
+    "paintId": 86,
+    "blockId": "minecraft:cyan_terracotta",
+    "nameEs": "Terracota cian",
+    "nameEn": "Cyan Terracotta"
+  },
+  {
+    "paintId": 87,
+    "blockId": "minecraft:cyan_wool",
+    "nameEs": "Lana cian",
+    "nameEn": "Cyan Wool"
+  },
+  {
+    "paintId": 88,
+    "blockId": "minecraft:dark_oak_log",
+    "nameEs": "Tronco de roble oscuro",
+    "nameEn": "Dark Oak Log"
+  },
+  {
+    "paintId": 89,
+    "blockId": "minecraft:dark_oak_planks",
+    "nameEs": "Tablones de roble oscuro",
+    "nameEn": "Dark Oak Planks"
+  },
+  {
+    "paintId": 90,
+    "blockId": "minecraft:dark_oak_wood",
+    "nameEs": "Leño de roble oscuro",
+    "nameEn": "Dark Oak Wood"
+  },
+  {
+    "paintId": 91,
+    "blockId": "minecraft:dark_prismarine",
+    "nameEs": "Prismarina oscura",
+    "nameEn": "Dark Prismarine"
+  },
+  {
+    "paintId": 92,
+    "blockId": "minecraft:dead_brain_coral_block",
+    "nameEs": "Bloque de coral de cerebro muerto",
+    "nameEn": "Dead Brain Coral Block"
+  },
+  {
+    "paintId": 93,
+    "blockId": "minecraft:dead_bubble_coral_block",
+    "nameEs": "Bloque de coral de burbuja muerto",
+    "nameEn": "Dead Bubble Coral Block"
+  },
+  {
+    "paintId": 94,
+    "blockId": "minecraft:dead_fire_coral_block",
+    "nameEs": "Bloque de coral de fuego muerto",
+    "nameEn": "Dead Fire Coral Block"
+  },
+  {
+    "paintId": 95,
+    "blockId": "minecraft:dead_horn_coral_block",
+    "nameEs": "Bloque de coral de cuerno muerto",
+    "nameEn": "Dead Horn Coral Block"
+  },
+  {
+    "paintId": 96,
+    "blockId": "minecraft:dead_tube_coral_block",
+    "nameEs": "Bloque de coral de tubo muerto",
+    "nameEn": "Dead Tube Coral Block"
+  },
+  {
+    "paintId": 97,
+    "blockId": "minecraft:deepslate",
+    "nameEs": "Pizarra profunda",
+    "nameEn": "Deepslate"
+  },
+  {
+    "paintId": 98,
+    "blockId": "minecraft:deepslate_bricks",
+    "nameEs": "Ladrillos de pizarra profunda",
+    "nameEn": "Deepslate Bricks"
+  },
+  {
+    "paintId": 99,
+    "blockId": "minecraft:deepslate_coal_ore",
+    "nameEs": "Mena de carbón de pizarra profunda",
+    "nameEn": "Deepslate Coal Ore"
+  },
+  {
+    "paintId": 100,
+    "blockId": "minecraft:deepslate_copper_ore",
+    "nameEs": "Mena de cobre de pizarra profunda",
+    "nameEn": "Deepslate Copper Ore"
+  },
+  {
+    "paintId": 101,
+    "blockId": "minecraft:deepslate_diamond_ore",
+    "nameEs": "Mena de diamante de pizarra profunda",
+    "nameEn": "Deepslate Diamond Ore"
+  },
+  {
+    "paintId": 102,
+    "blockId": "minecraft:deepslate_emerald_ore",
+    "nameEs": "Mena de esmeralda de pizarra profunda",
+    "nameEn": "Deepslate Emerald Ore"
+  },
+  {
+    "paintId": 103,
+    "blockId": "minecraft:deepslate_gold_ore",
+    "nameEs": "Mena de oro de pizarra profunda",
+    "nameEn": "Deepslate Gold Ore"
+  },
+  {
+    "paintId": 104,
+    "blockId": "minecraft:deepslate_iron_ore",
+    "nameEs": "Mena de hierro de pizarra profunda",
+    "nameEn": "Deepslate Iron Ore"
+  },
+  {
+    "paintId": 105,
+    "blockId": "minecraft:deepslate_lapis_ore",
+    "nameEs": "Mena de lapislázuli de pizarra profunda",
+    "nameEn": "Deepslate Lapis Lazuli Ore"
+  },
+  {
+    "paintId": 106,
+    "blockId": "minecraft:deepslate_redstone_ore",
+    "nameEs": "Mena de redstone de pizarra profunda",
+    "nameEn": "Deepslate Redstone Ore"
+  },
+  {
+    "paintId": 107,
+    "blockId": "minecraft:deepslate_tiles",
+    "nameEs": "Baldosas de pizarra profunda",
+    "nameEn": "Deepslate Tiles"
+  },
+  {
+    "paintId": 108,
+    "blockId": "minecraft:diamond_block",
+    "nameEs": "Bloque de diamante",
+    "nameEn": "Block of Diamond"
+  },
+  {
+    "paintId": 109,
+    "blockId": "minecraft:diamond_ore",
+    "nameEs": "Mena de diamante",
+    "nameEn": "Diamond Ore"
+  },
+  {
+    "paintId": 110,
+    "blockId": "minecraft:diorite",
+    "nameEs": "Diorita",
+    "nameEn": "Diorite"
+  },
+  {
+    "paintId": 111,
+    "blockId": "minecraft:dirt",
+    "nameEs": "Tierra",
+    "nameEn": "Dirt"
+  },
+  {
+    "paintId": 112,
+    "blockId": "minecraft:dried_kelp_block",
+    "nameEs": "Bloque de algas secas",
+    "nameEn": "Dried Kelp Block"
+  },
+  {
+    "paintId": 113,
+    "blockId": "minecraft:dripstone_block",
+    "nameEs": "Bloque de caliza",
+    "nameEn": "Dripstone Block"
+  },
+  {
+    "paintId": 114,
+    "blockId": "minecraft:emerald_block",
+    "nameEs": "Bloque de esmeralda",
+    "nameEn": "Block of Emerald"
+  },
+  {
+    "paintId": 115,
+    "blockId": "minecraft:emerald_ore",
+    "nameEs": "Mena de esmeralda",
+    "nameEn": "Emerald Ore"
+  },
+  {
+    "paintId": 116,
+    "blockId": "minecraft:end_stone",
+    "nameEs": "Piedra del End",
+    "nameEn": "End Stone"
+  },
+  {
+    "paintId": 117,
+    "blockId": "minecraft:end_stone_bricks",
+    "nameEs": "Ladrillos de piedra del End",
+    "nameEn": "End Stone Bricks"
+  },
+  {
+    "paintId": 118,
+    "blockId": "minecraft:exposed_chiseled_copper",
+    "nameEs": "Cobre cincelado expuesto",
+    "nameEn": "Exposed Chiseled Copper"
+  },
+  {
+    "paintId": 119,
+    "blockId": "minecraft:exposed_copper",
+    "nameEs": "Cobre expuesto",
+    "nameEn": "Exposed Copper"
+  },
+  {
+    "paintId": 120,
+    "blockId": "minecraft:exposed_copper_bulb",
+    "nameEs": "Lámpara de cobre expuesto",
+    "nameEn": "Exposed Copper Bulb"
+  },
+  {
+    "paintId": 121,
+    "blockId": "minecraft:exposed_cut_copper",
+    "nameEs": "Cobre cortado expuesto",
+    "nameEn": "Exposed Cut Copper"
+  },
+  {
+    "paintId": 122,
+    "blockId": "minecraft:fire_coral_block",
+    "nameEs": "Bloque de coral de fuego",
+    "nameEn": "Fire Coral Block"
+  },
+  {
+    "paintId": 123,
+    "blockId": "minecraft:fletching_table",
+    "nameEs": "Mesa de flechas",
+    "nameEn": "Fletching Table"
+  },
+  {
+    "paintId": 124,
+    "blockId": "minecraft:gilded_blackstone",
+    "nameEs": "Piedra negra áurea",
+    "nameEn": "Gilded Blackstone"
+  },
+  {
+    "paintId": 125,
+    "blockId": "minecraft:glowstone",
+    "nameEs": "Piedra luminosa",
+    "nameEn": "Glowstone"
+  },
+  {
+    "paintId": 126,
+    "blockId": "minecraft:gold_block",
+    "nameEs": "Bloque de oro",
+    "nameEn": "Block of Gold"
+  },
+  {
+    "paintId": 127,
+    "blockId": "minecraft:gold_ore",
+    "nameEs": "Mena de oro",
+    "nameEn": "Gold Ore"
+  },
+  {
+    "paintId": 128,
+    "blockId": "minecraft:granite",
+    "nameEs": "Granito",
+    "nameEn": "Granite"
+  },
+  {
+    "paintId": 129,
+    "blockId": "minecraft:grass_block",
+    "nameEs": "Césped",
+    "nameEn": "Grass Block"
+  },
+  {
+    "paintId": 130,
+    "blockId": "minecraft:gravel",
+    "nameEs": "Grava",
+    "nameEn": "Gravel"
+  },
+  {
+    "paintId": 131,
+    "blockId": "minecraft:gray_concrete",
+    "nameEs": "Hormigón gris",
+    "nameEn": "Gray Concrete"
+  },
+  {
+    "paintId": 132,
+    "blockId": "minecraft:gray_concrete_powder",
+    "nameEs": "Cemento gris",
+    "nameEn": "Gray Concrete Powder"
+  },
+  {
+    "paintId": 133,
+    "blockId": "minecraft:gray_glazed_terracotta",
+    "nameEs": "Azulejo gris",
+    "nameEn": "Gray Glazed Terracotta"
+  },
+  {
+    "paintId": 134,
+    "blockId": "minecraft:gray_terracotta",
+    "nameEs": "Terracota gris",
+    "nameEn": "Gray Terracotta"
+  },
+  {
+    "paintId": 135,
+    "blockId": "minecraft:gray_wool",
+    "nameEs": "Lana gris",
+    "nameEn": "Gray Wool"
+  },
+  {
+    "paintId": 136,
+    "blockId": "minecraft:green_concrete",
+    "nameEs": "Hormigón verde",
+    "nameEn": "Green Concrete"
+  },
+  {
+    "paintId": 137,
+    "blockId": "minecraft:green_concrete_powder",
+    "nameEs": "Cemento verde",
+    "nameEn": "Green Concrete Powder"
+  },
+  {
+    "paintId": 138,
+    "blockId": "minecraft:green_glazed_terracotta",
+    "nameEs": "Azulejo verde",
+    "nameEn": "Green Glazed Terracotta"
+  },
+  {
+    "paintId": 139,
+    "blockId": "minecraft:green_terracotta",
+    "nameEs": "Terracota verde",
+    "nameEn": "Green Terracotta"
+  },
+  {
+    "paintId": 140,
+    "blockId": "minecraft:green_wool",
+    "nameEs": "Lana verde",
+    "nameEn": "Green Wool"
+  },
+  {
+    "paintId": 141,
+    "blockId": "minecraft:hay_block",
+    "nameEs": "Bala de heno",
+    "nameEn": "Hay Bale"
+  },
+  {
+    "paintId": 142,
+    "blockId": "minecraft:honeycomb_block",
+    "nameEs": "Bloque de panal",
+    "nameEn": "Honeycomb Block"
+  },
+  {
+    "paintId": 143,
+    "blockId": "minecraft:horn_coral_block",
+    "nameEs": "Bloque de coral de cuerno",
+    "nameEn": "Horn Coral Block"
+  },
+  {
+    "paintId": 144,
+    "blockId": "minecraft:iron_block",
+    "nameEs": "Bloque de hierro",
+    "nameEn": "Block of Iron"
+  },
+  {
+    "paintId": 145,
+    "blockId": "minecraft:iron_ore",
+    "nameEs": "Mena de hierro",
+    "nameEn": "Iron Ore"
+  },
+  {
+    "paintId": 146,
+    "blockId": "minecraft:jack_o_lantern",
+    "nameEs": "Calabaza de Halloween",
+    "nameEn": "Jack o'Lantern"
+  },
+  {
+    "paintId": 147,
+    "blockId": "minecraft:jungle_log",
+    "nameEs": "Tronco de jungla",
+    "nameEn": "Jungle Log"
+  },
+  {
+    "paintId": 148,
+    "blockId": "minecraft:jungle_planks",
+    "nameEs": "Tablones de jungla",
+    "nameEn": "Jungle Planks"
+  },
+  {
+    "paintId": 149,
+    "blockId": "minecraft:jungle_wood",
+    "nameEs": "Leño de jungla",
+    "nameEn": "Jungle Wood"
+  },
+  {
+    "paintId": 150,
+    "blockId": "minecraft:lapis_block",
+    "nameEs": "Bloque de lapislázuli",
+    "nameEn": "Block of Lapis Lazuli"
+  },
+  {
+    "paintId": 151,
+    "blockId": "minecraft:lapis_ore",
+    "nameEs": "Mena de lapislázuli",
+    "nameEn": "Lapis Lazuli Ore"
+  },
+  {
+    "paintId": 152,
+    "blockId": "minecraft:light_blue_concrete",
+    "nameEs": "Hormigón azul claro",
+    "nameEn": "Light Blue Concrete"
+  },
+  {
+    "paintId": 153,
+    "blockId": "minecraft:light_blue_concrete_powder",
+    "nameEs": "Cemento azul claro",
+    "nameEn": "Light Blue Concrete Powder"
+  },
+  {
+    "paintId": 154,
+    "blockId": "minecraft:light_blue_glazed_terracotta",
+    "nameEs": "Azulejo azul claro",
+    "nameEn": "Light Blue Glazed Terracotta"
+  },
+  {
+    "paintId": 155,
+    "blockId": "minecraft:light_blue_terracotta",
+    "nameEs": "Terracota azul claro",
+    "nameEn": "Light Blue Terracotta"
+  },
+  {
+    "paintId": 156,
+    "blockId": "minecraft:light_blue_wool",
+    "nameEs": "Lana azul claro",
+    "nameEn": "Light Blue Wool"
+  },
+  {
+    "paintId": 157,
+    "blockId": "minecraft:light_gray_concrete",
+    "nameEs": "Hormigón gris claro",
+    "nameEn": "Light Gray Concrete"
+  },
+  {
+    "paintId": 158,
+    "blockId": "minecraft:light_gray_concrete_powder",
+    "nameEs": "Cemento gris claro",
+    "nameEn": "Light Gray Concrete Powder"
+  },
+  {
+    "paintId": 159,
+    "blockId": "minecraft:light_gray_glazed_terracotta",
+    "nameEs": "Azulejo gris claro",
+    "nameEn": "Light Gray Glazed Terracotta"
+  },
+  {
+    "paintId": 160,
+    "blockId": "minecraft:light_gray_terracotta",
+    "nameEs": "Terracota gris claro",
+    "nameEn": "Light Gray Terracotta"
+  },
+  {
+    "paintId": 161,
+    "blockId": "minecraft:light_gray_wool",
+    "nameEs": "Lana gris claro",
+    "nameEn": "Light Gray Wool"
+  },
+  {
+    "paintId": 162,
+    "blockId": "minecraft:lime_concrete",
+    "nameEs": "Hormigón verde lima",
+    "nameEn": "Lime Concrete"
+  },
+  {
+    "paintId": 163,
+    "blockId": "minecraft:lime_concrete_powder",
+    "nameEs": "Cemento verde lima",
+    "nameEn": "Lime Concrete Powder"
+  },
+  {
+    "paintId": 164,
+    "blockId": "minecraft:lime_glazed_terracotta",
+    "nameEs": "Azulejo verde lima",
+    "nameEn": "Lime Glazed Terracotta"
+  },
+  {
+    "paintId": 165,
+    "blockId": "minecraft:lime_terracotta",
+    "nameEs": "Terracota verde lima",
+    "nameEn": "Lime Terracotta"
+  },
+  {
+    "paintId": 166,
+    "blockId": "minecraft:lime_wool",
+    "nameEs": "Lana verde lima",
+    "nameEn": "Lime Wool"
+  },
+  {
+    "paintId": 167,
+    "blockId": "minecraft:lodestone",
+    "nameEs": "Magnetita",
+    "nameEn": "Lodestone"
+  },
+  {
+    "paintId": 168,
+    "blockId": "minecraft:loom",
+    "nameEs": "Telar",
+    "nameEn": "Loom"
+  },
+  {
+    "paintId": 169,
+    "blockId": "minecraft:magenta_concrete",
+    "nameEs": "Hormigón magenta",
+    "nameEn": "Magenta Concrete"
+  },
+  {
+    "paintId": 170,
+    "blockId": "minecraft:magenta_concrete_powder",
+    "nameEs": "Cemento magenta",
+    "nameEn": "Magenta Concrete Powder"
+  },
+  {
+    "paintId": 171,
+    "blockId": "minecraft:magenta_glazed_terracotta",
+    "nameEs": "Azulejo magenta",
+    "nameEn": "Magenta Glazed Terracotta"
+  },
+  {
+    "paintId": 172,
+    "blockId": "minecraft:magenta_terracotta",
+    "nameEs": "Terracota magenta",
+    "nameEn": "Magenta Terracotta"
+  },
+  {
+    "paintId": 173,
+    "blockId": "minecraft:magenta_wool",
+    "nameEs": "Lana magenta",
+    "nameEn": "Magenta Wool"
+  },
+  {
+    "paintId": 174,
+    "blockId": "minecraft:magma_block",
+    "nameEs": "Bloque de magma",
+    "nameEn": "Magma Block"
+  },
+  {
+    "paintId": 175,
+    "blockId": "minecraft:mangrove_log",
+    "nameEs": "Tronco de mangle",
+    "nameEn": "Mangrove Log"
+  },
+  {
+    "paintId": 176,
+    "blockId": "minecraft:mangrove_planks",
+    "nameEs": "Tablones de mangle",
+    "nameEn": "Mangrove Planks"
+  },
+  {
+    "paintId": 177,
+    "blockId": "minecraft:mangrove_wood",
+    "nameEs": "Leño de mangle",
+    "nameEn": "Mangrove Wood"
+  },
+  {
+    "paintId": 178,
+    "blockId": "minecraft:melon",
+    "nameEs": "Sandía",
+    "nameEn": "Melon"
+  },
+  {
+    "paintId": 179,
+    "blockId": "minecraft:moss_block",
+    "nameEs": "Bloque de musgo",
+    "nameEn": "Moss Block"
+  },
+  {
+    "paintId": 180,
+    "blockId": "minecraft:mossy_cobblestone",
+    "nameEs": "Roca musgosa",
+    "nameEn": "Mossy Cobblestone"
+  },
+  {
+    "paintId": 181,
+    "blockId": "minecraft:mossy_stone_bricks",
+    "nameEs": "Ladrillos de piedra musgosos",
+    "nameEn": "Mossy Stone Bricks"
+  },
+  {
+    "paintId": 182,
+    "blockId": "minecraft:mud",
+    "nameEs": "Barro",
+    "nameEn": "Mud"
+  },
+  {
+    "paintId": 183,
+    "blockId": "minecraft:mud_bricks",
+    "nameEs": "Ladrillos de adobe",
+    "nameEn": "Mud Bricks"
+  },
+  {
+    "paintId": 184,
+    "blockId": "minecraft:muddy_mangrove_roots",
+    "nameEs": "Raíces de mangle embarradas",
+    "nameEn": "Muddy Mangrove Roots"
+  },
+  {
+    "paintId": 185,
+    "blockId": "minecraft:mushroom_stem",
+    "nameEs": "Tallo de champiñón",
+    "nameEn": "Mushroom Stem"
+  },
+  {
+    "paintId": 186,
+    "blockId": "minecraft:mycelium",
+    "nameEs": "Micelio",
+    "nameEn": "Mycelium"
+  },
+  {
+    "paintId": 187,
+    "blockId": "minecraft:nether_bricks",
+    "nameEs": "Ladrillos del Nether",
+    "nameEn": "Nether Bricks"
+  },
+  {
+    "paintId": 188,
+    "blockId": "minecraft:nether_gold_ore",
+    "nameEs": "Mena de oro del Nether",
+    "nameEn": "Nether Gold Ore"
+  },
+  {
+    "paintId": 189,
+    "blockId": "minecraft:nether_quartz_ore",
+    "nameEs": "Mena de cuarzo del Nether",
+    "nameEn": "Nether Quartz Ore"
+  },
+  {
+    "paintId": 190,
+    "blockId": "minecraft:nether_wart_block",
+    "nameEs": "Bloque de verrugas del Nether",
+    "nameEn": "Nether Wart Block"
+  },
+  {
+    "paintId": 191,
+    "blockId": "minecraft:netherite_block",
+    "nameEs": "Bloque de netherita",
+    "nameEn": "Block of Netherite"
+  },
+  {
+    "paintId": 192,
+    "blockId": "minecraft:netherrack",
+    "nameEs": "Netherrack",
+    "nameEn": "Netherrack"
+  },
+  {
+    "paintId": 193,
+    "blockId": "minecraft:note_block",
+    "nameEs": "Bloque musical",
+    "nameEn": "Note Block"
+  },
+  {
+    "paintId": 194,
+    "blockId": "minecraft:oak_log",
+    "nameEs": "Tronco de roble",
+    "nameEn": "Oak Log"
+  },
+  {
+    "paintId": 195,
+    "blockId": "minecraft:oak_planks",
+    "nameEs": "Tablones de roble",
+    "nameEn": "Oak Planks"
+  },
+  {
+    "paintId": 196,
+    "blockId": "minecraft:oak_wood",
+    "nameEs": "Leño de roble",
+    "nameEn": "Oak Wood"
+  },
+  {
+    "paintId": 197,
+    "blockId": "minecraft:observer",
+    "nameEs": "Observador",
+    "nameEn": "Observer"
+  },
+  {
+    "paintId": 198,
+    "blockId": "minecraft:obsidian",
+    "nameEs": "Obsidiana",
+    "nameEn": "Obsidian"
+  },
+  {
+    "paintId": 199,
+    "blockId": "minecraft:ochre_froglight",
+    "nameEs": "Ranaluz ocre",
+    "nameEn": "Ochre Froglight"
+  },
+  {
+    "paintId": 200,
+    "blockId": "minecraft:orange_concrete",
+    "nameEs": "Hormigón naranja",
+    "nameEn": "Orange Concrete"
+  },
+  {
+    "paintId": 201,
+    "blockId": "minecraft:orange_concrete_powder",
+    "nameEs": "Cemento naranja",
+    "nameEn": "Orange Concrete Powder"
+  },
+  {
+    "paintId": 202,
+    "blockId": "minecraft:orange_glazed_terracotta",
+    "nameEs": "Azulejo naranja",
+    "nameEn": "Orange Glazed Terracotta"
+  },
+  {
+    "paintId": 203,
+    "blockId": "minecraft:orange_terracotta",
+    "nameEs": "Terracota naranja",
+    "nameEn": "Orange Terracotta"
+  },
+  {
+    "paintId": 204,
+    "blockId": "minecraft:orange_wool",
+    "nameEs": "Lana naranja",
+    "nameEn": "Orange Wool"
+  },
+  {
+    "paintId": 205,
+    "blockId": "minecraft:oxidized_chiseled_copper",
+    "nameEs": "Cobre cincelado oxidado",
+    "nameEn": "Oxidized Chiseled Copper"
+  },
+  {
+    "paintId": 206,
+    "blockId": "minecraft:oxidized_copper",
+    "nameEs": "Cobre oxidado",
+    "nameEn": "Oxidized Copper"
+  },
+  {
+    "paintId": 207,
+    "blockId": "minecraft:oxidized_copper_bulb",
+    "nameEs": "Lámpara de cobre oxidado",
+    "nameEn": "Oxidized Copper Bulb"
+  },
+  {
+    "paintId": 208,
+    "blockId": "minecraft:oxidized_cut_copper",
+    "nameEs": "Cobre cortado oxidado",
+    "nameEn": "Oxidized Cut Copper"
+  },
+  {
+    "paintId": 209,
+    "blockId": "minecraft:packed_ice",
+    "nameEs": "Hielo compacto",
+    "nameEn": "Packed Ice"
+  },
+  {
+    "paintId": 210,
+    "blockId": "minecraft:packed_mud",
+    "nameEs": "Adobe",
+    "nameEn": "Packed Mud"
+  },
+  {
+    "paintId": 211,
+    "blockId": "minecraft:pale_moss_block",
+    "nameEs": "Bloque de musgo pálido",
+    "nameEn": "Pale Moss Block"
+  },
+  {
+    "paintId": 212,
+    "blockId": "minecraft:pale_oak_log",
+    "nameEs": "Tronco de roble pálido",
+    "nameEn": "Pale Oak Log"
+  },
+  {
+    "paintId": 213,
+    "blockId": "minecraft:pale_oak_planks",
+    "nameEs": "Tablones de roble pálido",
+    "nameEn": "Pale Oak Planks"
+  },
+  {
+    "paintId": 214,
+    "blockId": "minecraft:pale_oak_wood",
+    "nameEs": "Leño de roble pálido",
+    "nameEn": "Pale Oak Wood"
+  },
+  {
+    "paintId": 215,
+    "blockId": "minecraft:pearlescent_froglight",
+    "nameEs": "Ranaluz nacarada",
+    "nameEn": "Pearlescent Froglight"
+  },
+  {
+    "paintId": 216,
+    "blockId": "minecraft:pink_concrete",
+    "nameEs": "Hormigón rosa",
+    "nameEn": "Pink Concrete"
+  },
+  {
+    "paintId": 217,
+    "blockId": "minecraft:pink_concrete_powder",
+    "nameEs": "Cemento rosa",
+    "nameEn": "Pink Concrete Powder"
+  },
+  {
+    "paintId": 218,
+    "blockId": "minecraft:pink_glazed_terracotta",
+    "nameEs": "Azulejo rosa",
+    "nameEn": "Pink Glazed Terracotta"
+  },
+  {
+    "paintId": 219,
+    "blockId": "minecraft:pink_terracotta",
+    "nameEs": "Terracota rosa",
+    "nameEn": "Pink Terracotta"
+  },
+  {
+    "paintId": 220,
+    "blockId": "minecraft:pink_wool",
+    "nameEs": "Lana rosa",
+    "nameEn": "Pink Wool"
+  },
+  {
+    "paintId": 221,
+    "blockId": "minecraft:podzol",
+    "nameEs": "Podsol",
+    "nameEn": "Podzol"
+  },
+  {
+    "paintId": 222,
+    "blockId": "minecraft:polished_andesite",
+    "nameEs": "Andesita pulida",
+    "nameEn": "Polished Andesite"
+  },
+  {
+    "paintId": 223,
+    "blockId": "minecraft:polished_basalt",
+    "nameEs": "Basalto pulido",
+    "nameEn": "Polished Basalt"
+  },
+  {
+    "paintId": 224,
+    "blockId": "minecraft:polished_blackstone",
+    "nameEs": "Piedra negra pulida",
+    "nameEn": "Polished Blackstone"
+  },
+  {
+    "paintId": 225,
+    "blockId": "minecraft:polished_blackstone_bricks",
+    "nameEs": "Ladrillos de piedra negra pulida",
+    "nameEn": "Polished Blackstone Bricks"
+  },
+  {
+    "paintId": 226,
+    "blockId": "minecraft:polished_cinnabar",
+    "nameEs": "Cinabrio pulido",
+    "nameEn": "Polished Cinnabar"
+  },
+  {
+    "paintId": 227,
+    "blockId": "minecraft:polished_deepslate",
+    "nameEs": "Pizarra profunda pulida",
+    "nameEn": "Polished Deepslate"
+  },
+  {
+    "paintId": 228,
+    "blockId": "minecraft:polished_diorite",
+    "nameEs": "Diorita pulida",
+    "nameEn": "Polished Diorite"
+  },
+  {
+    "paintId": 229,
+    "blockId": "minecraft:polished_granite",
+    "nameEs": "Granito pulido",
+    "nameEn": "Polished Granite"
+  },
+  {
+    "paintId": 230,
+    "blockId": "minecraft:polished_sulfur",
+    "nameEs": "Azufre pulido",
+    "nameEn": "Polished Sulfur"
+  },
+  {
+    "paintId": 231,
+    "blockId": "minecraft:polished_tuff",
+    "nameEs": "Toba pulida",
+    "nameEn": "Polished Tuff"
+  },
+  {
+    "paintId": 232,
+    "blockId": "minecraft:powder_snow",
+    "nameEs": "Nieve polvo",
+    "nameEn": "Powder Snow"
+  },
+  {
+    "paintId": 233,
+    "blockId": "minecraft:prismarine",
+    "nameEs": "Prismarina",
+    "nameEn": "Prismarine"
+  },
+  {
+    "paintId": 234,
+    "blockId": "minecraft:prismarine_bricks",
+    "nameEs": "Ladrillos de prismarina",
+    "nameEn": "Prismarine Bricks"
+  },
+  {
+    "paintId": 235,
+    "blockId": "minecraft:pumpkin",
+    "nameEs": "Calabaza",
+    "nameEn": "Pumpkin"
+  },
+  {
+    "paintId": 236,
+    "blockId": "minecraft:purple_concrete",
+    "nameEs": "Hormigón morado",
+    "nameEn": "Purple Concrete"
+  },
+  {
+    "paintId": 237,
+    "blockId": "minecraft:purple_concrete_powder",
+    "nameEs": "Cemento morado",
+    "nameEn": "Purple Concrete Powder"
+  },
+  {
+    "paintId": 238,
+    "blockId": "minecraft:purple_glazed_terracotta",
+    "nameEs": "Azulejo morado",
+    "nameEn": "Purple Glazed Terracotta"
+  },
+  {
+    "paintId": 239,
+    "blockId": "minecraft:purple_terracotta",
+    "nameEs": "Terracota morada",
+    "nameEn": "Purple Terracotta"
+  },
+  {
+    "paintId": 240,
+    "blockId": "minecraft:purple_wool",
+    "nameEs": "Lana morada",
+    "nameEn": "Purple Wool"
+  },
+  {
+    "paintId": 241,
+    "blockId": "minecraft:purpur_block",
+    "nameEs": "Bloque de purpur",
+    "nameEn": "Purpur Block"
+  },
+  {
+    "paintId": 242,
+    "blockId": "minecraft:purpur_pillar",
+    "nameEs": "Pilar de purpur",
+    "nameEn": "Purpur Pillar"
+  },
+  {
+    "paintId": 243,
+    "blockId": "minecraft:quartz_block",
+    "nameEs": "Cuarzo",
+    "nameEn": "Block of Quartz"
+  },
+  {
+    "paintId": 244,
+    "blockId": "minecraft:quartz_bricks",
+    "nameEs": "Ladrillos de cuarzo",
+    "nameEn": "Quartz Bricks"
+  },
+  {
+    "paintId": 245,
+    "blockId": "minecraft:quartz_pillar",
+    "nameEs": "Pilar de cuarzo",
+    "nameEn": "Quartz Pillar"
+  },
+  {
+    "paintId": 246,
+    "blockId": "minecraft:raw_copper_block",
+    "nameEs": "Bloque de cobre en bruto",
+    "nameEn": "Block of Raw Copper"
+  },
+  {
+    "paintId": 247,
+    "blockId": "minecraft:raw_gold_block",
+    "nameEs": "Bloque de oro en bruto",
+    "nameEn": "Block of Raw Gold"
+  },
+  {
+    "paintId": 248,
+    "blockId": "minecraft:raw_iron_block",
+    "nameEs": "Bloque de hierro en bruto",
+    "nameEn": "Block of Raw Iron"
+  },
+  {
+    "paintId": 249,
+    "blockId": "minecraft:red_concrete",
+    "nameEs": "Hormigón rojo",
+    "nameEn": "Red Concrete"
+  },
+  {
+    "paintId": 250,
+    "blockId": "minecraft:red_concrete_powder",
+    "nameEs": "Cemento rojo",
+    "nameEn": "Red Concrete Powder"
+  },
+  {
+    "paintId": 251,
+    "blockId": "minecraft:red_glazed_terracotta",
+    "nameEs": "Azulejo rojo",
+    "nameEn": "Red Glazed Terracotta"
+  },
+  {
+    "paintId": 252,
+    "blockId": "minecraft:red_mushroom_block",
+    "nameEs": "Bloque de champiñón rojo",
+    "nameEn": "Red Mushroom Block"
+  },
+  {
+    "paintId": 253,
+    "blockId": "minecraft:red_nether_bricks",
+    "nameEs": "Ladrillos del Nether rojos",
+    "nameEn": "Red Nether Bricks"
+  },
+  {
+    "paintId": 254,
+    "blockId": "minecraft:red_sand",
+    "nameEs": "Arena roja",
+    "nameEn": "Red Sand"
+  },
+  {
+    "paintId": 255,
+    "blockId": "minecraft:red_sandstone",
+    "nameEs": "Arenisca roja",
+    "nameEn": "Red Sandstone"
+  },
+  {
+    "paintId": 256,
+    "blockId": "minecraft:red_terracotta",
+    "nameEs": "Terracota roja",
+    "nameEn": "Red Terracotta"
+  },
+  {
+    "paintId": 257,
+    "blockId": "minecraft:red_wool",
+    "nameEs": "Lana roja",
+    "nameEn": "Red Wool"
+  },
+  {
+    "paintId": 258,
+    "blockId": "minecraft:redstone_block",
+    "nameEs": "Bloque de redstone",
+    "nameEn": "Block of Redstone"
+  },
+  {
+    "paintId": 259,
+    "blockId": "minecraft:redstone_lamp",
+    "nameEs": "Lámpara de redstone",
+    "nameEn": "Redstone Lamp"
+  },
+  {
+    "paintId": 260,
+    "blockId": "minecraft:redstone_ore",
+    "nameEs": "Mena de redstone",
+    "nameEn": "Redstone Ore"
+  },
+  {
+    "paintId": 261,
+    "blockId": "minecraft:reinforced_deepslate",
+    "nameEs": "Pizarra profunda reforzada",
+    "nameEn": "Reinforced Deepslate"
+  },
+  {
+    "paintId": 262,
+    "blockId": "minecraft:resin_block",
+    "nameEs": "Bloque de resina",
+    "nameEn": "Block of Resin"
+  },
+  {
+    "paintId": 263,
+    "blockId": "minecraft:resin_bricks",
+    "nameEs": "Ladrillos de resina",
+    "nameEn": "Resin Bricks"
+  },
+  {
+    "paintId": 264,
+    "blockId": "minecraft:respawn_anchor",
+    "nameEs": "Nexo de reaparición",
+    "nameEn": "Respawn Anchor"
+  },
+  {
+    "paintId": 265,
+    "blockId": "minecraft:rooted_dirt",
+    "nameEs": "Tierra enraizada",
+    "nameEn": "Rooted Dirt"
+  },
+  {
+    "paintId": 266,
+    "blockId": "minecraft:sand",
+    "nameEs": "Arena",
+    "nameEn": "Sand"
+  },
+  {
+    "paintId": 267,
+    "blockId": "minecraft:sandstone",
+    "nameEs": "Arenisca",
+    "nameEn": "Sandstone"
+  },
+  {
+    "paintId": 268,
+    "blockId": "minecraft:sculk",
+    "nameEs": "Sculk",
+    "nameEn": "Sculk"
+  },
+  {
+    "paintId": 269,
+    "blockId": "minecraft:sea_lantern",
+    "nameEs": "Linterna marina",
+    "nameEn": "Sea Lantern"
+  },
+  {
+    "paintId": 270,
+    "blockId": "minecraft:shroomlight",
+    "nameEs": "Brillongo",
+    "nameEn": "Shroomlight"
+  },
+  {
+    "paintId": 271,
+    "blockId": "minecraft:smithing_table",
+    "nameEs": "Mesa de herrería",
+    "nameEn": "Smithing Table"
+  },
+  {
+    "paintId": 272,
+    "blockId": "minecraft:smooth_basalt",
+    "nameEs": "Basalto liso",
+    "nameEn": "Smooth Basalt"
+  },
+  {
+    "paintId": 273,
+    "blockId": "minecraft:smooth_quartz",
+    "nameEs": "Bloque de cuarzo liso",
+    "nameEn": "Smooth Quartz Block"
+  },
+  {
+    "paintId": 274,
+    "blockId": "minecraft:smooth_red_sandstone",
+    "nameEs": "Arenisca roja lisa",
+    "nameEn": "Smooth Red Sandstone"
+  },
+  {
+    "paintId": 275,
+    "blockId": "minecraft:smooth_sandstone",
+    "nameEs": "Arenisca lisa",
+    "nameEn": "Smooth Sandstone"
+  },
+  {
+    "paintId": 276,
+    "blockId": "minecraft:smooth_stone",
+    "nameEs": "Piedra lisa",
+    "nameEn": "Smooth Stone"
+  },
+  {
+    "paintId": 277,
+    "blockId": "minecraft:snow_block",
+    "nameEs": "Bloque de nieve",
+    "nameEn": "Snow Block"
+  },
+  {
+    "paintId": 278,
+    "blockId": "minecraft:soul_sand",
+    "nameEs": "Arena de almas",
+    "nameEn": "Soul Sand"
+  },
+  {
+    "paintId": 279,
+    "blockId": "minecraft:soul_soil",
+    "nameEs": "Tierra de almas",
+    "nameEn": "Soul Soil"
+  },
+  {
+    "paintId": 280,
+    "blockId": "minecraft:sponge",
+    "nameEs": "Esponja",
+    "nameEn": "Sponge"
+  },
+  {
+    "paintId": 281,
+    "blockId": "minecraft:spruce_log",
+    "nameEs": "Tronco de abeto",
+    "nameEn": "Spruce Log"
+  },
+  {
+    "paintId": 282,
+    "blockId": "minecraft:spruce_planks",
+    "nameEs": "Tablones de abeto",
+    "nameEn": "Spruce Planks"
+  },
+  {
+    "paintId": 283,
+    "blockId": "minecraft:spruce_wood",
+    "nameEs": "Leño de abeto",
+    "nameEn": "Spruce Wood"
+  },
+  {
+    "paintId": 284,
+    "blockId": "minecraft:stone",
+    "nameEs": "Piedra",
+    "nameEn": "Stone"
+  },
+  {
+    "paintId": 285,
+    "blockId": "minecraft:stone_bricks",
+    "nameEs": "Ladrillos de piedra",
+    "nameEn": "Stone Bricks"
+  },
+  {
+    "paintId": 286,
+    "blockId": "minecraft:stripped_acacia_log",
+    "nameEs": "Tronco de acacia sin corteza",
+    "nameEn": "Stripped Acacia Log"
+  },
+  {
+    "paintId": 287,
+    "blockId": "minecraft:stripped_acacia_wood",
+    "nameEs": "Leño de acacia sin corteza",
+    "nameEn": "Stripped Acacia Wood"
+  },
+  {
+    "paintId": 288,
+    "blockId": "minecraft:stripped_bamboo_block",
+    "nameEs": "Bloque de bambú pelado",
+    "nameEn": "Block of Stripped Bamboo"
+  },
+  {
+    "paintId": 289,
+    "blockId": "minecraft:stripped_birch_log",
+    "nameEs": "Tronco de abedul sin corteza",
+    "nameEn": "Stripped Birch Log"
+  },
+  {
+    "paintId": 290,
+    "blockId": "minecraft:stripped_birch_wood",
+    "nameEs": "Leño de abedul sin corteza",
+    "nameEn": "Stripped Birch Wood"
+  },
+  {
+    "paintId": 291,
+    "blockId": "minecraft:stripped_cherry_log",
+    "nameEs": "Tronco de cerezo sin corteza",
+    "nameEn": "Stripped Cherry Log"
+  },
+  {
+    "paintId": 292,
+    "blockId": "minecraft:stripped_cherry_wood",
+    "nameEs": "Leño de cerezo sin corteza",
+    "nameEn": "Stripped Cherry Wood"
+  },
+  {
+    "paintId": 293,
+    "blockId": "minecraft:stripped_crimson_hyphae",
+    "nameEs": "Hifas carmesí peladas",
+    "nameEn": "Stripped Crimson Hyphae"
+  },
+  {
+    "paintId": 294,
+    "blockId": "minecraft:stripped_crimson_stem",
+    "nameEs": "Tallo carmesí pelado",
+    "nameEn": "Stripped Crimson Stem"
+  },
+  {
+    "paintId": 295,
+    "blockId": "minecraft:stripped_dark_oak_log",
+    "nameEs": "Tronco de roble oscuro sin corteza",
+    "nameEn": "Stripped Dark Oak Log"
+  },
+  {
+    "paintId": 296,
+    "blockId": "minecraft:stripped_dark_oak_wood",
+    "nameEs": "Leño de roble oscuro sin corteza",
+    "nameEn": "Stripped Dark Oak Wood"
+  },
+  {
+    "paintId": 297,
+    "blockId": "minecraft:stripped_jungle_log",
+    "nameEs": "Tronco de jungla sin corteza",
+    "nameEn": "Stripped Jungle Log"
+  },
+  {
+    "paintId": 298,
+    "blockId": "minecraft:stripped_jungle_wood",
+    "nameEs": "Leño de jungla sin corteza",
+    "nameEn": "Stripped Jungle Wood"
+  },
+  {
+    "paintId": 299,
+    "blockId": "minecraft:stripped_mangrove_log",
+    "nameEs": "Tronco de mangle sin corteza",
+    "nameEn": "Stripped Mangrove Log"
+  },
+  {
+    "paintId": 300,
+    "blockId": "minecraft:stripped_mangrove_wood",
+    "nameEs": "Leño de mangle sin corteza",
+    "nameEn": "Stripped Mangrove Wood"
+  },
+  {
+    "paintId": 301,
+    "blockId": "minecraft:stripped_oak_log",
+    "nameEs": "Tronco de roble sin corteza",
+    "nameEn": "Stripped Oak Log"
+  },
+  {
+    "paintId": 302,
+    "blockId": "minecraft:stripped_oak_wood",
+    "nameEs": "Leño de roble sin corteza",
+    "nameEn": "Stripped Oak Wood"
+  },
+  {
+    "paintId": 303,
+    "blockId": "minecraft:stripped_pale_oak_log",
+    "nameEs": "Tronco de roble pálido sin corteza",
+    "nameEn": "Stripped Pale Oak Log"
+  },
+  {
+    "paintId": 304,
+    "blockId": "minecraft:stripped_pale_oak_wood",
+    "nameEs": "Leño de roble pálido sin corteza",
+    "nameEn": "Stripped Pale Oak Wood"
+  },
+  {
+    "paintId": 305,
+    "blockId": "minecraft:stripped_spruce_log",
+    "nameEs": "Tronco de abeto sin corteza",
+    "nameEn": "Stripped Spruce Log"
+  },
+  {
+    "paintId": 306,
+    "blockId": "minecraft:stripped_spruce_wood",
+    "nameEs": "Leño de abeto sin corteza",
+    "nameEn": "Stripped Spruce Wood"
+  },
+  {
+    "paintId": 307,
+    "blockId": "minecraft:stripped_warped_hyphae",
+    "nameEs": "Hifas distorsionadas peladas",
+    "nameEn": "Stripped Warped Hyphae"
+  },
+  {
+    "paintId": 308,
+    "blockId": "minecraft:stripped_warped_stem",
+    "nameEs": "Tallo distorsionado pelado",
+    "nameEn": "Stripped Warped Stem"
+  },
+  {
+    "paintId": 309,
+    "blockId": "minecraft:sulfur",
+    "nameEs": "Azufre",
+    "nameEn": "Sulfur"
+  },
+  {
+    "paintId": 310,
+    "blockId": "minecraft:sulfur_bricks",
+    "nameEs": "Ladrillos de azufre",
+    "nameEn": "Sulfur Bricks"
+  },
+  {
+    "paintId": 311,
+    "blockId": "minecraft:target",
+    "nameEs": "Diana",
+    "nameEn": "Target"
+  },
+  {
+    "paintId": 312,
+    "blockId": "minecraft:terracotta",
+    "nameEs": "Terracota",
+    "nameEn": "Terracotta"
+  },
+  {
+    "paintId": 313,
+    "blockId": "minecraft:tnt",
+    "nameEs": "Dinamita",
+    "nameEn": "TNT"
+  },
+  {
+    "paintId": 314,
+    "blockId": "minecraft:tube_coral_block",
+    "nameEs": "Bloque de coral de tubo",
+    "nameEn": "Tube Coral Block"
+  },
+  {
+    "paintId": 315,
+    "blockId": "minecraft:tuff",
+    "nameEs": "Toba",
+    "nameEn": "Tuff"
+  },
+  {
+    "paintId": 316,
+    "blockId": "minecraft:tuff_bricks",
+    "nameEs": "Ladrillos de toba",
+    "nameEn": "Tuff Bricks"
+  },
+  {
+    "paintId": 317,
+    "blockId": "minecraft:verdant_froglight",
+    "nameEs": "Ranaluz verde",
+    "nameEn": "Verdant Froglight"
+  },
+  {
+    "paintId": 318,
+    "blockId": "minecraft:warped_hyphae",
+    "nameEs": "Hifas distorsionadas",
+    "nameEn": "Warped Hyphae"
+  },
+  {
+    "paintId": 319,
+    "blockId": "minecraft:warped_nylium",
+    "nameEs": "Necelio distorsionado",
+    "nameEn": "Warped Nylium"
+  },
+  {
+    "paintId": 320,
+    "blockId": "minecraft:warped_planks",
+    "nameEs": "Tablones distorsionados",
+    "nameEn": "Warped Planks"
+  },
+  {
+    "paintId": 321,
+    "blockId": "minecraft:warped_stem",
+    "nameEs": "Tallo distorsionado",
+    "nameEn": "Warped Stem"
+  },
+  {
+    "paintId": 322,
+    "blockId": "minecraft:warped_wart_block",
+    "nameEs": "Bloque de verrugas distorsionadas",
+    "nameEn": "Warped Wart Block"
+  },
+  {
+    "paintId": 323,
+    "blockId": "minecraft:weathered_chiseled_copper",
+    "nameEs": "Cobre cincelado degradado",
+    "nameEn": "Weathered Chiseled Copper"
+  },
+  {
+    "paintId": 324,
+    "blockId": "minecraft:weathered_copper",
+    "nameEs": "Cobre degradado",
+    "nameEn": "Weathered Copper"
+  },
+  {
+    "paintId": 325,
+    "blockId": "minecraft:weathered_copper_bulb",
+    "nameEs": "Lámpara de cobre degradado",
+    "nameEn": "Weathered Copper Bulb"
+  },
+  {
+    "paintId": 326,
+    "blockId": "minecraft:weathered_cut_copper",
+    "nameEs": "Cobre cortado degradado",
+    "nameEn": "Weathered Cut Copper"
+  },
+  {
+    "paintId": 327,
+    "blockId": "minecraft:wet_sponge",
+    "nameEs": "Esponja mojada",
+    "nameEn": "Wet Sponge"
+  },
+  {
+    "paintId": 328,
+    "blockId": "minecraft:white_concrete",
+    "nameEs": "Hormigón blanco",
+    "nameEn": "White Concrete"
+  },
+  {
+    "paintId": 329,
+    "blockId": "minecraft:white_concrete_powder",
+    "nameEs": "Cemento blanco",
+    "nameEn": "White Concrete Powder"
+  },
+  {
+    "paintId": 330,
+    "blockId": "minecraft:white_glazed_terracotta",
+    "nameEs": "Azulejo blanco",
+    "nameEn": "White Glazed Terracotta"
+  },
+  {
+    "paintId": 331,
+    "blockId": "minecraft:white_terracotta",
+    "nameEs": "Terracota blanca",
+    "nameEn": "White Terracotta"
+  },
+  {
+    "paintId": 332,
+    "blockId": "minecraft:white_wool",
+    "nameEs": "Lana blanca",
+    "nameEn": "White Wool"
+  },
+  {
+    "paintId": 333,
+    "blockId": "minecraft:yellow_concrete",
+    "nameEs": "Hormigón amarillo",
+    "nameEn": "Yellow Concrete"
+  },
+  {
+    "paintId": 334,
+    "blockId": "minecraft:yellow_concrete_powder",
+    "nameEs": "Cemento amarillo",
+    "nameEn": "Yellow Concrete Powder"
+  },
+  {
+    "paintId": 335,
+    "blockId": "minecraft:yellow_glazed_terracotta",
+    "nameEs": "Azulejo amarillo",
+    "nameEn": "Yellow Glazed Terracotta"
+  },
+  {
+    "paintId": 336,
+    "blockId": "minecraft:yellow_terracotta",
+    "nameEs": "Terracota amarilla",
+    "nameEn": "Yellow Terracotta"
+  },
+  {
+    "paintId": 337,
+    "blockId": "minecraft:yellow_wool",
+    "nameEs": "Lana amarilla",
+    "nameEn": "Yellow Wool"
+  }
+]

@@ -31,3 +31,9 @@ Estos son trabajos pendientes, no decisiones de producto que deban aprobarse otr
 Los adjuntos técnicos sirvieron de comparación, no de sustitución automática del planteamiento. Prevalecen las decisiones actuales: cinco resoluciones hasta 16×16, 256 unidades por ítem, conversión exclusiva de estaciones, orientación conjunta con 24 giros y prensa sin combustible.
 
 Los IDs del catálogo se toman del CSV: nieve en polvo es `paint_id` 232; 233 corresponde a prismarina. No copiar el ID erróneo de los adjuntos ni importar sus recetas ausentes, tamaños de texturas o supuestos de implementación.
+
+## Resoluciones durante el grupo 1
+
+El usuario autorizó decidir sin consulta durante este avance. Se documentaron las resoluciones de textura provisional, pinturas exclusivas de creativo, iluminación de recortes, datos inválidos y caché en [Grupo 1](../../../../technical/group1.md).
+
+El original `unpainted.png` sigue pendiente de integrar; no se ha recreado. Tenazas y guantes ya tienen funciones en código y habilitan sus recursos definitivos individuales. Las recetas sin patrones concretos corresponden al futuro frente de recetas; no impiden el acceso creativo al contenido preparado.

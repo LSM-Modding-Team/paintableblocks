@@ -12,3 +12,5 @@ bin/
 out/
 .DS_Store
 docs/obsidian/PaintableBlocks/.obsidian/
+__pycache__/
+*.py[cod]

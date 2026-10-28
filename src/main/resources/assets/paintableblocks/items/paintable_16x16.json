@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "paintableblocks:design",
+    "base_model": "paintableblocks:block/unpainted"
+  }
+}

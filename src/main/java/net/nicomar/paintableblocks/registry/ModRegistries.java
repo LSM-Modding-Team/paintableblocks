@@ -11,7 +11,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.nicomar.paintableblocks.PaintableBlocks;
 
-/** Registry containers only: this base does not register playable content. */
+/** Shared registry containers. Group 1 entries are declared by ModContent before events fire. */
 public final class ModRegistries {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(PaintableBlocks.MOD_ID);

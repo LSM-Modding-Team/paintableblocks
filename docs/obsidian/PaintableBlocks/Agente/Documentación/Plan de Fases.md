@@ -68,3 +68,19 @@ Estado de esta tarea: **implementada como esqueleto**, con revisión estática y
 Evidencia y alcance: [registro de cambios](../../../../../CHANGELOG.md), [mapa del esqueleto](../../../../technical/skeleton.md) e [investigación NeoForge 26.2](../../../../technical/neoforge-26.2.md).
 
 Próximas alternativas elegibles: catálogo/balance, datos de diseño y preparaciones independientes de ítems o recetas con requisitos completos. Las integraciones de geometría, herramientas, pintura e interfaces siguen requiriendo las dependencias de la tabla. No se inició otro frente en esta entrega.
+
+## Ejecución: grupo 1 — bloques y diseños
+
+El usuario eligió los cinco frentes y autorizó resolver las decisiones faltantes durante el trabajo, informándolas después del commit.
+
+| Frente | Estado de implementación | Evidencia de ejecución |
+|---|---|---|
+| Catálogo y balance | Código, catálogo y traducciones preparados | Validación estática del CSV y recursos; sin carga del mod |
+| Datos de diseño | Datos inmutables y codec versionado preparados | Casos de contrato escritos; Java no ejecutado |
+| Geometría y selección | Formas exactas, superficies y conversión de impactos preparadas | Revisión de APIs/sintaxis; sin interacción en juego |
+| Guardado y conservación | Componentes, entidad, drops, tenazas, guantes y copia preparados | Sin partida, descarga de mundo ni prueba de sincronización |
+| Representación del diseño | Modelos de mundo/ítem y proyección común preparados | Sin visualización en juego; textura original pendiente |
+
+Tenazas y guantes habilitan sus recursos definitivos como tareas individuales; esta ejecución no los genera. Sus referencias visuales son provisionales. Los demás frentes no se marcan implementados por tener una reserva Java.
+
+Las decisiones tomadas y limitaciones están en [Grupo 1](../../../../technical/group1.md) y el detalle de avance en [CHANGELOG](../../../../../CHANGELOG.md). El grupo 2 dispone ahora de catálogo, diseño, selección y conservación como bases; las estaciones y máquinas del grupo 3 siguen requiriendo sus inventarios y operaciones propias.

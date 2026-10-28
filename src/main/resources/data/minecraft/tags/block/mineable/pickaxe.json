@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "paintableblocks:paintable",
+    "paintableblocks:paintable_2x2",
+    "paintableblocks:paintable_4x4",
+    "paintableblocks:paintable_8x8",
+    "paintableblocks:paintable_16x16"
+  ]
+}

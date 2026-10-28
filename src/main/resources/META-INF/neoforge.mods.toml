@@ -8,8 +8,8 @@ version="${mod_version}"
 displayName="${mod_name}"
 authors="nicomar"
 description='''
-Base de Paintable Blocks para Minecraft 26.2 y NeoForge 26.2.0.88.
-Los sistemas de bloques pintables, pinturas y herramientas están pendientes de implementación.
+Bloques pintables subdivididos, diseños persistentes y catálogo decorativo para Minecraft 26.2.
+Grupo 1 implementado en código; compilación y pruebas dentro de Minecraft pendientes.
 '''
 
 [[dependencies.${mod_id}]]

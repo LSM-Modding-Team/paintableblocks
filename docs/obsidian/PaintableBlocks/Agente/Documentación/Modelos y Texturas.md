@@ -23,8 +23,8 @@ Esta tabla establece los recursos a seguir, no declara que se hayan creado. Su e
 | Cincel | Retirar capa plana sin atravesar huecos | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Raspador | Limpiar orientación y profundidad seleccionadas | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Esponja de limpieza | Limpiar todo conservando geometría | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Tenazas | Recoger recortes sin pintura | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Guantes | Recoger diseño completo | Pendiente de función | 16×16, pendiente de función | Pendiente |
+| Tenazas | Recogida implementada en código; sin prueba en juego | Disponible; referencia provisional | 16×16, disponible | Pendiente |
+| Guantes | Recogida implementada en código; sin prueba en juego | Disponible; referencia provisional | 16×16, disponible | Pendiente |
 | Llave de giro | Girar con vista previa y validar colisión | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Rasqueta de cobblestone | Extracción y 64 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Rasqueta de cobre | Extracción y 128 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
@@ -56,3 +56,11 @@ La vista previa destaca exactamente superficies o subcubos afectados; tenazas y 
 Las texturas del catálogo se fragmentan, no se repiten en miniatura. Respetan orientación, estados visuales fijos y animaciones decorativas de [[Texturas y Orientación]]. Los packs de recursos pueden cambiar su apariencia sin cambiar esas reglas.
 
 Una inspección estática de archivos no acredita que el modelo se vea correctamente en juego. Registrar por separado modelo creado, textura creada y resultado de verificación, respetando la autorización de ejecución de [[Agente]].
+
+## Estado tras el grupo 1
+
+Se prepararon los modelos dinámicos del bloque y su ítem conservado, con proyección continua compartida, y el bote 3D de pintura. No han sido visualizados en juego.
+
+No se encontró el archivo original `unpainted.png`; se utiliza piedra vanilla como apariencia provisional, sin generar ni reemplazar el PNG original. La integración del recurso elegido sigue pendiente.
+
+Las funciones de tenazas y guantes están implementadas en código. Sus modelos/texturas definitivos pasan a estar disponibles como tareas individuales; mientras tanto se referencian modelos vanilla provisionales. Las demás herramientas conservan su dependencia de funciones completas. Véase [Grupo 1](../../../../technical/group1.md).

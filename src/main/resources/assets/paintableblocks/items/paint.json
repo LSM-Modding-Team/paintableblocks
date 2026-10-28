@@ -1,0 +1,7 @@
+{
+  "model": {
+    "type": "paintableblocks:paint_sample",
+    "base_model": "paintableblocks:block/unpainted",
+    "cap_model": "paintableblocks:item/paint_cap"
+  }
+}
