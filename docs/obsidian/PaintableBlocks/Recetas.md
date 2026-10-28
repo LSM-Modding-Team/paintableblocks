@@ -1,5 +1,11 @@
 # Recetas
 
+## Concreción durante el grupo 3
+
+Por autorización del usuario para decidir reglas faltantes durante la implementación, los patrones y cantidades pendientes se concretaron en [recetas del grupo 3](../../technical/group3-recipes.md). Esa tabla sustituye las referencias históricas a patrones aún ausentes en esta página. Se mantiene el balance de lotes y las restricciones de contenido.
+
+La selección creativa vigente es clic derecho de inventario con pintura sobre el pincel, como indica [[Pintura en Creativo]]; no se publica una receta creativa global.
+
 Se recogen los ingredientes y relaciones aceptados. Los patrones y cantidades todavía no especificados no se deducen de los documentos de referencia.
 
 ## Bloques pintables

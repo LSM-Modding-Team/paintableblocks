@@ -2,6 +2,21 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Grupo 3: producción e integración
+
+- Añadidos banco, cortadora y ensambladora: multiplicadores ×2/×4/×8, capacidades compartidas 1024/4096/16 384, fabricación de las cinco subdivisiones y consumo únicamente si cabe el lote completo.
+- Conversión 1:1 de contadores y un par de ranuras para convertir bloques completos sin pintura conservando orientación y componentes; los contadores solo admiten ítems canónicos nuevos. Pintura y recortes impiden convertir.
+- Añadidos molino y prensa: 4/16 pinturas por bloque, 80 ticks, sin combustible, validación del lote completo y del cubo vacío de nieve en polvo. Progreso conservado al recoger/colocar y reiniciado al cambiar la identidad de entrada; salida bloqueada pausa el proceso.
+- Inventarios, contadores y progreso viajan en un único ítem mediante `ProductionState`. Sin dispersar inventario adicional al romper; Ctrl + clic central, creativo, explosiones, validación de datos y bloqueo de pistones integrados.
+- Menús de estaciones y máquinas, pantallas con botones nativos/fondos sólidos, retiradas sin tirar excedentes, predicción coherente de depósitos y selección independiente por menú. Paquete de estación valida contenedor, permisos, alcance, subdivisión y material esperado. Protocolo de red **4**.
+- Fabricación manual con los seis centros/exteriores aceptados. Recetas de ocho herramientas, cinco pinceles y cinco rasquetas iniciales, cubo de cobre, banco y molino; mejoras de estaciones/máquinas vacías y mejoras de pinceles/cubos conservando componentes y capacidad. Netherite mantiene herrería con plantilla.
+- Unificados los filtros del catálogo entre rasquetas y máquinas; entradas personalizadas y pinturas exclusivas de creativo se rechazan sin consumir. Molino/prensa admiten tolvas con entrada arriba/laterales y salida debajo.
+- Cinco modelos de bloque e ítem cúbicos **sin texturas asignadas**, conforme a la instrucción del usuario. No se genera ningún PNG ni se añaden recursos visuales de herramientas.
+- Decisiones adoptadas: distribución de ranuras y cuatro salidas de máquina; conversión personalizada separada de contadores; progreso portátil; rutas de tolvas; dureza 3,5/resistencia 6/sonido piedra de bloques de trabajo; patrones y cantidades antes ausentes concretados en [recetas del grupo 3](docs/technical/group3-recipes.md). Mejoras especiales sin autorrelleno del libro para conservar datos; recetas normales con desbloqueos.
+- Actualizados README, mapa de código, plan y documentación. Informe de alcance y límites: [Grupo 3](docs/technical/group3.md).
+- Ampliados validadores estáticos y preparados contratos de lotes/capacidad, contadores, salidas llenas, nieve en polvo, persistencia y mejoras inválidas. Contrastes de recursos, importaciones y sintaxis; patrones nuevos comparados con 733 recetas vanilla con forma, sin coincidencias.
+- Sin ejecutar Gradle, compilación, builds, Java, CI, clientes ni servidores. Los contratos Java y el funcionamiento en juego quedan sin verificar; publicación directa online en `26.2`, sin commits locales.
+
 ## 2026-10-28 — Correcciones de interacción del bloque pintable
 
 - Corregido el fallo confirmado de actualización visual: cada recepción de cambios reconstruye la geometría cliente además de refrescar ModelData, aunque no cambie el estado `CUT`. Pintura y recortes posteriores dejan de depender de la primera actualización de estado.

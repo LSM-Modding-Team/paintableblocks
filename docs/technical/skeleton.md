@@ -26,12 +26,12 @@ Raíz: `src/main/java/net/nicomar/paintableblocks/`.
 | `paint/PaintCatalog.java` | Catálogo: identidades del CSV; no se ha cargado en esta entrega. | Código de grupo 1 |
 | `paint/PaintContent.java` | Identidad y unidades reales de pintura en recipientes y pinceles. | Código de grupo 2 |
 | `block/PaintableBlock.java` | Bloques pintables: propiedades, forma y selección. | Código de grupo 1 |
-| `block/WorkstationBlock.java` | Banco, cortadora y ensambladora. | Reserva vacía |
-| `block/PaintMachineBlock.java` | Molino y prensa. | Reserva vacía |
+| `block/WorkstationBlock.java` | Banco, cortadora y ensambladora. | Código de grupo 3 |
+| `block/PaintMachineBlock.java` | Molino y prensa. | Código de grupo 3 |
 | `block/PaintBucketBlock.java` | Cubos de pintura colocados. | Código de grupo 2 |
 | `blockentity/PaintableBlockEntity.java` | Diseño persistente y sincronización del bloque pintable. | Código de grupo 1 |
-| `blockentity/WorkstationBlockEntity.java` | Inventario y contadores de estaciones. | Reserva vacía |
-| `blockentity/PaintMachineBlockEntity.java` | Inventario y proceso sin combustible de máquinas. | Reserva vacía |
+| `blockentity/WorkstationBlockEntity.java` | Inventario y contadores de estaciones. | Código de grupo 3 |
+| `blockentity/PaintMachineBlockEntity.java` | Inventario y proceso sin combustible de máquinas. | Código de grupo 3 |
 | `blockentity/PaintBucketBlockEntity.java` | Almacenamiento de identidades y cantidades del cubo. | Código de grupo 2 |
 | `item/PaintableBlockItem.java` | Colocación y representación del diseño conservado. | Código de grupo 1 |
 | `item/PaintItem.java` | Tipo único de ítem con identidad de pintura. | Código de grupo 1 |
@@ -47,11 +47,11 @@ Raíz: `src/main/java/net/nicomar/paintableblocks/`.
 | `item/BrushItem.java` | Pinceles por material: carga, selección y aplicación. | Código de grupo 2 |
 | `item/PaintBucketItem.java` | Cubos por material: contenido portable y mejoras. | Código de grupo 2 |
 | `inventory/PaintTransfers.java` | Transferencias limitadas por identidad y capacidad. | Código de grupo 2 |
-| `menu/WorkstationMenu.java` | Menú de estaciones de bloques. | Reserva vacía |
-| `menu/PaintMachineMenu.java` | Menú de molino y prensa. | Reserva vacía |
+| `menu/WorkstationMenu.java` | Menú de estaciones de bloques. | Código de grupo 3 |
+| `menu/PaintMachineMenu.java` | Menú de molino y prensa. | Código de grupo 3 |
 | `menu/PaintBucketMenu.java` | Menú de cubos; selección individual por jugador. | Código de grupo 2 |
-| `production/WorkstationOperations.java` | Fabricación, contadores y conversión 1:1. | Reserva vacía |
-| `production/PaintMachineOperations.java` | Producción de pintura en lotes completos. | Reserva vacía |
+| `production/WorkstationOperations.java` | Fabricación, contadores y conversión 1:1. | Código de grupo 3 |
+| `production/PaintMachineOperations.java` | Producción de pintura en lotes completos. | Código de grupo 3 |
 | `recipe/PaintExtractionRecipe.java` | Extracción manual y desgaste de rasqueta. | Código de grupo 2 |
 | `recipe/UpgradeRecipe.java` | Mejoras con conservación y límites de capacidad. | Código de grupo 2 |
 | `recipe/CreativePaintSelectionRecipe.java` | Selección de identidad exclusiva de creativo. | Reserva vacía |
@@ -60,8 +60,8 @@ Raíz: `src/main/java/net/nicomar/paintableblocks/`.
 | `client/model/DesignItemModel.java` | Representación 3D del diseño conservado en inventario. | Código de grupo 1 |
 | `client/model/PaintSampleItemModel.java` | Bote 3D de pintura con apariencia del catálogo. | Código de grupo 1 |
 | `client/selection/SelectionPreview.java` | Extracción de datos para el contorno de la acción prevista. | Código de grupo 1 |
-| `client/screen/WorkstationScreen.java` | Presentación de cantidades y acciones de estaciones. | Reserva vacía |
-| `client/screen/PaintMachineScreen.java` | Presentación del proceso y salidas de máquinas. | Reserva vacía |
+| `client/screen/WorkstationScreen.java` | Presentación de cantidades y acciones de estaciones. | Código de grupo 3 |
+| `client/screen/PaintMachineScreen.java` | Presentación del proceso y salidas de máquinas. | Código de grupo 3 |
 | `client/screen/PaintBucketScreen.java` | Presentación del contenido y selección del cubo. | Código de grupo 2 |
 
 Los nombres y paquetes pueden ajustarse sin modificar las reglas del producto. Una reserva vacía no representa una función implementada. Las variantes por material siguen compartiendo las clases de sus familias; no hay clase por pintura o por diseño.
@@ -83,3 +83,11 @@ El grupo 2 integra el PNG original, elimina los recursos de tenazas/guantes y de
 - `ToolPaintContractChecks` prepara casos de edición, planos/huecos, consumo y conservación de unidades. Java no ejecutado.
 
 Detalle: [Grupo 2](group2.md). Los archivos vacíos restantes no acreditan implementación.
+
+## Grupo 3: producción e integración
+
+Las reservas de estaciones, máquinas, operaciones, menús y pantallas tienen implementación. Se añaden `ProductionState`, `ProductionInputs`, `PortableProductionEntity`, `PortableProductionBlock`, `ProductionBlockItem`, `ProductionMenu`, `ProductionScreen` y `ProductionContent` para persistencia, reglas e integración compartidas. `PaintableCraftingRecipe` y `ProgressionRecipe` cubren crafteo manual y mejoras que conservan datos.
+
+Los cinco bloques usan cubos sin texturas asignadas. Las herramientas siguen sin recursos visuales. `CreativePaintSelectionRecipe.java` permanece vacío: la selección creativa se resuelve en inventario, según la decisión vigente del grupo 2.
+
+Detalle, límites y comprobaciones: [Grupo 3](group3.md). Los grupos tienen revisión estática; no se han compilado ni probado en Minecraft.

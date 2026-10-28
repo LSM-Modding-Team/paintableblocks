@@ -4,11 +4,11 @@ Mod en desarrollo para **Minecraft 26.2**, **NeoForge 26.2.0.88** y **Java 25**.
 
 ## Estado actual
 
-Base del mod y grupos **1: bloques y diseños** y **2: herramientas y pinturas** implementados en código. Hay cinco subdivisiones, 337 pinturas, herramientas de conservación/edición/giro, seis niveles de pinceles y rasquetas y cuatro cubos portátiles con interfaz.
+Base del mod y grupos **1: bloques y diseños**, **2: herramientas y pinturas** y **3: producción e integración** implementados en código. Hay cinco subdivisiones, 337 pinturas, herramientas de conservación/edición/giro, pinceles, rasquetas, cubos, tres estaciones y dos máquinas de pintura.
 
-Se integró el original `unpainted.png` de 16×16. **Ninguna herramienta tiene modelos ni texturas**, tampoco provisionales; se acepta missing model/texture hasta su frente visual independiente. Estaciones, máquinas y recetas generales de fabricación corresponden al grupo 3.
+Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes completos en 80 ticks. Se incorporan recetas y mejoras con conservación de datos. Los cinco bloques de producción usan cubos 3D sin texturas asignadas. Ninguna herramienta tiene modelos ni texturas por ahora.
 
-El detalle del alcance, decisiones y límites está en [Grupo 1](docs/technical/group1.md) y [Grupo 2](docs/technical/group2.md). Implementado no significa probado en juego.
+Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **4**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
 
 ## Guías
 
@@ -19,6 +19,8 @@ El detalle del alcance, decisiones y límites está en [Grupo 1](docs/technical/
 - [Investigación oficial y compatibilidad de NeoForge](docs/technical/neoforge-26.2.md).
 - [Avance del grupo 1 y decisiones tomadas](docs/technical/group1.md).
 - [Avance del grupo 2 y decisiones tomadas](docs/technical/group2.md).
+- [Producción, interfaces e integración](docs/technical/group3.md).
+- [Recetas concretadas del grupo 3](docs/technical/group3-recipes.md).
 - [Registro de cambios](CHANGELOG.md).
 
 ## Plataforma y comprobaciones

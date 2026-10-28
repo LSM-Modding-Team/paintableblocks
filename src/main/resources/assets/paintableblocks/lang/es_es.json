@@ -382,5 +382,19 @@
   "item.paintableblocks.netherite_brush": "Pincel de netherite",
   "item.paintableblocks.netherite_scraper": "Rasqueta de netherite",
   "block.paintableblocks.netherite_paint_bucket": "Cubo de pintura de netherite",
-  "message.paintableblocks.invalid_area": "Área inválida: elige otra esquina del mismo bloque y plano"
+  "message.paintableblocks.invalid_area": "Área inválida: elige otra esquina del mismo bloque y plano",
+  "block.paintableblocks.workbench": "Banco de bloques",
+  "block.paintableblocks.cutter": "Cortadora de bloques",
+  "block.paintableblocks.assembler": "Ensambladora de bloques",
+  "block.paintableblocks.paint_mill": "Molino de pintura",
+  "block.paintableblocks.paint_press": "Prensa de pintura",
+  "tooltip.paintableblocks.production": "%s bloques · %s pilas · progreso %s/%s",
+  "button.paintableblocks.manufacture": "Fabricar lote",
+  "button.paintableblocks.manufacture_count": "Fabricar %s bloques",
+  "button.paintableblocks.convert_item": "Convertir ítem → 1",
+  "message.paintableblocks.production_blocked": "Operación detenida: comprueba entradas, capacidad y salida",
+  "label.paintableblocks.processing": "Progreso %s/%s · Lote: %s pinturas",
+  "label.paintableblocks.machine_wait": "Espera si la salida no admite el lote completo",
+  "tooltip.paintableblocks.station_inputs": "Primeras dos ranuras: 1 piedra central y 8 exteriores iguales. Shift + clic guarda bloques nuevos en los contadores.",
+  "tooltip.paintableblocks.station_convert": "Tercera ranura: bloque completo sin pintura. La cuarta recibe el resultado con sus datos. Los botones → convierten los contadores a la subdivisión elegida."
 }

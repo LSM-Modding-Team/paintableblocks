@@ -100,3 +100,19 @@ El usuario eligió este grupo y autorizó resolver decisiones faltantes durante 
 Se incorporó el PNG original y se retiraron los recursos de tenazas y guantes. La instrucción actual deja todas las herramientas sin modelos ni texturas, aceptando missing model/texture. Los recursos se realizarán individualmente al terminar los demás frentes.
 
 Quedan disponibles las estaciones de bloques, molino/prensa, recetas generales y sus interfaces/integraciones del grupo 3. Las recetas de extracción y mejora a netherite de herramientas/cubos ya forman parte del grupo 2; esto no implementa las máquinas. Véanse [Grupo 2](../../../../technical/group2.md) y [CHANGELOG](../../../../../CHANGELOG.md).
+
+## Ejecución: grupo 3 — producción e integración
+
+El usuario eligió las cinco áreas del grupo y autorizó resolver decisiones faltantes durante el trabajo, informándolas después del commit.
+
+| Frente | Implementación | Evidencia |
+|---|---|---|
+| Estaciones de bloques | Banco/cortadora/ensambladora, lotes, contadores, conversión y portabilidad | Revisión estática; sin partida de prueba |
+| Molino y prensa | Procesamiento de 80 ticks, salidas completas, recipiente sobrante, progreso y tolvas | Contratos preparados; no ejecutados |
+| Interfaces | Slots, cantidades reales, selección por menú/jugador, acciones y predicción de inventario | Sin prueba multijugador |
+| Recetas y mejoras | Manual, herramientas, estaciones, máquinas y conservación de datos/capacidad | JSON y patrones revisados |
+| Verificación e integración | Registros, componentes, recetas, menús, ticker, acceso creativo y validadores conectados | Comprobación estática; compilación/carga y pruebas de juego pendientes de autorización |
+
+Los cinco bloques de esta entrega tienen cubo 3D sin texturas asignadas. No se generan recursos visuales de herramientas. Quedan como alternativas el frente individual de recursos de herramientas y las comprobaciones de ejecución cuando se autoricen; las correcciones concretas pueden elegirse según sus resultados.
+
+Evidencia, decisiones y límites: [Grupo 3](../../../../technical/group3.md), [recetas](../../../../technical/group3-recipes.md) y [CHANGELOG](../../../../../CHANGELOG.md).

@@ -27,9 +27,6 @@ def main():
     for kind in ['extract_paint', 'upgrade_tools']:
         recipe = ROOT / f'src/main/resources/data/paintableblocks/recipe/{kind}.json'
         assert json.loads(recipe.read_text())['type'] == f'paintableblocks:{kind}'
-    for relative in ['production/WorkstationOperations.java', 'production/PaintMachineOperations.java',
-                     'block/WorkstationBlock.java', 'block/PaintMachineBlock.java', 'menu/WorkstationMenu.java', 'menu/PaintMachineMenu.java']:
-        assert (JAVA / relative).stat().st_size == 0, f'Unexpected group-3 implementation: {relative}'
     for lang in ['es_es', 'en_us']:
         strings = json.loads((ASSETS / f'lang/{lang}.json').read_text())
         for name in TOOLS:
@@ -39,7 +36,7 @@ def main():
         if 'client' not in path.relative_to(JAVA).parts:
             assert not re.search(r'import\s+net\.minecraft\.client\.', path.read_text())
     print(json.dumps({'original_png': '16x16, exact SHA256', 'tools_without_visual_assets': len(TOOLS),
-                      'recipe_definitions': 2, 'group3_boundary': 'passed', 'java_compilation_or_execution': False}))
+                      'recipe_definitions': 2, 'group3_boundary': 'superseded by group3', 'java_compilation_or_execution': False}))
     print('Static checks only; Java contract cases are prepared but not executed.')
 
 

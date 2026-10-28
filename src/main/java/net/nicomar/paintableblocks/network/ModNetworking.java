@@ -54,10 +54,16 @@ public final class ModNetworking {
         public static final StreamCodec<RegistryFriendlyByteBuf,BucketAction> CODEC=StreamCodec.of((b,v)->{b.writeVarInt(v.container);b.writeVarInt(v.button);},b->new BucketAction(b.readVarInt(),b.readVarInt()));
         @Override public Type<BucketAction> type(){return TYPE;}
     }
+    public record ProductionAction(int container,int action,int variant,int expectedResolution,int expectedMaterial) implements CustomPacketPayload {
+        public static final Type<ProductionAction> TYPE=new Type<>(Identifier.fromNamespaceAndPath("paintableblocks","production_action"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,ProductionAction> CODEC=StreamCodec.of((b,v)->{b.writeVarInt(v.container);b.writeVarInt(v.action);b.writeVarInt(v.variant);b.writeVarInt(v.expectedResolution);b.writeVarInt(v.expectedMaterial);},b->new ProductionAction(b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt()));
+        @Override public Type<ProductionAction> type(){return TYPE;}
+    }
     public static void register(RegisterPayloadHandlersEvent event){
-        var registrar=event.registrar("3");
+        var registrar=event.registrar("4");
         registrar.playToServer(Use.TYPE,Use.CODEC,(v,ctx)->ServerInteractions.use(ctx.player(),v));
         registrar.playToClient(Selection.TYPE,Selection.CODEC);
+        registrar.playToServer(ProductionAction.TYPE,ProductionAction.CODEC,(v,ctx)->{var p=ctx.player();if(p.containerMenu instanceof net.nicomar.paintableblocks.menu.WorkstationMenu menu&&menu.containerId==v.container)menu.action(p,v.action,v.variant,v.expectedResolution,v.expectedMaterial);});
         registrar.playToServer(BucketAction.TYPE,BucketAction.CODEC,(v,ctx)->{
             var player=ctx.player();if(player.containerMenu instanceof net.nicomar.paintableblocks.menu.PaintBucketMenu menu&&menu.containerId==v.container)menu.clickMenuButton(player,v.button);
         });

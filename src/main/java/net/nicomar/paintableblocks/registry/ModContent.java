@@ -100,7 +100,7 @@ public final class ModContent {
     private ModContent(){}
     public static PaintableBlock block(int n){return BLOCKS.get(PaintingBalance.requireResolution(n)).get();}
     public static ItemStack stack(BlockDesign design){ItemStack out=new ItemStack(ITEMS.get(design.resolution()).get());out.set(DESIGN.get(),design);return out;}
-    public static void initialize(IEventBus bus){bus.addListener(ModContent::creative);bus.addListener(ModContent::setup);bus.addListener(net.nicomar.paintableblocks.network.ModNetworking::register);net.nicomar.paintableblocks.interaction.ServerInteractions.register();}
+    public static void initialize(IEventBus bus){ProductionContent.initialize(bus);bus.addListener(ModContent::creative);bus.addListener(ModContent::setup);bus.addListener(net.nicomar.paintableblocks.network.ModNetworking::register);net.nicomar.paintableblocks.interaction.ServerInteractions.register();}
     private static void setup(FMLCommonSetupEvent event){event.enqueueWork(PaintCatalog::validateRegistries);}
     private static void creative(BuildCreativeModeTabContentsEvent event){
         if(event.getTabKey().equals(CreativeModeTabs.BUILDING_BLOCKS))for(var item:ITEMS.values())event.accept(new ItemStack(item.get()));

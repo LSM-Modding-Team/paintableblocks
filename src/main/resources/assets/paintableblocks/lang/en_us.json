@@ -382,5 +382,19 @@
   "item.paintableblocks.netherite_brush": "Netherite brush",
   "item.paintableblocks.netherite_scraper": "Netherite scraper",
   "block.paintableblocks.netherite_paint_bucket": "Netherite paint bucket",
-  "message.paintableblocks.invalid_area": "Invalid area: choose another corner on the same block and plane"
+  "message.paintableblocks.invalid_area": "Invalid area: choose another corner on the same block and plane",
+  "block.paintableblocks.workbench": "Block workbench",
+  "block.paintableblocks.cutter": "Block cutter",
+  "block.paintableblocks.assembler": "Block assembler",
+  "block.paintableblocks.paint_mill": "Paint mill",
+  "block.paintableblocks.paint_press": "Paint press",
+  "tooltip.paintableblocks.production": "%s blocks · %s stacks · progress %s/%s",
+  "button.paintableblocks.manufacture": "Manufacture batch",
+  "button.paintableblocks.manufacture_count": "Manufacture %s blocks",
+  "button.paintableblocks.convert_item": "Convert item → 1",
+  "message.paintableblocks.production_blocked": "Operation blocked: check inputs, capacity and output",
+  "label.paintableblocks.processing": "Progress %s/%s · Batch: %s paints",
+  "label.paintableblocks.machine_wait": "Waits when the complete batch cannot fit",
+  "tooltip.paintableblocks.station_inputs": "First two slots: 1 central stone and 8 matching outer materials. Shift-click stores new blocks in the counters.",
+  "tooltip.paintableblocks.station_convert": "Third slot: a complete unpainted block. The fourth receives the result with its data. Arrow buttons convert counters to the selected resolution."
 }

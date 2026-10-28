@@ -20,10 +20,8 @@ public final class PaintExtractionRecipe extends CustomRecipe {
         for(int slot=0;slot<input.size();slot++){
             var stack=input.getItem(slot);if(stack.isEmpty())continue;
             if(stack.getItem() instanceof ScraperItem item){if(tool!=-1||stack.getCount()!=1)return null;tool=slot;scraper=item;continue;}
-            String source=BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();if(stack.is(Items.POWDER_SNOW_BUCKET))source="minecraft:powder_snow";
-            final String key=source;var entry=PaintCatalog.entries().stream().filter(e->e.blockId().equals(key)&&e.survivalAvailable()).findFirst().orElse(null);
-            if(entry==null||!ItemStack.isSameItemSameComponents(stack,new ItemStack(stack.getItem()))||paint!=0&&paint!=entry.paintId())return null;
-            paint=entry.paintId();blocks++;
+            int id=net.nicomar.paintableblocks.production.ProductionInputs.paint(stack);
+            if(id==0||paint!=0&&paint!=id)return null;paint=id;blocks++;
         }
         if(scraper==null||blocks!=1&&blocks!=8||!scraper.valid(input.getItem(tool),blocks))return null;
         if(blocks==8&&(input.width()!=3||input.height()!=3||tool!=4))return null;

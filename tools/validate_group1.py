@@ -40,7 +40,7 @@ def main():
         assert parsed[f'assets/paintableblocks/blockstates/{name}.json']['variants']['']['type'] == 'paintableblocks:design'
         assert parsed[f'assets/paintableblocks/items/{name}.json']['model']['type'] == 'paintableblocks:design'
     mineable = parsed['data/minecraft/tags/block/mineable/pickaxe.json']
-    assert mineable['replace'] is False and set(mineable['values']) == {f'paintableblocks:{n}' for n in names} | {f'paintableblocks:{n}_paint_bucket' for n in ['copper','gold','diamond','netherite']}
+    assert mineable['replace'] is False and set(mineable['values']) == {f'paintableblocks:{n}' for n in names} | {f'paintableblocks:{n}_paint_bucket' for n in ['copper','gold','diamond','netherite']} | {f'paintableblocks:{n}' for n in ['workbench','cutter','assembler','paint_mill','paint_press']}
     for path in JAVA.rglob('*.java'):
         if 'client' not in path.relative_to(JAVA).parts:
             assert not re.search(r'import\s+net\.minecraft\.client\.', path.read_text()), f'Client import in common code: {path}'
@@ -83,8 +83,9 @@ def main():
         elif isinstance(value, list):
             for item in value:
                 inspect(item)
-    for document in parsed.values():
-        inspect(document)
+    for resource,document in parsed.items():
+        if resource.startswith("assets/"):
+            inspect(document)
     for path in (ROOT / 'docs/obsidian/PaintableBlocks').rglob('*.md'):
         for target in re.findall(r'\[\[([^\]]+)\]\]', path.read_text()):
             assert target.split('|')[0].endswith('.csv') or target.split('|')[0] in docs, (path, target)

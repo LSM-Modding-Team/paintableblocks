@@ -9,6 +9,11 @@
     "paintableblocks:copper_paint_bucket",
     "paintableblocks:gold_paint_bucket",
     "paintableblocks:diamond_paint_bucket",
-    "paintableblocks:netherite_paint_bucket"
+    "paintableblocks:netherite_paint_bucket",
+    "paintableblocks:workbench",
+    "paintableblocks:cutter",
+    "paintableblocks:assembler",
+    "paintableblocks:paint_mill",
+    "paintableblocks:paint_press"
   ]
 }
