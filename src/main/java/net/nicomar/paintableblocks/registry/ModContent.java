@@ -87,7 +87,7 @@ public final class ModContent {
         }
         for(var tier:PaintingBalance.Bucket.values()){
             String name=tier.name().toLowerCase(java.util.Locale.ROOT)+"_paint_bucket";
-            var block=ModRegistries.BLOCKS.registerBlock(name,p->new PaintBucketBlock(tier,p),()->BlockBehaviour.Properties.of().strength(1.5F,6).sound(SoundType.METAL).pushReaction(PushReaction.BLOCK));BUCKETS.put(tier,block);
+            var block=ModRegistries.BLOCKS.registerBlock(name,p->new PaintBucketBlock(tier,p),()->BlockBehaviour.Properties.of().strength(1.5F,6).sound(SoundType.METAL).noOcclusion().pushReaction(PushReaction.BLOCK));BUCKETS.put(tier,block);
             BUCKET_ITEMS.put(tier,ModRegistries.ITEMS.registerItem(name,p->new PaintBucketItem(block.get(),p),()->new Item.Properties().stacksTo(1).useBlockDescriptionPrefix().component(BUCKET_PAINTS.get(),PaintStorage.EMPTY)));
         }
     }

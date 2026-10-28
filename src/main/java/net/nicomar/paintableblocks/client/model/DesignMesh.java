@@ -101,7 +101,10 @@ public final class DesignMesh {
         List<BlockStateModelPart> parts=new ArrayList<>();model.collectParts(RandomSource.create(0),parts);
         List<BakedQuad> out=new ArrayList<>();
         for(var part:parts){
-            List<BakedQuad> source=new ArrayList<>(part.getQuads(face));
+            List<BakedQuad> source=new ArrayList<>();
+            // A cull direction can group inward-facing backs (notably powder snow).
+            // Select the outward normal before flattening geometry to a paintable surface.
+            for(var quad:part.getQuads(face))if(quad.direction()==face)source.add(quad);
             for(var quad:part.getQuads(null))if(quad.direction()==face)source.add(quad);
             for(var q:source){
                 int tint=0xFFFFFFFF;

@@ -8,8 +8,8 @@ NAMES=['workbench','cutter','assembler','paint_mill','paint_press']
 def main():
     for name in NAMES:
         model=json.loads((RES/f'assets/paintableblocks/models/block/{name}.json').read_text())
-        assert model=={'parent':'minecraft:block/cube_all'}
-        assert not (RES/f'assets/paintableblocks/textures/block/{name}.png').exists()
+        assert model['parent']=='minecraft:block/block' and model['elements']
+        assert all((RES/('assets/paintableblocks/textures/'+value.split(':',1)[1]+'.png')).exists() for value in model['textures'].values() if not value.startswith('#'))
         state=json.loads((RES/f'assets/paintableblocks/blockstates/{name}.json').read_text())
         assert state['variants']['']['model']==f'paintableblocks:block/{name}'
         item=json.loads((RES/f'assets/paintableblocks/items/{name}.json').read_text())
@@ -36,6 +36,6 @@ def main():
     for lang in ['en_us','es_es']:
         strings=json.loads((RES/f'assets/paintableblocks/lang/{lang}.json').read_text())
         for name in NAMES:assert 'block.paintableblocks.'+name in strings
-    print(json.dumps({'production_blocks':5,'default_cube_models':5,'new_block_textures':0,'recipe_files':len(recipes),'java_or_game_execution':False}))
+    print(json.dumps({'production_blocks':5,'textured_production_models':5,'recipe_files':len(recipes),'java_or_game_execution':False}))
 
 if __name__=='__main__':main()

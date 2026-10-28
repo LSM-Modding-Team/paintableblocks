@@ -39,7 +39,7 @@ public final class ProductionContent {
             MACHINE_ITEMS.put(tier,ModRegistries.ITEMS.registerItem(name,p->new ProductionBlockItem(block.get(),p),ProductionContent::itemProperties));
         }
     }
-    private static BlockBehaviour.Properties properties(){return BlockBehaviour.Properties.of().strength(3.5F,6).sound(SoundType.STONE).pushReaction(PushReaction.BLOCK);}
+    private static BlockBehaviour.Properties properties(){return BlockBehaviour.Properties.of().strength(3.5F,6).sound(SoundType.STONE).noOcclusion().pushReaction(PushReaction.BLOCK);}
     private static Item.Properties itemProperties(){return new Item.Properties().stacksTo(1).useBlockDescriptionPrefix().component(PRODUCTION_CONTENTS.get(),ProductionState.EMPTY);}
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<WorkstationBlockEntity>> WORKSTATION_ENTITY=ModRegistries.BLOCK_ENTITY_TYPES.register("workstation",()->new BlockEntityType<>(WorkstationBlockEntity::new,Set.copyOf(STATIONS.values().stream().map(DeferredBlock::get).toList())));
     public static final DeferredHolder<BlockEntityType<?>,BlockEntityType<PaintMachineBlockEntity>> MACHINE_ENTITY=ModRegistries.BLOCK_ENTITY_TYPES.register("paint_machine",()->new BlockEntityType<>(PaintMachineBlockEntity::new,Set.copyOf(MACHINES.values().stream().map(DeferredBlock::get).toList())));

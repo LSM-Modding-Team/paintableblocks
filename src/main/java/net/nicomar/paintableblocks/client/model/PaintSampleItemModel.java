@@ -30,8 +30,11 @@ public final class PaintSampleItemModel implements ItemModel {
         Integer id=stack.get(ModContent.PAINT_ID.get());if(id==null||!PaintCatalog.validId(id))return;
         BlockDesign design=BlockDesign.full(1);for(Direction face:Direction.values())design=design.paint(0,face,id);
         var out=new QuadCollection.Builder().addAll(cap);
-        for(var q:meshes.mesh(design).quads().getAll())out.addUnculledFace(new BakedQuad(scale(q.position0()),scale(q.position1()),scale(q.position2()),scale(q.position3()),
+        for(var q:meshes.mesh(design).quads().getAll()){
+            if(q.direction()==Direction.UP)continue; // Covered by the cap: never draw coplanar contact faces.
+            out.addUnculledFace(new BakedQuad(scale(q.position0()),scale(q.position1()),scale(q.position2()),scale(q.position3()),
                 q.packedUV0(),q.packedUV1(),q.packedUV2(),q.packedUV3(),q.direction(),q.materialInfo(),q.bakedNormals(),q.bakedColors()));
+        }
         new CuboidItemModelWrapper(List.of(),out.build(),properties,transform).update(state,stack,resolver,display,level,owner,seed);
     }
     private static Vector3f scale(Vector3fc p){return new Vector3f(.25F+p.x()*.5F,.125F+p.y()*.5F,.25F+p.z()*.5F);}

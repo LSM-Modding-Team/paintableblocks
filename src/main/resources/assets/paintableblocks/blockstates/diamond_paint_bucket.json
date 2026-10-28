@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "paintableblocks:block/diamond_paint_bucket"
+    }
+  }
+}

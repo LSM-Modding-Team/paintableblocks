@@ -6,7 +6,7 @@ Mod en desarrollo para **Minecraft 26.2**, **NeoForge 26.2.0.88** y **Java 25**.
 
 Base del mod y grupos **1: bloques y diseños**, **2: herramientas y pinturas** y **3: producción e integración** implementados en código. Hay cinco subdivisiones, 337 pinturas, herramientas de conservación/edición/giro, pinceles, rasquetas, cubos, tres estaciones y dos máquinas de pintura.
 
-Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes completos en 80 ticks. Se incorporan recetas y mejoras con conservación de datos. Los cinco bloques de producción usan cubos 3D sin texturas asignadas. Ninguna herramienta tiene modelos ni texturas por ahora.
+Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes completos en 80 ticks. Se incorporan recetas y mejoras con conservación de datos. Los recursos de 20 herramientas, cuatro cubos y cinco bloques de producción están implementados: modelos 3D, texturas originales de 16×16 y colisión coincidente. Se validan caras y UV para evitar superficies superpuestas. [Vista técnica y detalles](docs/technical/visual-assets.md).
 
 Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **4**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
 
@@ -21,6 +21,7 @@ Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md
 - [Avance del grupo 2 y decisiones tomadas](docs/technical/group2.md).
 - [Producción, interfaces e integración](docs/technical/group3.md).
 - [Recetas concretadas del grupo 3](docs/technical/group3-recipes.md).
+- [Modelos, texturas y vista técnica](docs/technical/visual-assets.md).
 - [Registro de cambios](CHANGELOG.md).
 
 ## Plataforma y comprobaciones

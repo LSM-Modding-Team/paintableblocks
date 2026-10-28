@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "paintableblocks:block/copper_paint_bucket"
+    }
+  }
+}

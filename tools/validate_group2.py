@@ -20,9 +20,11 @@ def main():
     assert hashlib.sha256(raw).hexdigest() == 'aca1bd691809249ca928990bca71ea1cee4a150e409bd2d14e664baaa2472afa'
     assert raw[:8] == b'\x89PNG\r\n\x1a\n' and struct.unpack('>II', raw[16:24]) == (16, 16)
     assert json.loads((ASSETS / 'models/block/unpainted.json').read_text())['textures']['all'] == 'paintableblocks:block/unpainted'
-    for path in ASSETS.rglob('*'):
-        if path.is_file() and any(tool in path.stem for tool in TOOLS):
-            assert not any(part in ['items', 'models', 'textures'] for part in path.relative_to(ASSETS).parts), f'Tool visual asset forbidden: {path}'
+    for tool in TOOLS:
+        definition=json.loads((ASSETS/'items'/(tool+'.json')).read_text())
+        assert definition['model']['type']=='minecraft:model'
+        name=definition['model']['model'].split(':',1)[1]
+        assert (ASSETS/'models'/(name+'.json')).exists()
     assert '.random' not in (JAVA / 'operation/CollectionPolicy.java').read_text()
     for kind in ['extract_paint', 'upgrade_tools']:
         recipe = ROOT / f'src/main/resources/data/paintableblocks/recipe/{kind}.json'
@@ -35,7 +37,7 @@ def main():
     for path in JAVA.rglob('*.java'):
         if 'client' not in path.relative_to(JAVA).parts:
             assert not re.search(r'import\s+net\.minecraft\.client\.', path.read_text())
-    print(json.dumps({'original_png': '16x16, exact SHA256', 'tools_without_visual_assets': len(TOOLS),
+    print(json.dumps({'original_png': '16x16, exact SHA256', 'tools_with_visual_assets': len(TOOLS),
                       'recipe_definitions': 2, 'group3_boundary': 'superseded by group3', 'java_compilation_or_execution': False}))
     print('Static checks only; Java contract cases are prepared but not executed.')
 

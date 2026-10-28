@@ -91,3 +91,9 @@ Las reservas de estaciones, máquinas, operaciones, menús y pantallas tienen im
 Los cinco bloques usan cubos sin texturas asignadas. Las herramientas siguen sin recursos visuales. `CreativePaintSelectionRecipe.java` permanece vacío: la selección creativa se resuelve en inventario, según la decisión vigente del grupo 2.
 
 Detalle, límites y comprobaciones: [Grupo 3](group3.md). Los grupos tienen revisión estática; no se han compilado ni probado en Minecraft.
+
+## Recursos visuales e integración física
+
+`design/VisualShapes.java` contiene las formas comunes de los nueve bloques con nuevos modelos. Se genera desde los mismos sólidos mediante `tools/generate_visual_assets.py`. La representación dinámica de bloques pintables y diseños conservados sigue compartida; el bote elimina sus contactos ocultos y filtra las normales de pinturas vanilla.
+
+La prohibición visual temporal ha sido sustituida por la autorización actual. Estado y evidencia: [recursos visuales](visual-assets.md).

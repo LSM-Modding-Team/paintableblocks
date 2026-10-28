@@ -24,7 +24,7 @@ Patrón `EEE / ECE / EEE`: C es stone, deepslate, andesite, diorite, granite o t
 | Rasqueta de esos cinco niveles | Sin forma: 1 palo + 3 materiales del nivel |
 | Cubo de pintura de cobre | `CCC / C·C / CCC`: 8 lingotes de cobre |
 
-Se eligieron patrones distintos entre las herramientas y se evita reutilizar el patrón del pico para el martillo. Las herramientas siguen sin modelos ni texturas.
+Se eligieron patrones distintos entre las herramientas y se evita reutilizar el patrón del pico para el martillo. Los recursos de las herramientas se incorporan en la [entrega visual posterior](visual-assets.md).
 
 ## Estaciones y máquinas
 

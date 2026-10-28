@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "paintableblocks:block/gold_paint_bucket"
+  }
+}

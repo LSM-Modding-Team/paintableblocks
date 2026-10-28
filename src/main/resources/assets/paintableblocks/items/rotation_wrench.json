@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "paintableblocks:item/rotation_wrench"
+  }
+}

@@ -18,6 +18,7 @@ public final class WorkstationBlock extends PortableProductionBlock {
     private final PaintingBalance.Station tier;
     public WorkstationBlock(PaintingBalance.Station tier,Properties p){super(p);this.tier=tier;}
     public PaintingBalance.Station tier(){return tier;}
+    @Override protected String visualName(){return tier.name().toLowerCase(java.util.Locale.ROOT); }
     @Override protected MapCodec<WorkstationBlock> codec(){return CODEC;}
     @Override public boolean accepts(ProductionState s){return s.valid()&&s.total()<=tier.capacity&&s.progress()==0&&s.paint()==0&&s.items().stream().allMatch(e->e.slot()<4);}
     @Override public BlockEntity newBlockEntity(BlockPos pos,BlockState state){return new WorkstationBlockEntity(pos,state);}

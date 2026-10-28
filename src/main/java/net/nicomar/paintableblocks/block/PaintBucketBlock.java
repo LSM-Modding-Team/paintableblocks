@@ -31,6 +31,12 @@ public final class PaintBucketBlock extends BaseEntityBlock {
     private final PaintingBalance.Bucket tier;
     public PaintBucketBlock(PaintingBalance.Bucket tier,Properties p){super(p);this.tier=tier;}
     public PaintingBalance.Bucket tier(){return tier;}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state,net.minecraft.world.level.BlockGetter level,BlockPos pos,net.minecraft.world.phys.shapes.CollisionContext context){return net.nicomar.paintableblocks.design.VisualShapes.of(tier.name().toLowerCase(java.util.Locale.ROOT)+"_paint_bucket");}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getCollisionShape(BlockState state,net.minecraft.world.level.BlockGetter level,BlockPos pos,net.minecraft.world.phys.shapes.CollisionContext context){return getShape(state,level,pos,context);}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getVisualShape(BlockState state,net.minecraft.world.level.BlockGetter level,BlockPos pos,net.minecraft.world.phys.shapes.CollisionContext context){return getShape(state,level,pos,context);}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getBlockSupportShape(BlockState state,net.minecraft.world.level.BlockGetter level,BlockPos pos){return net.nicomar.paintableblocks.design.VisualShapes.of(tier.name().toLowerCase(java.util.Locale.ROOT)+"_paint_bucket");}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getInteractionShape(BlockState state,net.minecraft.world.level.BlockGetter level,BlockPos pos){return net.minecraft.world.phys.shapes.Shapes.empty();}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState state){return net.minecraft.world.phys.shapes.Shapes.empty();}
     @Override protected MapCodec<? extends BaseEntityBlock> codec(){return CODEC;}
     @Override protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state){return net.minecraft.world.level.block.RenderShape.MODEL;}
     @Override public BlockEntity newBlockEntity(BlockPos pos,BlockState state){return new PaintBucketBlockEntity(pos,state);}

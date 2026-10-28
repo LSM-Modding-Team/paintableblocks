@@ -1,5 +1,7 @@
 # Grupo 3: producción e integración
 
+> Actualización visual posterior: [recursos completos](visual-assets.md) sustituye los cubos sin texturas y las formas provisionales por modelos texturizados con colisión coincidente.
+
 Implementación para Minecraft 26.2 / NeoForge 26.2.0.88. Incluye estaciones de bloques, molino/prensa, sus interfaces, recetas/mejoras e integración estática. No se ha compilado ni ejecutado Minecraft: los estados de implementación no acreditan verificación en juego.
 
 ## Estaciones

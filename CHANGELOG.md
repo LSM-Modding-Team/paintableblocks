@@ -2,6 +2,20 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Recursos visuales de bloques y herramientas
+
+- Completados modelos 3D de 20 herramientas: ocho de edición/conservación/giro, seis pinceles y seis rasquetas, con materiales y siluetas diferenciados.
+- Añadidos recursos de los cuatro cubos de pintura: recipientes con tapa, asa y distintivos de 1/4/8/8 identidades por nivel. Sus pinturas/cantidades siguen siendo datos reales de interfaz/tooltip.
+- Sustituidos los cinco cubos provisionales de producción por banco, cortadora, ensambladora, molino y prensa con volumetría de taller.
+- Creadas **28 texturas originales de 16×16**, todas opacas; conservado el original `unpainted.png` sin modificar. Las familias comparten geometría y materiales mediante modelos padre; no se utilizan iconos planos como sustituto del 3D.
+- Prevención de z-fighting: geometría exterior de uniones de vóxeles, eliminación de caras de contacto, rectángulos fusionados, UV explícitos y ausencia de planos de grosor cero o adornos coplanares. Cero solapes detectados en 20 654 parches unitarios de los 33 modelos con superficies revisados.
+- Nueve bloques de mundo integran colisión, selección y apoyo desde los mismos sólidos del modelo, mediante 91 cajas disjuntas. Se evita el cubo invisible provisional y la ocultación de vecinos a través de huecos.
+- Bote de pintura: tapa/asa remalladas con acero propio, retiradas las caras ocultas entre cuerpo y tapa. Proyección vanilla: filtrada la normal real de los quads para no aplanar también caras de vuelta, como las de nieve en polvo. Se mantienen las capas decorativas intencionadas y las 337 identidades.
+- Decisiones adoptadas: estética de madera/acero/cobre; niveles por material/color; recipientes cerrados con marcas de capacidad de identidades; formas físicas coincidentes; preservación de los diseños y texturas originales del catálogo. Detalle en [recursos visuales](docs/technical/visual-assets.md).
+- Añadidos generador reproducible de recursos/formas, render técnico de inspección y validador de UV, referencias, opacidad, contactos y equivalencia visual/física. Actualizados los validadores de grupos 2/3 y la documentación para la autorización visual vigente.
+- Los validadores de recursos pasan y se revisó la sintaxis de 70 archivos Java. La lámina técnica representa los JSON/PNG por software; no es una captura de Minecraft ni acredita ausencia de artefactos con shaders externos.
+- Sin Gradle, compilación, ejecución de Java, CI o Minecraft. Quedan pendientes las comprobaciones visuales en juego. Publicación directa online en `26.2`, sin commits locales. El protocolo se mantiene en 4; actualizar ambos lados por las nuevas formas físicas compartidas.
+
 ## 2026-10-28 — Grupo 3: producción e integración
 
 - Añadidos banco, cortadora y ensambladora: multiplicadores ×2/×4/×8, capacidades compartidas 1024/4096/16 384, fabricación de las cinco subdivisiones y consumo únicamente si cabe el lote completo.

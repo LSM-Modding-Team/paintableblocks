@@ -17,6 +17,6 @@ Antes de actuar se destacan exactamente los subcubos o superficies afectados. Te
 
 ## Desarrollo por herramienta
 
-Primero se implementan el ítem y todas sus funciones, con selección, persistencia y mensajes necesarios. Por instrucción posterior del usuario, ninguna herramienta tendrá por ahora modelos ni texturas, tampoco provisionales: se acepta missing model/texture. El frente de recursos se realizará individualmente al terminar los otros frentes. Después se crearán modelos 3D y texturas de 16×16.
+Primero se implementan el ítem y todas sus funciones, con selección, persistencia y mensajes necesarios. El usuario autorizó ahora sus recursos: las veinte variantes de herramientas tienen modelos 3D y materiales de 16×16. La validación estática de superficies no sustituye la inspección en Minecraft. Véase [[Modelos y Texturas]].
 
 [[Plan de Fases]] · [[Modelos y Texturas]]

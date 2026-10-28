@@ -116,3 +116,11 @@ El usuario eligió las cinco áreas del grupo y autorizó resolver decisiones fa
 Los cinco bloques de esta entrega tienen cubo 3D sin texturas asignadas. No se generan recursos visuales de herramientas. Quedan como alternativas el frente individual de recursos de herramientas y las comprobaciones de ejecución cuando se autoricen; las correcciones concretas pueden elegirse según sus resultados.
 
 Evidencia, decisiones y límites: [Grupo 3](../../../../technical/group3.md), [recetas](../../../../technical/group3-recipes.md) y [CHANGELOG](../../../../../CHANGELOG.md).
+
+## Ejecución: recursos visuales completos
+
+Por petición del usuario se completan los recursos de 20 herramientas, cuatro cubos y cinco bloques de producción. Las texturas propias son de 16×16 y los ítems tienen modelos 3D. El PNG original y los diseños dinámicos de bloques/pinturas se mantienen.
+
+Estado: recursos implementados; inspección técnica y validación estática de geometría/colisión realizadas. Comprobación en Minecraft pendiente. Esta petición sustituye las restricciones temporales de recursos de las entregas anteriores.
+
+Las alternativas siguientes son inspección de manos/cámara/recarga, pruebas de integración autorizadas y correcciones según sus resultados. No se declara verificación en juego. Evidencia y decisiones: [recursos visuales](../../../../technical/visual-assets.md).

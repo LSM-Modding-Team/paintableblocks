@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "paintableblocks:item/diamond_scraper"
+  }
+}

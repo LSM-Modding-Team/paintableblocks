@@ -20,6 +20,7 @@ public final class PaintMachineBlock extends PortableProductionBlock {
     private final PaintingBalance.Production tier;
     public PaintMachineBlock(PaintingBalance.Production tier,Properties p){super(p);if(tier==PaintingBalance.Production.SCRAPER)throw new IllegalArgumentException("Not a machine");this.tier=tier;}
     public PaintingBalance.Production tier(){return tier;}
+    @Override protected String visualName(){return tier==PaintingBalance.Production.MILL?"paint_mill":"paint_press";}
     @Override protected MapCodec<PaintMachineBlock> codec(){return CODEC;}
     @Override public boolean accepts(ProductionState s){return s.valid()&&s.total()==0;}
     @Override public BlockEntity newBlockEntity(BlockPos pos,BlockState state){return new PaintMachineBlockEntity(pos,state);}

@@ -23,6 +23,13 @@ import net.nicomar.paintableblocks.production.ProductionState;
 public abstract class PortableProductionBlock extends BaseEntityBlock {
     protected PortableProductionBlock(Properties p){super(p);}
     public abstract boolean accepts(ProductionState state);
+    protected abstract String visualName();
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state,BlockGetter level,BlockPos pos,net.minecraft.world.phys.shapes.CollisionContext context){return net.nicomar.paintableblocks.design.VisualShapes.of(visualName());}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getCollisionShape(BlockState state,BlockGetter level,BlockPos pos,net.minecraft.world.phys.shapes.CollisionContext context){return getShape(state,level,pos,context);}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getVisualShape(BlockState state,BlockGetter level,BlockPos pos,net.minecraft.world.phys.shapes.CollisionContext context){return getShape(state,level,pos,context);}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getBlockSupportShape(BlockState state,BlockGetter level,BlockPos pos){return net.nicomar.paintableblocks.design.VisualShapes.of(visualName());}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getInteractionShape(BlockState state,BlockGetter level,BlockPos pos){return net.minecraft.world.phys.shapes.Shapes.empty();}
+    @Override protected net.minecraft.world.phys.shapes.VoxelShape getOcclusionShape(BlockState state){return net.minecraft.world.phys.shapes.Shapes.empty();}
     protected abstract AbstractContainerMenu menu(int id,Inventory inventory,BlockPos pos);
     @Override protected RenderShape getRenderShape(BlockState state){return RenderShape.MODEL;}
     private void open(Player p,BlockPos pos){

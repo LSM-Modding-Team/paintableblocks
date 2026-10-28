@@ -1,71 +1,59 @@
 # Modelos y texturas
 
-## Instrucción vigente tras el grupo 1
+## Instrucción vigente
 
-El original `unpainted.png` de 16×16 está integrado sin modificar. Ninguna herramienta debe disponer ahora de modelo o textura, tampoco provisional: se retiraron los recursos de tenazas y guantes. Se acepta missing model/texture, incluidos pinceles, rasquetas, herramientas de edición/giro y cubos. El frente de recursos de herramientas se realizará individualmente al terminar los otros frentes. Esta instrucción sustituye cualquier habilitación anterior de recursos provisionales o de iniciarlos inmediatamente al terminar una herramienta.
+El usuario autoriza ahora crear todos los recursos de bloques y herramientas que faltaban, evitando el parpadeo por superficies superpuestas. Esta petición sustituye la prohibición temporal de modelos/texturas. Las funciones de los grupos 1–3 preceden a esta entrega visual.
 
+Las texturas de juego son **16×16 píxeles** y los modelos de ítem son **3D**. El tamaño de textura no limita la resolución geométrica ni cambia las subdivisiones. El original `unpainted.png` se conserva exactamente, sin recrearlo; no es una pintura del catálogo.
 
-## Especificación común
+## Estado individual
 
-Las texturas propias son de **16×16 píxeles**. Los modelos de ítems son **3D**; los modelos no tienen una resolución en píxeles. El tamaño de textura no determina la subdivisión: 1×1, 2×2, 4×4, 8×8 y 16×16 comparten proyección continua sobre la cara completa.
+Modelo y textura de las siguientes variantes: **implementados**. Verificación en Minecraft: **pendiente** para todas; se revisaron por software y mediante validadores estáticos.
 
-## Función antes que recursos definitivos
+| Recurso | Modelo y material |
+|---|---|
+| Martillo | Cabeza de acero y mango de madera |
+| Mazo | Cabeza y mango de madera con bandas |
+| Cincel | Hoja y casquillos de acero, empuñadura de madera |
+| Raspador | Hoja plana ancha y mango corto |
+| Esponja de limpieza | Volumen escalonado y textura porosa |
+| Tenazas | Dos brazos, articulación y mordazas abiertas |
+| Guantes | Par de guantes de cuero con refuerzos metálicos |
+| Llave de giro | Boca abierta, mango de cobre y anillo |
+| Pincel de cobblestone | Cerdas claras y abrazadera de piedra |
+| Pincel de cobre | Cerdas claras y abrazadera de cobre |
+| Pincel de hierro | Cerdas claras y abrazadera de acero |
+| Pincel de oro | Cerdas claras y abrazadera dorada |
+| Pincel de diamante | Cerdas claras y abrazadera turquesa |
+| Pincel de netherite | Cerdas claras y abrazadera oscura |
+| Rasqueta de cobblestone | Hoja dentada de piedra |
+| Rasqueta de cobre | Hoja dentada de cobre |
+| Rasqueta de hierro | Hoja dentada de acero |
+| Rasqueta de oro | Hoja dentada dorada |
+| Rasqueta de diamante | Hoja dentada turquesa |
+| Rasqueta de netherite | Hoja dentada oscura |
+| Cubo de cobre | Recipiente cerrado, asa y marca de una identidad |
+| Cubo de oro | Recipiente cerrado y cuatro marcas |
+| Cubo de diamante | Recipiente cerrado y ocho marcas |
+| Cubo de netherite | Recipiente cerrado, ocho marcas y distintivo dorado |
+| Banco | Patas, estante y tablero de trabajo |
+| Cortadora | Cuerpo, guías y hoja de corte |
+| Ensambladora | Cuerpo con pórtico y cabezal |
+| Molino | Base, tolva y manivela |
+| Prensa | Base, columnas y plato |
 
-En todas las herramientas se completa primero el ítem funcional: registro, interacción, reglas, consumo o desgaste cuando corresponda, persistencia, selección y mensajes necesarios. Solo después se crea su modelo 3D y textura definitiva de 16×16.
+Las familias reutilizan materiales y modelos padre sin perder la diferencia entre niveles. Las cantidades y pinturas reales del pincel/cubo se consultan en interfaz y tooltip; no se inventa contenido líquido estático.
 
-Durante el desarrollo funcional se acepta missing model/texture. No crear recursos provisionales. Las funciones preceden a los recursos y, por instrucción actual del usuario, el frente visual se realizará individualmente al terminar los otros frentes.
+## Superficies, mundo e inventario
 
-## Seguimiento individual
+Se genera una única superficie exterior por unión de sólidos, sin caras internas de contacto, planos de grosor cero ni adornos coplanares. Los nueve bloques de mundo comparten esa geometría con sus formas físicas; los huecos y asas no conservan el cubo invisible provisional.
 
-Cada recurso mantiene por separado los estados de función, modelo, textura y verificación. Los valores de seguimiento son pendiente, en desarrollo, implementado o verificado según corresponda; un recurso visual permanece bloqueado mientras su función no esté completa.
+Los bloques pintables conservan su diseño dinámico en mundo e inventario. Las texturas del catálogo se fragmentan y giran con el diseño; no se duplican en miniatura ni se sustituyen por los nuevos materiales. Se conservan las animaciones y capas decorativas intencionadas de [[Texturas y Orientación]].
 
-Esta tabla establece los recursos a seguir, no declara que se hayan creado. Su estado inicial es pendiente de inspección al iniciar código. En las familias por material, llevar una entrada independiente por variante durante la ejecución, aunque aquí se agrupen para lectura.
+El bote de pintura mantiene su cuerpo dinámico; se remalla la tapa y se suprimen las caras ocultas de contacto. La proyección de pinturas selecciona la normal exterior real para no superponer las caras de vuelta de modelos vanilla.
 
-| Herramienta o variante | Función previa necesaria | Modelo final | Textura final | Verificación visual |
-|---|---|---|---|---|
-| Martillo | Retirar un subcubo y previsualizarlo | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Mazo | Retirar primeros subcubos por columna | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Cincel | Retirar capa plana sin atravesar huecos | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Raspador | Limpiar orientación y profundidad seleccionadas | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Esponja de limpieza | Limpiar todo conservando geometría | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Tenazas | Recogida implementada en código; sin prueba en juego | Pendiente; sin modelo | 16×16, pendiente | Pendiente |
-| Guantes | Recogida implementada en código; sin prueba en juego | Pendiente; sin modelo | 16×16, pendiente | Pendiente |
-| Llave de giro | Girar con vista previa y validar colisión | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Rasqueta de cobblestone | Extracción y 64 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Rasqueta de cobre | Extracción y 128 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Rasqueta de hierro | Extracción y 256 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Rasqueta de oro | Extracción y 128 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Rasqueta de diamante | Extracción y 1024 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Rasqueta de netherite | Extracción, 4096 usos y mejora proporcional | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Pincel de cobblestone | Aplicación y capacidad 1024 | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Pincel de cobre | Aplicación y capacidad 2048 | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Pincel de hierro | Aplicación y capacidad 4096 | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Pincel de oro | Aplicación y capacidad 8192 | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Pincel de diamante | Aplicación y capacidad 16 384 | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Pincel de netherite | Aplicación y capacidad 65 536 | Pendiente de función | 16×16, pendiente de función | Pendiente |
+## Evidencia
 
-Los cubos, estaciones, máquinas, bloques pintables y el bote de pintura también necesitan recursos 3D de ítem. Sus funciones y apariencias se rigen por sus entradas; no se toma la estética de los adjuntos como un recurso ya aprobado o generado.
+Informe, decisiones, lámina técnica y validadores: [recursos visuales](../../../../technical/visual-assets.md). La lámina es un render de inspección por software, no una captura del juego. El modelo y la textura creados no acreditan comprobación de iluminación, oclusión, manos, cámara o recarga en Minecraft.
 
-## Textura original del bloque
-
-Usar exactamente el `unpainted.png` elegido por el usuario, sin recrearlo ni reinterpretarlo. Es la textura original, no una pintura: no tiene ítem ni entrada en el catálogo.
-
-Se proyecta continuamente sobre la cara completa en las cinco subdivisiones. Las superficies nuevas tras un recorte muestran el fragmento correspondiente. Raspador y esponja restauran esta apariencia. Antes de integrarlo se comprueba el original y su tamaño de 16×16; si difiere, se comunica antes de alterarlo. No se presupone que el archivo ya esté en el repositorio.
-
-## Mundo, inventario y selección
-
-Los ítems conservados muestran su forma y pinturas y las restauran al colocarse. Mundo e inventario deben interpretar el mismo diseño. El bote de pintura 3D muestra la identidad correspondiente.
-
-La vista previa destaca exactamente superficies o subcubos afectados; tenazas y guantes indican qué se conserva y la llave muestra el giro previsto. El pincel muestra el área válida y su coste, excluyendo huecos y cuadrados que no cambian.
-
-Las texturas del catálogo se fragmentan, no se repiten en miniatura. Respetan orientación, estados visuales fijos y animaciones decorativas de [[Texturas y Orientación]]. Los packs de recursos pueden cambiar su apariencia sin cambiar esas reglas.
-
-Una inspección estática de archivos no acredita que el modelo se vea correctamente en juego. Registrar por separado modelo creado, textura creada y resultado de verificación, respetando la autorización de ejecución de [[Agente]].
-
-## Estado tras el grupo 1
-
-Se prepararon los modelos dinámicos del bloque y su ítem conservado, con proyección continua compartida, y el bote 3D de pintura. No han sido visualizados en juego.
-
-El grupo 2 incorpora el original `unpainted.png` de 16×16 sin modificar; deja de usarse la piedra vanilla provisional.
-
-Las funciones de tenazas, guantes y herramientas del grupo 2 están implementadas en código, sin prueba en juego. Se retiran las referencias vanilla provisionales. Ninguna herramienta tiene modelos o texturas por ahora. Véase [Grupo 1](../../../../technical/group1.md).
+No compilar ni iniciar clientes/servidores sin petición expresa, según [[Agente]]. Los commits se publican online únicamente en `26.2`.
