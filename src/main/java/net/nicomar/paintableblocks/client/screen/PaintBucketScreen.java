@@ -14,13 +14,13 @@ import net.nicomar.paintableblocks.paint.PaintCatalog;
 public final class PaintBucketScreen extends AbstractContainerScreen<PaintBucketMenu> {
     private final List<Button> paints=new ArrayList<>();
     public PaintBucketScreen(PaintBucketMenu menu,Inventory inventory,Component title){super(menu,inventory,title,300,218);}
-    private void send(int id){if(minecraft.gameMode!=null)minecraft.gameMode.handleInventoryButtonClick(menu.containerId,id);}
+    private void send(int id){if(minecraft.getConnection()!=null)net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(new net.nicomar.paintableblocks.network.ModNetworking.BucketAction(menu.containerId,id));}
     @Override protected void init(){
         super.init();paints.clear();
-        for(int slot=0;slot<8;slot++){final int index=slot;paints.add(addRenderableWidget(Button.builder(Component.empty(),b->send(index)).bounds(leftPos+8+(slot/4)*144,topPos+18+(slot%4)*20,140,19).build()));}
+        for(int slot=0;slot<8;slot++){final int index=slot;paints.add(addRenderableWidget(Button.builder(Component.empty(),b->{int id=menu.paint(index);if(id>0)send(PaintBucketMenu.SELECT_PAINT+id);}).bounds(leftPos+8+(slot/4)*144,topPos+18+(slot%4)*20,140,19).build()));}
         addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.deposit"),b->send(8)).bounds(leftPos+8,topPos+98,284,18).build());
-        addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.withdraw_one"),b->send(9)).bounds(leftPos+8,topPos+116,140,18).build());
-        addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.withdraw_stack"),b->send(10)).bounds(leftPos+152,topPos+116,140,18).build());
+        addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.withdraw_one"),b->{int id=menu.selected();if(id>0)send(PaintBucketMenu.WITHDRAW_ONE+id);}).bounds(leftPos+8,topPos+116,140,18).build());
+        addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.withdraw_stack"),b->{int id=menu.selected();if(id>0)send(PaintBucketMenu.WITHDRAW_STACK+id);}).bounds(leftPos+152,topPos+116,140,18).build());
         labels();
     }
     private void labels(){for(int i=0;i<paints.size();i++){int id=menu.paint(i);paints.get(i).active=id>0;var name=PaintCatalog.validId(id)?Component.translatable(PaintCatalog.byId(id).translationKey()):Component.literal("—");paints.get(i).setMessage(Component.literal(id==menu.selected()&&id>0?"> ":"").append(name).append(" · "+menu.units(i)));}}

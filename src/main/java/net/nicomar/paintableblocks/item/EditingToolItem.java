@@ -12,8 +12,8 @@ public class EditingToolItem extends Item {
     public EditingToolItem(Properties properties,DesignOperations.Action action){super(properties);this.action=action;}
     public DesignOperations.Action action(){return action;}
     @Override public InteractionResult useOn(UseOnContext context){
-        if(context.getPlayer()==null)return InteractionResult.PASS;
-        if(!context.getLevel().isClientSide())ServerInteractions.use(context.getPlayer(),false,context.isSecondaryUseActive(),0);
+        if(context.getPlayer()==null||!ServerInteractions.relevant(context.getPlayer(),context.getClickedPos()))return InteractionResult.PASS;
+        if(!context.getLevel().isClientSide())ServerInteractions.nativeUse(context);
         return InteractionResult.SUCCESS;
     }
 }

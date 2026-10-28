@@ -381,5 +381,6 @@
   "block.paintableblocks.diamond_paint_bucket": "Cubo de pintura de diamante",
   "item.paintableblocks.netherite_brush": "Pincel de netherite",
   "item.paintableblocks.netherite_scraper": "Rasqueta de netherite",
-  "block.paintableblocks.netherite_paint_bucket": "Cubo de pintura de netherite"
+  "block.paintableblocks.netherite_paint_bucket": "Cubo de pintura de netherite",
+  "message.paintableblocks.invalid_area": "Área inválida: elige otra esquina del mismo bloque y plano"
 }

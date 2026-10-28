@@ -32,6 +32,10 @@ public final class DesignMesh {
     private final Map<Integer,List<BakedQuad>> samples=new ConcurrentHashMap<>();
     private final LinkedHashMap<BlockDesign,Mesh> meshes=new LinkedHashMap<>(16,.75F,true);
     private int cachedQuads;
+    private final Map<BlockDesign,java.util.concurrent.CompletableFuture<Mesh>> building=new ConcurrentHashMap<>();
+    private record SurfaceKey(int resolution,int cell,Direction face,int paint,int orientation){}
+    private final LinkedHashMap<SurfaceKey,List<BakedQuad>> projected=new LinkedHashMap<>(16,.75F,true);
+    private int projectedQuads;
     public record Mesh(QuadCollection quads,BlockStateModelPart part){}
     private record Part(List<BakedQuad> quads,Material.Baked particleMaterial,int materialFlags) implements BlockStateModelPart {
         @Override public List<BakedQuad> getQuads(Direction side){return side==null?quads:List.of();}
@@ -43,24 +47,46 @@ public final class DesignMesh {
         @Override public DesignMesh compute(ModelBaker baker){return new DesignMesh(new Variant(baseModel).bake(baker));}
     }
     public Material.Baked particle(){return base.particleMaterial();}
-    public synchronized Mesh mesh(BlockDesign design){
-        Mesh present=meshes.get(design);if(present!=null)return present;
-        List<BakedQuad> quads=new ArrayList<>();int n=design.resolution();
-        for(var surface:DesignGeometry.surfaces(design)){
-            int id=design.paint(surface.cell(),surface.face());
-            List<BakedQuad> source=samples.computeIfAbsent(id*6+surface.face().ordinal(),k->sample(id,surface.face()));
-            int before=quads.size();
-            for(BakedQuad quad:source)project(design,surface,quad,quads);
-            if(quads.size()==before)for(BakedQuad quad:baseQuads(surface.face()))project(design,surface,quad,quads);
-        }
+    public Mesh mesh(BlockDesign design){
+        synchronized(meshes){var present=meshes.get(design);if(present!=null)return present;}
+        var future=new java.util.concurrent.CompletableFuture<Mesh>();var existing=building.putIfAbsent(design,future);
+        if(existing!=null)return existing.join();
+        try{
+            synchronized(meshes){var raced=meshes.get(design);if(raced!=null){future.complete(raced);return raced;}}
+            // Rendering different designs never shares a mesh-generation monitor.
+            Mesh result=build(design);int count=result.quads().getAll().size();
+            if(count<=MAX_CACHED_QUADS)synchronized(meshes){
+                while(!meshes.isEmpty()&&(meshes.size()>=MAX_ENTRIES||cachedQuads+count>MAX_CACHED_QUADS)){
+                    var first=meshes.entrySet().iterator();cachedQuads-=first.next().getValue().quads().getAll().size();first.remove();
+                }
+                meshes.put(design,result);cachedQuads+=count;
+            }
+            future.complete(result);return result;
+        }catch(RuntimeException|Error failure){future.completeExceptionally(failure);throw failure;}
+        finally{building.remove(design,future);}
+    }
+    private Mesh build(BlockDesign design){
+        List<BakedQuad> quads=new ArrayList<>();
+        for(var surface:DesignGeometry.surfaces(design))quads.addAll(surfaceQuads(design,surface));
         QuadCollection.Builder builder=new QuadCollection.Builder();int flags=0;
         for(BakedQuad quad:quads){builder.addUnculledFace(quad);flags|=quad.materialInfo().flags();}
-        Mesh result=new Mesh(builder.build(),new Part(List.copyOf(quads),particle(),flags));
-        if(quads.size()<=MAX_CACHED_QUADS){
-            while(!meshes.isEmpty()&&(meshes.size()>=MAX_ENTRIES||cachedQuads+quads.size()>MAX_CACHED_QUADS)){
-                var first=meshes.entrySet().iterator();var entry=first.next();cachedQuads-=entry.getValue().quads().getAll().size();first.remove();
+        return new Mesh(builder.build(),new Part(List.copyOf(quads),particle(),flags));
+    }
+    private List<BakedQuad> surfaceQuads(BlockDesign design,DesignGeometry.Surface surface){
+        int id=design.paint(surface.cell(),surface.face());
+        var key=new SurfaceKey(design.resolution(),surface.cell(),surface.face(),id,design.orientation());
+        synchronized(projected){var present=projected.get(key);if(present!=null)return present;}
+        List<BakedQuad> quads=new ArrayList<>();
+        var source=samples.computeIfAbsent(id*6+surface.face().ordinal(),k->sample(id,surface.face()));
+        for(var quad:source)project(design,surface,quad,quads);
+        if(quads.isEmpty())for(var quad:baseQuads(surface.face()))project(design,surface,quad,quads);
+        var result=List.copyOf(quads);
+        synchronized(projected){
+            var raced=projected.get(key);if(raced!=null)return raced;
+            while(!projected.isEmpty()&&(projected.size()>=8192||projectedQuads+result.size()>16384)){
+                var first=projected.entrySet().iterator();projectedQuads-=first.next().getValue().size();first.remove();
             }
-            meshes.put(design,result);cachedQuads+=quads.size();
+            if(result.size()<=16384){projected.put(key,result);projectedQuads+=result.size();}
         }
         return result;
     }

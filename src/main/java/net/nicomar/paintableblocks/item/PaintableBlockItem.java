@@ -25,12 +25,11 @@ public final class PaintableBlockItem extends BlockItem {
     @Override public InteractionResult place(BlockPlaceContext context){
         BlockDesign design=preparedFor(context);
         if(design==null)return InteractionResult.FAIL;
-        InteractionResult result=super.place(context);
-        if(result.consumesAction() && !context.getLevel().isClientSide() && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof PaintableBlockEntity block) {
-            block.setDesign(design);
+        try(var scope=net.nicomar.paintableblocks.design.PlacementDesign.enter(context.getClickedPos(),design)){
+            return super.place(context);
         }
-        return result;
     }
+
     @Override protected boolean canPlace(BlockPlaceContext context,BlockState state){
         BlockDesign design=preparedFor(context);
         return design!=null && state.canSurvive(context.getLevel(),context.getClickedPos()) && context.getLevel().isUnobstructed(null,

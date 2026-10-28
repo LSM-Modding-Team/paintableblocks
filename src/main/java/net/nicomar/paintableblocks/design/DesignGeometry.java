@@ -14,13 +14,22 @@ public final class DesignGeometry {
     public record Surface(int cell,Direction face) {}
     public record Box(int x0,int y0,int z0,int x1,int y1,int z1) {}
     private DesignGeometry() {}
+    private static final java.util.LinkedHashMap<BlockDesign.GeometryKey,List<Surface>> SURFACES=new java.util.LinkedHashMap<>(16,.75F,true);
+    private static int cachedSurfaces;
     public static List<Surface> surfaces(BlockDesign design){
+        var key=design.geometryKey();synchronized(SURFACES){var cached=SURFACES.get(key);if(cached!=null)return cached;}
         List<Surface> out=new ArrayList<>();int n=design.resolution();
         for(int c=0;c<n*n*n;c++)if(design.occupied(c))for(Direction face:Direction.values())if(design.exposed(c,face))out.add(new Surface(c,face));
-        return List.copyOf(out);
+        var result=List.copyOf(out);
+        synchronized(SURFACES){
+            var raced=SURFACES.get(key);if(raced!=null)return raced;
+            while(!SURFACES.isEmpty()&&(SURFACES.size()>=64||cachedSurfaces+result.size()>65536)){var iterator=SURFACES.entrySet().iterator();cachedSurfaces-=iterator.next().getValue().size();iterator.remove();}
+            if(result.size()<=65536){SURFACES.put(key,result);cachedSurfaces+=result.size();}
+        }
+        return result;
     }
     public static List<Box> boxes(BlockDesign local){
-        BlockDesign d=local.physical();int n=d.resolution();boolean[] used=new boolean[n*n*n];List<Box> out=new ArrayList<>();
+        BlockDesign d=local.withoutPaint().physical();int n=d.resolution();boolean[] used=new boolean[n*n*n];List<Box> out=new ArrayList<>();
         for(int z=0;z<n;z++)for(int y=0;y<n;y++)for(int x=0;x<n;x++){
             if(!free(d,used,x,y,z))continue;
             int x1=x+1;while(x1<n&&free(d,used,x1,y,z))x1++;

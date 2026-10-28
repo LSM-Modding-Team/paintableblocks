@@ -20,8 +20,8 @@ public final class BrushItem extends Item {
     public PaintContent content(ItemStack stack){return stack.get(ModContent.BRUSH_PAINT.get());}
     public boolean valid(ItemStack stack){var content=content(stack);return content!=null&&content.fits(material.brushCapacity);}
     @Override public InteractionResult useOn(UseOnContext context){
-        if(context.getPlayer()==null)return InteractionResult.PASS;
-        if(!context.getLevel().isClientSide())ServerInteractions.use(context.getPlayer(),false,context.isSecondaryUseActive(),0);
+        if(context.getPlayer()==null||!ServerInteractions.relevant(context.getPlayer(),context.getClickedPos()))return InteractionResult.PASS;
+        if(!context.getLevel().isClientSide())ServerInteractions.nativeUse(context);
         return InteractionResult.SUCCESS;
     }
     @Override public boolean overrideOtherStackedOnMe(ItemStack self,ItemStack other,Slot slot,ClickAction action,Player player,SlotAccess access){

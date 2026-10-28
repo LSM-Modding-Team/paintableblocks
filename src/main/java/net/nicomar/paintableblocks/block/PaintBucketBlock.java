@@ -35,8 +35,7 @@ public final class PaintBucketBlock extends BaseEntityBlock {
     @Override protected net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state){return net.minecraft.world.level.block.RenderShape.MODEL;}
     @Override public BlockEntity newBlockEntity(BlockPos pos,BlockState state){return new PaintBucketBlockEntity(pos,state);}
     @Override protected InteractionResult useItemOn(ItemStack stack,BlockState state,Level level,BlockPos pos,Player player,InteractionHand hand,BlockHitResult hit){
-        if(hand!=InteractionHand.MAIN_HAND)return InteractionResult.PASS;
-        if(!level.isClientSide())ServerInteractions.bucket(player,pos,player.isShiftKeyDown());
+        if(!level.isClientSide())ServerInteractions.bucket(player,pos,hand,player.isShiftKeyDown());
         return InteractionResult.SUCCESS;
     }
     @Override protected InteractionResult useWithoutItem(BlockState state,Level level,BlockPos pos,Player player,BlockHitResult hit){

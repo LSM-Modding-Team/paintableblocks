@@ -2,6 +2,22 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Correcciones de interacción del bloque pintable
+
+- Corregido el fallo confirmado de actualización visual: cada recepción de cambios reconstruye la geometría cliente además de refrescar ModelData, aunque no cambie el estado `CUT`. Pintura y recortes posteriores dejan de depender de la primera actualización de estado.
+- **1–4:** una confirmación de área invalidada no se convierte en pintura individual; los clics sobre otros bloques/entidades conservan su flujo nativo; herramientas y carga de pinceles admiten ambas manos sin doble ejecución; el trazado acepta objetivos cargados antes de un chunk descargado.
+- **5–7:** el contorno de pintura incluye solo caras que cambian; planes y avisos no conservan costes de áreas inválidas; guantes, tenazas y copia muestran avisos de datos inválidos sin prometer conservación.
+- **8–9:** recorte/giro actualizan formas y apoyos vecinos aun con el mismo BlockState. La colocación instala el diseño orientado mediante un contexto delimitado antes de callbacks y restauración de componentes, sin alterar el ciclo nativo de BlockItem.
+- **10–12:** selección por mano/ranura/tipo/pintura, sin referencias de ItemStack. Peticiones y selecciones llevan identificadores; se validan dimensión, bloque UUID/revisión, impacto, cara y herramienta. Respuestas y clics antiguos se rechazan sin editar otro objetivo. El protocolo pasa a `3`; cliente y servidor deben actualizarse juntos.
+- **13:** nuevo evento cancelable `PaintableBlockEditEvent`; únicamente retirar subcubos emite además `BreakBlockEvent`. Pintar, limpiar o girar no se anuncian como rotura. Se revalida después de listeners y se consume el objeto actual de la mano correcta.
+- **14–15:** acciones del menú vinculadas a la identidad de pintura mediante un paquete con enteros explícitos y validación del contenedor; no dependen de filas móviles ni del ancho del botón nativo. Shift + clic predice el mismo depósito que realiza el servidor, sin mover pintura a la barra rápida.
+- **16:** exposición local reutilizada por ocupación, proyecciones por superficie y cachés acotadas. La generación de mallas deja de mantener un bloqueo global durante los cálculos y comparte trabajos del mismo diseño; la colisión evita transformar mapas de pinturas.
+- UUID/revisión se conservan en el mundo y se excluyen como identidad del ítem al recoger/copiar/colocar. Los diseños antiguos sin esos campos reciben metadatos nuevos sin cambiar el codec v1 de forma/pinturas.
+- Añadidos avisos de área inválida en español/inglés y contratos de regresión para paquetes, contexto de colocación, reutilización de geometría y conservación de pinturas interiores/orientaciones. Los contratos Java quedan **sin ejecutar**.
+- Informe y correspondencia de los 17 casos, límites de rendimiento y escenarios de aceptación: [correcciones de interacción](docs/technical/interaction-fixes.md).
+- Pasan las comprobaciones estáticas de datos/recursos, sintaxis e importaciones. No se han ejecutado Gradle, compilación, builds, Java, CI ni Minecraft; no se declara verificación en juego o medición de FPS.
+- Publicación por commit creado directamente online en `26.2`, sin commits locales. No se crean modelos ni texturas de herramientas.
+
 ## 2026-10-28 — Grupo 2: herramientas y pinturas
 
 ### Correcciones solicitadas

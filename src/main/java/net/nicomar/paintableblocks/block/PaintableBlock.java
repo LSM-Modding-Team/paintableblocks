@@ -46,7 +46,10 @@ public final class PaintableBlock extends BaseEntityBlock {
         return entity instanceof PaintableBlockEntity block?CollectionPolicy.drops(block,params):List.of();
     }
     @Override public ItemStack getCloneItemStack(LevelReader level,BlockPos pos,BlockState state,boolean includeData,Player player){
-        if(includeData && player.isCreative() && level.getBlockEntity(pos) instanceof PaintableBlockEntity block)return block.toItem(true);
+        if(includeData && player.isCreative() && level.getBlockEntity(pos) instanceof PaintableBlockEntity block){
+            if(!block.valid()&&player instanceof net.minecraft.server.level.ServerPlayer server)server.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.paintableblocks.invalid_design"));
+            return block.toItem(true);
+        }
         return new ItemStack(asItem());
     }
     @Override protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block,BlockState> builder){builder.add(CUT);}

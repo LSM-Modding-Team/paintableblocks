@@ -1,13 +1,17 @@
 package net.nicomar.paintableblocks.client.selection;
 
 import java.util.List;
+import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.client.event.*;
@@ -25,65 +29,90 @@ import net.nicomar.paintableblocks.operation.DesignOperations;
 import net.nicomar.paintableblocks.paint.PaintCatalog;
 import net.nicomar.paintableblocks.registry.ModContent;
 
-/** Extract immutable outlines only; rendering callbacks never retain a level or block entity. */
+/** Previews and responses identify the level, block revision and logical held item, never ItemStack references. */
 public final class SelectionPreview {
     private static ModNetworking.Selection selection;
-    private static BlockDesign selectedDesign;
-    private static Object selectedItem;
+    private static long nextRequest,lastSent;
+    private static boolean overlayOwned;
     private static Key cachedKey;
     private static DesignOperations.Plan cachedPlan;
     private static VoxelShape cachedShape=Shapes.empty();
-    private record Key(BlockDesign design,DesignGeometry.Surface surface,Object tool,int paint,boolean reverse,ModNetworking.Selection selection){}
+    private record Key(Identifier dimension,BlockPos pos,UUID block,long revision,DesignGeometry.Surface surface,InteractionHand hand,Object tool,int paint,boolean reverse,long selection){}
     private SelectionPreview(){}
     public static void register(){NeoForge.EVENT_BUS.addListener(SelectionPreview::input);NeoForge.EVENT_BUS.addListener(SelectionPreview::outline);NeoForge.EVENT_BUS.addListener(SelectionPreview::tick);}
     public static void payloads(RegisterClientPayloadHandlersEvent event){event.register(ModNetworking.Selection.TYPE,(v,ctx)->{
-        selection=v.active()?v:null;selectedDesign=null;selectedItem=null;var c=Minecraft.getInstance();
-        if(selection!=null&&c.level!=null&&c.player!=null&&c.level.getBlockEntity(v.pos()) instanceof PaintableBlockEntity be&&be.valid()&&v.cell()>=0&&v.cell()<be.design().resolution()*be.design().resolution()*be.design().resolution()&&v.face()>=0&&v.face()<6){selectedDesign=be.design();selectedItem=c.player.getMainHandItem();}
-        else selection=null;
+        if(v.request()!=lastSent)return;selection=v.active()?v:null;invalidate();
     });}
+    private static void feedback(Component message){Minecraft.getInstance().gui.hud.setOverlayMessage(message,false);overlayOwned=true;}
+    private static void clearFeedback(){if(overlayOwned){Minecraft.getInstance().gui.hud.setOverlayMessage(Component.empty(),false);overlayOwned=false;}}
+    private static void invalidate(){cachedKey=null;cachedPlan=null;cachedShape=Shapes.empty();}
     private static boolean key(int first,int second){var c=Minecraft.getInstance();return InputConstants.isKeyDown(c.getWindow(),first)||InputConstants.isKeyDown(c.getWindow(),second);}
     private static boolean control(){return key(GLFW.GLFW_KEY_LEFT_CONTROL,GLFW.GLFW_KEY_RIGHT_CONTROL);}
     private static boolean reverse(){return key(GLFW.GLFW_KEY_LEFT_SHIFT,GLFW.GLFW_KEY_RIGHT_SHIFT);}
+    private static InteractionHand activeHand(){var p=Minecraft.getInstance().player;return p!=null&&ServerInteractions.tool(p.getMainHandItem())?InteractionHand.MAIN_HAND:InteractionHand.OFF_HAND;}
+    private static boolean selectionValid(){
+        var c=Minecraft.getInstance();var s=selection;if(s==null)return true;
+        if(c.player==null||c.level==null||!s.dimension().equals(c.level.dimension().identifier())||!c.level.hasChunkAt(s.pos())||!c.player.isWithinBlockInteractionRange(s.pos(),0)||s.face()<0||s.face()>=6)return false;
+        var held=c.player.getItemInHand(s.hand());
+        return BuiltInRegistries.ITEM.getKey(held.getItem()).equals(s.item())&&(s.hand()!=InteractionHand.MAIN_HAND||c.player.getInventory().getSelectedSlot()==s.slot())
+                &&held.getItem() instanceof BrushItem brush&&brush.valid(held)&&brush.content(held).paint()==s.paint()
+                &&c.level.getBlockEntity(s.pos()) instanceof PaintableBlockEntity be&&be.valid()&&be.editIdentity().equals(s.block())&&be.revision()==s.revision()
+                &&s.cell()>=0&&s.cell()<be.design().resolution()*be.design().resolution()*be.design().resolution();
+    }
+    private static void cancel(){
+        if(selection==null)return;var s=selection;lastSent=++nextRequest;
+        ClientPacketDistributor.sendToServer(new ModNetworking.Use(lastSent,s.selection(),s.hand(),s.slot(),s.dimension(),s.pos(),new Vec3(s.pos().getX()+.5,s.pos().getY()+.5,s.pos().getZ()+.5),Direction.UP,s.item(),s.paint(),s.block(),s.revision(),false,false,true));
+        selection=null;invalidate();
+    }
     private static void input(InputEvent.InteractionKeyMappingTriggered e){
-        var c=Minecraft.getInstance();if(c.player==null||c.gui.screen()!=null||!e.isUseItem()||!ServerInteractions.tool(c.player.getMainHandItem()))return;
-        e.setCanceled(true);e.setSwingHand(false);if(e.getHand()==InteractionHand.MAIN_HAND)ClientPacketDistributor.sendToServer(new ModNetworking.Use(control(),reverse(),false));
+        var c=Minecraft.getInstance();if(c.player==null||c.level==null||c.gui.screen()!=null||!e.isUseItem())return;
+        if(selection!=null&&!selectionValid()){cancel();e.setCanceled(true);e.setSwingHand(false);return;}
+        if(selection!=null&&control()){if(e.getHand()==selection.hand())cancel();e.setCanceled(true);e.setSwingHand(false);return;}
+        if(!(c.hitResult instanceof BlockHitResult hit)||hit.getType()!=HitResult.Type.BLOCK||!ServerInteractions.relevant(c.player,hit.getBlockPos()))return;
+        var hand=e.getHand();
+        if(hand==InteractionHand.OFF_HAND&&ServerInteractions.tool(c.player.getMainHandItem())){e.setCanceled(true);e.setSwingHand(false);return;}
+        if(!ServerInteractions.tool(c.player.getItemInHand(hand)))return;
+        e.setCanceled(true);e.setSwingHand(false);lastSent=++nextRequest;
+        ClientPacketDistributor.sendToServer(ModNetworking.Use.capture(c.player,hand,hit,lastSent,selection==null?0:selection.selection(),control(),reverse(),false));
     }
     private static void tick(ClientTickEvent.Post event){
-        var c=Minecraft.getInstance();if(c.player==null||c.level==null){selection=null;cachedKey=null;return;}
-        if(selection!=null&&(selectedItem!=c.player.getMainHandItem()||!c.level.hasChunkAt(selection.pos())||!c.player.isWithinBlockInteractionRange(selection.pos(),0)
-                ||!(c.level.getBlockEntity(selection.pos()) instanceof PaintableBlockEntity b)||!b.valid()||!b.design().equals(selectedDesign))){selection=null;ClientPacketDistributor.sendToServer(new ModNetworking.Use(false,false,true));}
-        if(c.gui.screen()!=null||!(c.hitResult instanceof BlockHitResult hit)||hit.getType()!=HitResult.Type.BLOCK||!(c.level.getBlockEntity(hit.getBlockPos()) instanceof PaintableBlockEntity be))return;
-        var held=c.player.getMainHandItem();
-        if(held.is(ModContent.GLOVES.get())||held.is(ModContent.TONGS.get()))c.gui.hud.setOverlayMessage(Component.translatable(c.player.isCreative()?"message.paintableblocks.creative_copy":held.is(ModContent.GLOVES.get())?"message.paintableblocks.keep_design":"message.paintableblocks.keep_shape"),false);
-        else if(cachedKey!=null&&cachedKey.design==be.design()&&held.getItem() instanceof BrushItem brush&&brush.valid(held))c.gui.hud.setOverlayMessage(Component.translatable(selection==null?"message.paintableblocks.paint_cost":"message.paintableblocks.area_cost",cachedPlan.units(),brush.content(held).units()),false);
+        var c=Minecraft.getInstance();if(c.player==null||c.level==null){selection=null;invalidate();clearFeedback();return;}
+        if(selection!=null&&(!selectionValid()||c.gui.screen()!=null))cancel();
+        if(c.gui.screen()!=null||!(c.hitResult instanceof BlockHitResult hit)||hit.getType()!=HitResult.Type.BLOCK||!(c.level.getBlockEntity(hit.getBlockPos()) instanceof PaintableBlockEntity be)){invalidate();clearFeedback();return;}
+        var held=c.player.getMainHandItem();if(!held.is(ModContent.GLOVES.get())&&!held.is(ModContent.TONGS.get()))held=c.player.getOffhandItem();
+        if(!be.valid()){invalidate();if(ServerInteractions.tool(c.player.getItemInHand(activeHand()))||held.is(ModContent.GLOVES.get())||held.is(ModContent.TONGS.get()))feedback(Component.translatable("message.paintableblocks.invalid_design"));else clearFeedback();return;}
+        if(!ServerInteractions.tool(c.player.getItemInHand(activeHand()))&&(held.is(ModContent.GLOVES.get())||held.is(ModContent.TONGS.get()))){invalidate();feedback(Component.translatable(c.player.isCreative()?"message.paintableblocks.creative_copy":held.is(ModContent.GLOVES.get())?"message.paintableblocks.keep_design":"message.paintableblocks.keep_shape"));return;}
+        if(!prepare(hit,be)){if(selection!=null)feedback(Component.translatable("message.paintableblocks.invalid_area"));else clearFeedback();return;}
+        var tool=c.player.getItemInHand(activeHand());
+        if(tool.getItem() instanceof BrushItem brush&&brush.valid(tool))feedback(Component.translatable(selection==null?"message.paintableblocks.paint_cost":"message.paintableblocks.area_cost",cachedPlan.units(),brush.content(tool).units()));else clearFeedback();
+    }
+    private static boolean prepare(BlockHitResult hit,PaintableBlockEntity be){
+        var c=Minecraft.getInstance();var hand=activeHand();var held=c.player.getItemInHand(hand);
+        if(!be.valid()||!ServerInteractions.tool(held)){invalidate();return false;}
+        var d=be.design();var target=DesignGeometry.target(d,hit.getLocation().subtract(hit.getBlockPos().getX(),hit.getBlockPos().getY(),hit.getBlockPos().getZ()),hit.getDirection());if(target.isEmpty()){invalidate();return false;}
+        int paint=held.getItem() instanceof BrushItem b&&b.valid(held)?b.content(held).paint():0;
+        var key=new Key(c.level.dimension().identifier(),hit.getBlockPos(),be.editIdentity(),be.revision(),target.get(),hand,held.getItem(),paint,reverse(),selection==null?0:selection.selection());
+        if(key.equals(cachedKey))return true;
+        invalidate();
+        try{
+            if(held.getItem() instanceof BrushItem){
+                if(!PaintCatalog.validId(paint)||selection!=null&&(!selectionValid()||selection.hand()!=hand||!selection.pos().equals(hit.getBlockPos())))return false;
+                var faces=selection==null?List.of(target.get()):DesignOperations.area(d,new DesignGeometry.Surface(selection.cell(),Direction.values()[selection.face()]),target.get());
+                cachedPlan=DesignOperations.paint(d,faces,paint);cachedShape=surfaces(d,cachedPlan.faces());
+            }else{cachedPlan=DesignOperations.tool(d,target.get(),((EditingToolItem)held.getItem()).action(),hit.getDirection(),reverse());cachedShape=held.getItem() instanceof RotationWrenchItem?DesignGeometry.shape(cachedPlan.after()):shape(cachedPlan);}
+            cachedKey=key;return true;
+        }catch(IllegalArgumentException invalid){invalidate();return false;}
     }
     private static void outline(ExtractBlockOutlineRenderStateEvent event){
-        var c=Minecraft.getInstance();if(c.player==null||c.player.isSpectator()||!(event.getLevel().getBlockEntity(event.getBlockPos()) instanceof PaintableBlockEntity be)||!be.valid())return;
-        var held=c.player.getMainHandItem();if(!ServerInteractions.tool(held))return;var d=be.design();var hit=event.getHitResult();
-        var target=DesignGeometry.target(d,hit.getLocation().subtract(event.getBlockPos().getX(),event.getBlockPos().getY(),event.getBlockPos().getZ()),hit.getDirection());if(target.isEmpty())return;
-        int paint=held.getItem() instanceof BrushItem b&&b.valid(held)?b.content(held).paint():0;
-        var key=new Key(d,target.get(),held.getItem(),paint,reverse(),selection);
-        try{
-            if(!key.equals(cachedKey)){
-                if(held.getItem() instanceof BrushItem){
-                    if(!PaintCatalog.validId(paint))return;
-                    if(selection!=null&&!selection.pos().equals(event.getBlockPos()))return;
-                    var faces=selection==null?List.of(target.get()):DesignOperations.area(d,new DesignGeometry.Surface(selection.cell(),Direction.values()[selection.face()]),target.get());
-                    cachedPlan=DesignOperations.paint(d,faces,paint);
-                    // First corner and unchanged surfaces remain visible even when the cost is zero.
-                    cachedShape=surfaces(d,faces);
-                }else{cachedPlan=DesignOperations.tool(d,target.get(),((EditingToolItem)held.getItem()).action(),hit.getDirection(),reverse());cachedShape=held.getItem() instanceof RotationWrenchItem?DesignGeometry.shape(cachedPlan.after()):shape(cachedPlan);}
-                cachedKey=key;
-            }
-        }catch(IllegalArgumentException invalid){return;}
-        VoxelShape shape=cachedShape;if(shape.isEmpty())return;
-        boolean insufficient=held.getItem() instanceof BrushItem b&&(!c.player.isCreative()&&(b.content(held).units()<cachedPlan.units()||!PaintCatalog.byId(paint).survivalAvailable()));
+        var c=Minecraft.getInstance();if(c.player==null||c.player.isSpectator()||!(event.getLevel().getBlockEntity(event.getBlockPos()) instanceof PaintableBlockEntity be)||!prepare(event.getHitResult(),be))return;
+        var held=c.player.getItemInHand(activeHand());VoxelShape shape=cachedShape;
+        boolean insufficient=held.getItem() instanceof BrushItem b&&!c.player.isCreative()&&(b.content(held).units()<cachedPlan.units()||!PaintCatalog.byId(cachedKey.paint).survivalAvailable());
         boolean obstructed=false;
-        if(held.getItem() instanceof RotationWrenchItem){var pos=event.getBlockPos();var worldShape=shape.move(pos.getX(),pos.getY(),pos.getZ());for(var collision:event.getLevel().getEntityCollisions(null,worldShape.bounds()))if(Shapes.joinIsNotEmpty(worldShape,collision,BooleanOp.AND)){obstructed=true;break;}}
+        if(held.getItem() instanceof RotationWrenchItem&&!shape.isEmpty()){var pos=event.getBlockPos();var worldShape=shape.move(pos.getX(),pos.getY(),pos.getZ());for(var collision:event.getLevel().getEntityCollisions(null,worldShape.bounds()))if(Shapes.joinIsNotEmpty(worldShape,collision,BooleanOp.AND)){obstructed=true;break;}}
         int color=insufficient||obstructed?0xffff5555:0xff55ddff;
         event.addCustomRenderer((state,collector,poses,levelState)->{
-            var camera=levelState.cameraRenderState.pos;var pos=state.pos();poses.pushPose();poses.translate(pos.getX()-camera.x,pos.getY()-camera.y,pos.getZ()-camera.z);
-            collector.order(1).submitShapeOutline(poses,shape,RenderTypes.lines(),color,2.5F,false);poses.popPose();return true;
+            if(!shape.isEmpty()){var camera=levelState.cameraRenderState.pos;var pos=state.pos();poses.pushPose();poses.translate(pos.getX()-camera.x,pos.getY()-camera.y,pos.getZ()-camera.z);
+            collector.order(1).submitShapeOutline(poses,shape,RenderTypes.lines(),color,2.5F,false);poses.popPose();}return true;
         });
     }
     private static int physicalCell(BlockDesign d,int cell){int[] xyz=DesignOrientation.cell(d.orientation(),d.x(cell),d.y(cell),d.z(cell),d.resolution());return d.index(xyz[0],xyz[1],xyz[2]);}

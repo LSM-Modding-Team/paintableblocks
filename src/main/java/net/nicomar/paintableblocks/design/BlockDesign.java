@@ -26,6 +26,9 @@ public final class BlockDesign {
                 Codec.INT.fieldOf("orientation").forGetter(Data::orientation)).apply(i, Data::new));
     }
     public static final Codec<BlockDesign> CODEC = Data.CODEC.flatXmap(BlockDesign::decode, d -> DataResult.success(d.data()));
+    public record GeometryKey(int resolution,List<Long> occupied){public GeometryKey{occupied=List.copyOf(occupied);}}
+    private final GeometryKey geometryKey;
+    public GeometryKey geometryKey(){return geometryKey;}
     private final int resolution, orientation;
     private final BitSet occupied;
     private final Map<Integer,Integer> paints;
@@ -34,6 +37,7 @@ public final class BlockDesign {
         this.resolution=PaintingBalance.requireResolution(resolution);
         this.orientation=DesignOrientation.require(orientation);
         this.occupied=(BitSet)occupied.clone();
+        this.geometryKey=new GeometryKey(resolution,java.util.Arrays.stream(this.occupied.toLongArray()).boxed().toList());
         if(occupied.length()>resolution*resolution*resolution) throw new IllegalArgumentException("Occupation outside block");
         TreeMap<Integer,Integer> sorted = new TreeMap<>();
         for(var e:paints.entrySet()) {

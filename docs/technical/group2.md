@@ -1,5 +1,7 @@
 # Grupo 2: herramientas y pinturas
 
+> Actualización posterior: [correcciones de interacción](interaction-fixes.md) sustituye el protocolo, la selección de peticiones, la actualización visual, los eventos de edición y las cachés descritos originalmente en esta entrega. Incluye la correspondencia con el fallo visual y los otros 16 puntos revisados.
+
 Código para Minecraft **26.2**, NeoForge **26.2.0.88** y Java 25. Incluye los cinco frentes elegidos: recorte/limpieza, colocación/giro, pintura/rasquetas, pinceles/aplicación y cubos. Se conserva la colocación y representación de diseños del grupo 1. La revisión es estática: no se ha compilado ni iniciado Minecraft.
 
 ## Correcciones previas

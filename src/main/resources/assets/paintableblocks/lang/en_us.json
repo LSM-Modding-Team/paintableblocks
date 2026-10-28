@@ -381,5 +381,6 @@
   "block.paintableblocks.diamond_paint_bucket": "Diamond paint bucket",
   "item.paintableblocks.netherite_brush": "Netherite brush",
   "item.paintableblocks.netherite_scraper": "Netherite scraper",
-  "block.paintableblocks.netherite_paint_bucket": "Netherite paint bucket"
+  "block.paintableblocks.netherite_paint_bucket": "Netherite paint bucket",
+  "message.paintableblocks.invalid_area": "Invalid area: choose another corner on the same block and plane"
 }
