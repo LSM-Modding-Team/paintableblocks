@@ -9,3 +9,9 @@ Permite convertir bloques completos y sin pintura, 1:1 y sin coste adicional. No
 Al recogerlo conserva el contenido en un único ítem. Es el primer nivel de estación especializada.
 
 Véanse [[Fabricación]], [[Conversión de Subdivisiones]] y [[Recetas]].
+
+## Reglas compartidas
+
+La capacidad cuenta bloques, no volumen de subcubos: 1×1 y 16×16 ocupan una unidad cada uno. No se reducen a contadores ítems personalizados o renombrados. La interfaz muestra el resultado completo aunque supere 64; retirar respeta el espacio real del inventario y deja el resto almacenado.
+
+Los pistones no mueven la estación. Si sobrevive como drop de una explosión, el contenido permanece en un solo ítem. Su ítem será 3D y las texturas propias de 16×16; véanse [[Modelos y Texturas]] y [[Plan de Fases]].

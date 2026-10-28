@@ -1,7 +1,7 @@
 # Esponja de limpieza
 
-Elimina todas las pinturas de un bloque, incluidas las superficies interiores expuestas por recortes.
+Elimina todas las pinturas de un bloque, incluidas las superficies interiores expuestas por recortes. Conserva su forma y no devuelve pintura. Todas las superficies limpiadas recuperan la textura original `unpainted.png`.
 
-Conserva su forma y no devuelve pintura.
+Funciona en las cinco resoluciones. No tiene durabilidad ni niveles y se apila de una en una. La vista previa identifica las superficies que se limpiarán. Sus ingredientes conocidos son esponja seca y hierro. No da ítem al romper el bloque según [[Recolección y Conservación]].
 
-No tiene durabilidad ni niveles por material y se apila de una en una. Antes de actuar, la selección destaca la superficie o los subcubos afectados. Véanse [[Herramientas]] y [[Recetas]].
+Primero se completa el ítem funcional y sus integraciones; después modelo 3D y textura 16×16. Véanse [[Herramientas]] y [[Recetas]].

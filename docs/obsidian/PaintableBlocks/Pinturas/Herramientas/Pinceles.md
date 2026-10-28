@@ -28,3 +28,9 @@ Las mejoras conservan pintura y componentes si el resultado tiene capacidad sufi
 Aplicar la misma pintura no consume unidades. Un área cobra únicamente los cuadrados que cambian. Si no hay suficiente para toda la aplicación, no pinta parcialmente ni consume nada. Repintar con otra identidad sustituye la anterior con el consumo normal.
 
 La selección se cancela al cambiar de ítem, alejarse del bloque o cambiar su geometría. Los controles completos están en [[Por Área]]. En [[Pintura en Creativo|creativo]] se selecciona una identidad y se pinta sin consumir unidades.
+
+## Desarrollo del ítem
+
+Se implementan primero cada variante funcional, capacidad, identidad, consumo, carga/devolución, selección, cancelación y guardado. Después se generan su modelo 3D y textura definitiva de 16×16. La vista previa y la aplicación real comparten reglas, y el servidor valida los cambios.
+
+[[Modelos y Texturas]] · [[Criterios de División]]

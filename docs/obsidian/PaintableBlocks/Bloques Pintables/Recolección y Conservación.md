@@ -20,3 +20,9 @@ El diseño guarda subdivisión, ocupación y pinturas para conservarlos al desca
 Las explosiones siguen la política de rotura normal, sujeta a la supervivencia de drops vanilla: un bloque completo puede soltar uno sin pintura; uno recortado no suelta nada. Nunca se recuperan fragmentos ni pintura. Las excepciones de tenazas y guantes requieren que un jugador use esas herramientas.
 
 Si una estación o un cubo sobrevive a una explosión como drop, su contenido viaja en un único ítem y no se suelta también por separado.
+
+## Reglas de implementación
+
+El ítem conservado y el bloque colocado representan el mismo diseño; el guardado debe conservarlo al descargar el mundo, no solo durante una interacción. La selección previa de tenazas o guantes indica qué forma se recoge y si se descartan o conservan pinturas.
+
+La conservación de contenido en estaciones, máquinas y cubos nunca genera además un segundo drop del mismo contenido. Los cambios los valida el servidor. Las funciones y su persistencia preceden a los recursos definitivos de las herramientas de recogida, según [[Criterios de División]].

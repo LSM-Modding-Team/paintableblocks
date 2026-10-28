@@ -16,3 +16,9 @@ Solo afecta a superficies existentes en ese plano. Los huecos y las superficies 
 - Si falta pintura, no se ejecuta parcialmente ni se consume nada.
 
 El coste es proporcional a la superficie que cambia: los cuadrados ya pintados con la misma identidad no consumen unidades. Repintar con otra sustituye la anterior al coste habitual. En [[Pintura en Creativo|creativo]] el flujo es el mismo, sin consumo.
+
+## Integración
+
+La vista previa y la acción efectiva utilizan las mismas reglas para enumerar las superficies y calcular unidades. La confirmación se valida contra la geometría real; no se aplica una selección cancelada por un cambio del diseño.
+
+La pintura resultante se guarda con el diseño y se representa en su ítem cuando se conserva. El desarrollo funcional del pincel incluye esta selección antes de sus recursos definitivos.

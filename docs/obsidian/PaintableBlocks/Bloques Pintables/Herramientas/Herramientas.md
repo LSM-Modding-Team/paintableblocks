@@ -14,3 +14,9 @@ Antes de actuar se destacan exactamente los subcubos o superficies afectados. Te
 - [[Raspador]]
 - [[Tenazas]]
 - [[Llave de Giro]]
+
+## Desarrollo por herramienta
+
+Primero se implementan el ítem y todas sus funciones, con selección, persistencia y mensajes necesarios. Después se crean el modelo 3D y la textura definitiva de 16×16. Durante la función se usa una representación provisional identificable. La dependencia es individual y se extiende también a [[Rasquetas]] y [[Pinceles]]; no exige terminar todas las herramientas antes de texturizar una ya funcional.
+
+[[Plan de Fases]] · [[Modelos y Texturas]]

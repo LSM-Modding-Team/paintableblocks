@@ -1,7 +1,33 @@
 # Decisiones pendientes
 
-Las reglas incorporadas en la documentación son decisiones aceptadas para el mod; no requieren aprobación posterior para implementarlas.
+## Requisitos ya aceptados
 
-Siguen sin concretarse los patrones y cantidades de recetas que [[Recetas]] identifica únicamente por familias de ingredientes. No se inventan patrones a partir de referencias ausentes.
+Las reglas de esta documentación forman parte definitiva del mod. No solicitar otra aprobación para implementarlas. El mapa por dependencias de [[Plan de Fases]], los límites de [[Arquitectura]] y los criterios de [[Criterios de División]] también están aceptados.
 
-Antes de integrar `unpainted.png` debe comprobarse el archivo original y su tamaño de 16×16 píxeles, según [[Modelos y Texturas]]. La arquitectura detallada y la división concreta del desarrollo en fases siguen sin definirse.
+La función de cada herramienta precede a sus recursos definitivos. Las decisiones técnicas rutinarias se resuelven dentro de esos límites; solo se consulta cuando falta una regla que afecta al comportamiento.
+
+## Información de producto aún no especificada
+
+| Tema | Información disponible | Qué no se debe inventar |
+|---|---|---|
+| Recetas de herramientas y recipientes | Familias de ingredientes y relaciones en [[Recetas]] | Cantidades y posiciones que nunca se concretaron |
+| Recetas de estaciones y máquinas | Mejoras de estación anterior vacía, costes/rendimientos de operación | Patrones supuestamente procedentes de `START_HERE.md`, que no fue aportado |
+
+La solicitud de completar documentación incorpora toda la información disponible; no convierte un patrón ausente en una receta acordada. Esto bloquea solo la receta afectada, no el desarrollo de las funciones ya definidas.
+
+## Recursos y trabajo por ejecutar
+
+| Trabajo | Requisito y condición |
+|---|---|
+| Integrar `unpainted.png` original | Localizar el archivo original y comprobar 16×16 sin recrearlo; esta documentación no acredita su integración |
+| Implementar sistemas | Elegir tareas disponibles de [[Plan de Fases]]; no confundir aprobación con código terminado |
+| Modelos y texturas de herramientas | Habilitados individualmente después de completar funciones; véase [[Modelos y Texturas]] |
+| Verificación en Minecraft | Requiere petición expresa; no afirmar resultados sin ejecución |
+
+Estos son trabajos pendientes, no decisiones de producto que deban aprobarse otra vez. La arquitectura y el método de dividir el desarrollo ya están definidos en sus páginas.
+
+## Documentos de referencia anteriores
+
+Los adjuntos técnicos sirvieron de comparación, no de sustitución automática del planteamiento. Prevalecen las decisiones actuales: cinco resoluciones hasta 16×16, 256 unidades por ítem, conversión exclusiva de estaciones, orientación conjunta con 24 giros y prensa sin combustible.
+
+Los IDs del catálogo se toman del CSV: nieve en polvo es `paint_id` 232; 233 corresponde a prismarina. No copiar el ID erróneo de los adjuntos ni importar sus recetas ausentes, tamaños de texturas o supuestos de implementación.

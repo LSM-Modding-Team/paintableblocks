@@ -44,3 +44,9 @@ Cada pintura utiliza una apariencia estable, independiente del entorno:
 Las texturas animadas conservan su animación visual, pero ninguna pintura emite luz ni aporta funciones. Los packs de recursos pueden cambiar las texturas sin alterar las reglas de proyección.
 
 Las texturas propias son de 16×16 píxeles y los modelos de ítems son 3D. La superficie sin pintar utiliza la textura original `unpainted.png`; véase [[Modelos y Texturas]].
+
+## Coherencia entre mundo e ítem
+
+El diseño conservado debe mostrar la misma forma y pinturas en inventario que al colocarse, ajustadas a la orientación del bloque. La vista previa de giro y el resultado usan la misma transformación, sin reinterpretar la pintura por cada cuadrado.
+
+Las texturas definitivas de herramientas se generan después de completar sus funciones; esa secuencia no altera las reglas de proyección del catálogo ni retrasa los frentes funcionales independientes. Véanse [[Arquitectura]] y [[Modelos y Texturas]].

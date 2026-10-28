@@ -32,3 +32,11 @@ Una mejora de cubo de oro a diamante debe respetar la menor capacidad por pintur
 ## Creativo
 
 Una receta sin forma con pincel e ítem de pintura permite seleccionar esa identidad exclusivamente en creativo, sin crear unidades utilizables en supervivencia. Véase [[Pintura en Creativo]].
+
+## Estado antes de programar
+
+Los ingredientes y relaciones descritos son decisiones aceptadas, no borradores que deban aprobarse otra vez. La tabla no define patrones ni cantidades adicionales donde no se especificaron. Los patrones ausentes son información de producto pendiente; no bloquean implementar ítems y funciones independientes.
+
+El balance operativo se toma de [[Fabricación]], [[Obtención]], [[Rasquetas]], [[Pinceles]] y [[Cubos de Pintura]]. Las recetas de mejora deben respetar conservación y capacidad antes de consumir entradas. En particular, mejorar una rasqueta conserva la proporción restante, no la repara, y mejorar un cubo no elimina el exceso de una pintura.
+
+La creación de recetas y revisión de sus datos se puede elegir como frente independiente cuando estén disponibles sus entradas. Los recursos definitivos de herramientas dependen de sus funciones, no de completar todos los patrones de supervivencia. Véanse [[Plan de Fases]] y [[Decisiones Pendientes]].

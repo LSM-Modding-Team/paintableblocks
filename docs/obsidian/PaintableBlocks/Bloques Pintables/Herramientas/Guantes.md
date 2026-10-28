@@ -1,9 +1,9 @@
 # Guantes
 
-Rompen y recogen el bloque conservando su subdivisión, recortes y pinturas, incluidas las de superficies interiores expuestas.
+Rompen y recogen el bloque conservando subdivisión, recortes y pinturas de todas las superficies, incluidas las interiores expuestas. El ítem muestra visualmente su geometría y pinturas en el inventario para distinguir diseños.
 
-El ítem muestra el diseño conservado en el inventario para distinguirlo de otros y lo reproduce al colocarlo. Forma y pinturas se orientan conjuntamente.
+Al colocar se restaura el diseño y se orientan conjuntamente forma y pinturas. Son la alternativa de supervivencia a copiar con Ctrl + clic central en creativo.
 
-Son la alternativa de supervivencia a copiar mediante **Ctrl + clic central** en creativo. Véase [[Recolección y Conservación]].
+Funcionan en las cinco resoluciones. No tienen durabilidad ni niveles y se apilan de una en una. La selección destaca la forma completa e indica que conserva las pinturas. Sus ingredientes conocidos son cuero y hierro.
 
-No tiene durabilidad ni niveles por material y se apila de una en una. Antes de actuar, la selección destaca la superficie o los subcubos afectados. Véanse [[Herramientas]] y [[Recetas]].
+La excepción de conservación requiere que el jugador use esta herramienta; una explosión no la obtiene. Primero se completa el ítem funcional y sus integraciones; después modelo 3D y textura 16×16. Véanse [[Recolección y Conservación]], [[Herramientas]] y [[Recetas]].

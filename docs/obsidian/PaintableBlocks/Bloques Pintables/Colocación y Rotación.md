@@ -16,3 +16,9 @@ El diseño completo se transforma conjuntamente: subcubos, pinturas y orientaci�
 Las ocho orientaciones iniciales no permiten tumbar cualquier diseño sobre cualquier cara: su eje vertical sigue vertical, aunque pueda invertirse. La [[Llave de Giro]] añade giros de 90° en los tres ejes y permite alcanzar las **24 orientaciones** de un objeto, sin reflejarlo ni deformarlo.
 
 El giro conserva el diseño y no consume pintura. Se rechaza si la nueva geometría colisiona con una entidad. La vista previa muestra el resultado antes de actuar.
+
+## Conservación y apariencia
+
+Al colocar un diseño recogido con guantes o copiado en creativo se restauran todos sus recortes y pinturas. La orientación se aplica al conjunto, no permite ejes independientes para dos pinturas dentro del mismo bloque y no cambia su coste o cantidades.
+
+La selección anticipa el resultado y la acción se valida en el servidor. La función y su guardado se completan antes de crear los recursos definitivos de la llave; véanse [[Arquitectura]] y [[Modelos y Texturas]].

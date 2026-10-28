@@ -26,3 +26,9 @@ La fabricación exige espacio para el lote completo antes de consumir materiales
 Las estaciones permiten [[Conversión de Subdivisiones]] 1:1 sin coste adicional, solo para bloques completos y sin pintura. Al recoger una estación, un único ítem conserva todo su contenido y lo restaura al colocar, sin drops adicionales de ese contenido.
 
 Las mejoras consumen la estación anterior vacía. Las familias de ingredientes están en [[Recetas]]; los patrones exactos de las estaciones no están definidos.
+
+## Organización de la implementación
+
+La lógica de costes y capacidad se comparte con la interfaz: el resultado mostrado debe coincidir con el que puede ejecutarse. Separar esa lógica permite desarrollar almacenamiento, conversión o una estación concreta sin esperar a todas las herramientas ni a sus recursos visuales.
+
+Las estaciones y sus ítems tendrán los recursos acordados en [[Modelos y Texturas]]. Los límites de los lotes se revisan por datos; su comportamiento en menús e inventarios se verifica en ejecución solo cuando esté autorizada.

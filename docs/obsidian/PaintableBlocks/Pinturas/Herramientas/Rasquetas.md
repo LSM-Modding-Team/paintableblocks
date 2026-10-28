@@ -22,3 +22,11 @@ No admiten encantamientos ni reparación. Cada bloque procesado consume exactame
 La mejora de diamante a netherite utiliza herrería con plantilla y conserva la proporción de usos restantes, sin restaurar una herramienta casi agotada. Una herramienta con el 25 % de duración produce otra con el 25 %.
 
 El raspador de limpieza es independiente de esta familia. Véanse [[Raspador]] y [[Recetas]].
+
+## Desarrollo y acceso
+
+Cada nivel se implementa primero como ítem funcional, con extracción, desgaste y conservación de usos al mejorar cuando corresponda. Después se generan su modelo 3D y textura definitiva de 16×16; una variante funcional no espera a las demás.
+
+La producción respeta [[Catálogo de Pinturas]]: las pinturas de bloques inaccesibles en supervivencia son exclusivas de creativo, sin recetas alternativas. El tipo compartido de pintura conserva una identidad distinta por textura.
+
+[[Modelos y Texturas]] · [[Criterios de División]]

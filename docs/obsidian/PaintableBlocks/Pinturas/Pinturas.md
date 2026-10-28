@@ -21,3 +21,9 @@ Aplicar la misma pintura no consume unidades. En áreas mixtas solo se cobra la 
 Cada identidad tiene nombre y aspecto propios, pero comparte el tipo de ítem con el resto del catálogo. El estado decorativo de cada pintura es fijo, según [[Texturas y Orientación]].
 
 [[Pintura en Creativo]]
+
+## Apariencia y recursos
+
+Todas las pinturas utilizan las propiedades del bloque pintable: dureza 1,5, resistencia 6 y sonido de piedra. No aportan funciones, luz ni transparencia física. Los estados decorativos son fijos y la orientación compartida se transforma con el diseño.
+
+El bote de pintura será 3D; las texturas propias del mod son 16×16. La textura original `unpainted.png` no es una pintura del catálogo y reaparece al limpiar. Véase [[Modelos y Texturas]].

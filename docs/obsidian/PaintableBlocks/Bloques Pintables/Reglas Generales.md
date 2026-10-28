@@ -29,3 +29,7 @@ Los pistones no pueden mover bloques pintables, estaciones ni cubos colocados.
 La colocación habitual sigue la lógica de escaleras. La [[Colocación y Rotación]] y la [[Llave de Giro]] permiten orientar conjuntamente forma y pinturas, sin ejes independientes por pintura.
 
 La apariencia original utiliza `unpainted.png`, no una pintura del catálogo. Véase [[Modelos y Texturas]].
+
+## Desarrollo de estas reglas
+
+Vista previa y acción real deben calcular los mismos resultados, validados por el servidor. El diseño persistente conserva subdivisión, forma y pinturas. La implementación se divide por dependencias y resultados observables, no por una lista rígida de fases; véanse [[Arquitectura]] y [[Plan de Fases]].

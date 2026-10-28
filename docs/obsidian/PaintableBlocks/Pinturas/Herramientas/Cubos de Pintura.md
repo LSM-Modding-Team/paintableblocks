@@ -33,3 +33,9 @@ En creativo, romper uno con contenido conserva ese ítem; uno vacío no produce 
 Las mejoras conservan contenido y componentes solo si el recipiente de destino admite todas las identidades y cantidades. Oro → diamante requiere comprobar la menor capacidad individual del diamante. Netherite usa herrería con plantilla. Véase [[Recetas]].
 
 Si sobrevive como drop de una explosión, todo el contenido viaja en el ítem y no se suelta por separado.
+
+## Datos y representación
+
+Las cantidades se guardan en unidades de pintura, no en número de ítems: un ítem completo contiene 256 unidades. Capacidad individual y número máximo de identidades son límites independientes; una transferencia debe respetar ambos.
+
+La interfaz y las interacciones directas consultan el mismo estado real; el servidor valida las transferencias. El ítem del cubo es 3D y las texturas propias son 16×16. El seguimiento de recursos y funciones se organiza en [[Plan de Fases]] y [[Modelos y Texturas]].
