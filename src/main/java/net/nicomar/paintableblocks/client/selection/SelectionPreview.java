@@ -12,7 +12,7 @@ import net.minecraft.world.phys.shapes.*;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -46,12 +46,12 @@ public final class SelectionPreview {
     private static boolean reverse(){return key(GLFW.GLFW_KEY_LEFT_SHIFT,GLFW.GLFW_KEY_RIGHT_SHIFT);}
     private static void input(InputEvent.InteractionKeyMappingTriggered e){
         var c=Minecraft.getInstance();if(c.player==null||c.gui.screen()!=null||!e.isUseItem()||!ServerInteractions.tool(c.player.getMainHandItem()))return;
-        e.setCanceled(true);e.setSwingHand(false);if(e.getHand()==InteractionHand.MAIN_HAND)PacketDistributor.sendToServer(new ModNetworking.Use(control(),reverse(),false));
+        e.setCanceled(true);e.setSwingHand(false);if(e.getHand()==InteractionHand.MAIN_HAND)ClientPacketDistributor.sendToServer(new ModNetworking.Use(control(),reverse(),false));
     }
     private static void tick(ClientTickEvent.Post event){
         var c=Minecraft.getInstance();if(c.player==null||c.level==null){selection=null;cachedKey=null;return;}
         if(selection!=null&&(selectedItem!=c.player.getMainHandItem()||!c.level.hasChunkAt(selection.pos())||!c.player.isWithinBlockInteractionRange(selection.pos(),0)
-                ||!(c.level.getBlockEntity(selection.pos()) instanceof PaintableBlockEntity b)||!b.valid()||!b.design().equals(selectedDesign))){selection=null;PacketDistributor.sendToServer(new ModNetworking.Use(false,false,true));}
+                ||!(c.level.getBlockEntity(selection.pos()) instanceof PaintableBlockEntity b)||!b.valid()||!b.design().equals(selectedDesign))){selection=null;ClientPacketDistributor.sendToServer(new ModNetworking.Use(false,false,true));}
         if(c.gui.screen()!=null||!(c.hitResult instanceof BlockHitResult hit)||hit.getType()!=HitResult.Type.BLOCK||!(c.level.getBlockEntity(hit.getBlockPos()) instanceof PaintableBlockEntity be))return;
         var held=c.player.getMainHandItem();
         if(held.is(ModContent.GLOVES.get())||held.is(ModContent.TONGS.get()))c.gui.hud.setOverlayMessage(Component.translatable(c.player.isCreative()?"message.paintableblocks.creative_copy":held.is(ModContent.GLOVES.get())?"message.paintableblocks.keep_design":"message.paintableblocks.keep_shape"),false);
