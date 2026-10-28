@@ -84,3 +84,19 @@ El usuario eligió los cinco frentes y autorizó resolver las decisiones faltant
 Tenazas y guantes habilitan sus recursos definitivos como tareas individuales; esta ejecución no los genera. Sus referencias visuales son provisionales. Los demás frentes no se marcan implementados por tener una reserva Java.
 
 Las decisiones tomadas y limitaciones están en [Grupo 1](../../../../technical/group1.md) y el detalle de avance en [CHANGELOG](../../../../../CHANGELOG.md). El grupo 2 dispone ahora de catálogo, diseño, selección y conservación como bases; las estaciones y máquinas del grupo 3 siguen requiriendo sus inventarios y operaciones propias.
+
+## Ejecución: grupo 2 — herramientas y pinturas
+
+El usuario eligió este grupo y autorizó resolver decisiones faltantes durante el trabajo, explicándolas después del commit.
+
+| Frente | Código incorporado | Verificación |
+|---|---|---|
+| Recorte y limpieza | Martillo, mazo, cincel, raspador y esponja; planes y contornos de selección compartidos | Revisión estática; contratos preparados sin ejecutar |
+| Colocación y giro | Llave con cuartos de vuelta en 24 orientaciones, inversión con Shift y rechazo de intersecciones con entidades; conserva colocación del grupo 1 | Sin prueba en juego |
+| Ítem de pintura y rasquetas | Seis niveles, extracción individual/×8, desgaste y mejora proporcional a netherite | JSON/API/sintaxis revisados; sin crafteo en ejecución |
+| Pinceles y aplicación | Seis capacidades, selección por esquinas coplanares, sustitución, coste y cancelación; creativo sin stock gratuito | Sin prueba de red/inventario en ejecución |
+| Cubos de pintura | Cuatro capacidades, portabilidad, menú y selección individual, transferencias y mejora a netherite | Validación estática; sin prueba multijugador |
+
+Se incorporó el PNG original y se retiraron los recursos de tenazas y guantes. La instrucción actual deja todas las herramientas sin modelos ni texturas, aceptando missing model/texture. Los recursos se realizarán individualmente al terminar los demás frentes.
+
+Quedan disponibles las estaciones de bloques, molino/prensa, recetas generales y sus interfaces/integraciones del grupo 3. Las recetas de extracción y mejora a netherite de herramientas/cubos ya forman parte del grupo 2; esto no implementa las máquinas. Véanse [Grupo 2](../../../../technical/group2.md) y [CHANGELOG](../../../../../CHANGELOG.md).

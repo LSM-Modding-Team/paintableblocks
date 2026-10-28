@@ -1,5 +1,10 @@
 # Modelos y texturas
 
+## Instrucción vigente tras el grupo 1
+
+El original `unpainted.png` de 16×16 está integrado sin modificar. Ninguna herramienta debe disponer ahora de modelo o textura, tampoco provisional: se retiraron los recursos de tenazas y guantes. Se acepta missing model/texture, incluidos pinceles, rasquetas, herramientas de edición/giro y cubos. El frente de recursos de herramientas se realizará individualmente al terminar los otros frentes. Esta instrucción sustituye cualquier habilitación anterior de recursos provisionales o de iniciarlos inmediatamente al terminar una herramienta.
+
+
 ## Especificación común
 
 Las texturas propias son de **16×16 píxeles**. Los modelos de ítems son **3D**; los modelos no tienen una resolución en píxeles. El tamaño de textura no determina la subdivisión: 1×1, 2×2, 4×4, 8×8 y 16×16 comparten proyección continua sobre la cara completa.
@@ -8,7 +13,7 @@ Las texturas propias son de **16×16 píxeles**. Los modelos de ítems son **3D*
 
 En todas las herramientas se completa primero el ítem funcional: registro, interacción, reglas, consumo o desgaste cuando corresponda, persistencia, selección y mensajes necesarios. Solo después se crea su modelo 3D y textura definitiva de 16×16.
 
-Durante el desarrollo funcional se usa una representación provisional identificable, sin generar texturas definitivas. La condición se aplica por herramienta: terminar el martillo habilita sus recursos aunque el cincel siga pendiente. No cerrar una fase visual global para poder seguir con otra función.
+Durante el desarrollo funcional se acepta missing model/texture. No crear recursos provisionales. Las funciones preceden a los recursos y, por instrucción actual del usuario, el frente visual se realizará individualmente al terminar los otros frentes.
 
 ## Seguimiento individual
 
@@ -23,8 +28,8 @@ Esta tabla establece los recursos a seguir, no declara que se hayan creado. Su e
 | Cincel | Retirar capa plana sin atravesar huecos | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Raspador | Limpiar orientación y profundidad seleccionadas | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Esponja de limpieza | Limpiar todo conservando geometría | Pendiente de función | 16×16, pendiente de función | Pendiente |
-| Tenazas | Recogida implementada en código; sin prueba en juego | Disponible; referencia provisional | 16×16, disponible | Pendiente |
-| Guantes | Recogida implementada en código; sin prueba en juego | Disponible; referencia provisional | 16×16, disponible | Pendiente |
+| Tenazas | Recogida implementada en código; sin prueba en juego | Pendiente; sin modelo | 16×16, pendiente | Pendiente |
+| Guantes | Recogida implementada en código; sin prueba en juego | Pendiente; sin modelo | 16×16, pendiente | Pendiente |
 | Llave de giro | Girar con vista previa y validar colisión | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Rasqueta de cobblestone | Extracción y 64 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
 | Rasqueta de cobre | Extracción y 128 usos | Pendiente de función | 16×16, pendiente de función | Pendiente |
@@ -61,6 +66,6 @@ Una inspección estática de archivos no acredita que el modelo se vea correctam
 
 Se prepararon los modelos dinámicos del bloque y su ítem conservado, con proyección continua compartida, y el bote 3D de pintura. No han sido visualizados en juego.
 
-No se encontró el archivo original `unpainted.png`; se utiliza piedra vanilla como apariencia provisional, sin generar ni reemplazar el PNG original. La integración del recurso elegido sigue pendiente.
+El grupo 2 incorpora el original `unpainted.png` de 16×16 sin modificar; deja de usarse la piedra vanilla provisional.
 
-Las funciones de tenazas y guantes están implementadas en código. Sus modelos/texturas definitivos pasan a estar disponibles como tareas individuales; mientras tanto se referencian modelos vanilla provisionales. Las demás herramientas conservan su dependencia de funciones completas. Véase [Grupo 1](../../../../technical/group1.md).
+Las funciones de tenazas, guantes y herramientas del grupo 2 están implementadas en código, sin prueba en juego. Se retiran las referencias vanilla provisionales. Ninguna herramienta tiene modelos o texturas por ahora. Véase [Grupo 1](../../../../technical/group1.md).

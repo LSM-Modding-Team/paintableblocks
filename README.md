@@ -4,11 +4,11 @@ Mod en desarrollo para **Minecraft 26.2**, **NeoForge 26.2.0.88** y **Java 25**.
 
 ## Estado actual
 
-Base del mod y **grupo 1: bloques y diseños** implementados en código: catálogo/balance, diseño inmutable, geometría, guardado/conservación y representación de mundo e inventario.
+Base del mod y grupos **1: bloques y diseños** y **2: herramientas y pinturas** implementados en código. Hay cinco subdivisiones, 337 pinturas, herramientas de conservación/edición/giro, seis niveles de pinceles y rasquetas y cuatro cubos portátiles con interfaz.
 
-Hay cinco variantes de bloque, 337 identidades de pintura y herramientas funcionales de conservación (tenazas y guantes). Los demás frentes siguen pendientes. El detalle del alcance, decisiones y límites está en [Grupo 1](docs/technical/group1.md).
+Se integró el original `unpainted.png` de 16×16. **Ninguna herramienta tiene modelos ni texturas**, tampoco provisionales; se acepta missing model/texture hasta su frente visual independiente. Estaciones, máquinas y recetas generales de fabricación corresponden al grupo 3.
 
-La textura original `unpainted.png` aún no está disponible: la apariencia sin pintar usa piedra vanilla de forma provisional, sin recrear el PNG. Tenazas y guantes tienen referencias visuales provisionales; sus recursos definitivos serán un trabajo individual posterior a sus funciones.
+El detalle del alcance, decisiones y límites está en [Grupo 1](docs/technical/group1.md) y [Grupo 2](docs/technical/group2.md). Implementado no significa probado en juego.
 
 ## Guías
 
@@ -18,6 +18,7 @@ La textura original `unpainted.png` aún no está disponible: la apariencia sin 
 - [Mapa del esqueleto y reservas Java](docs/technical/skeleton.md).
 - [Investigación oficial y compatibilidad de NeoForge](docs/technical/neoforge-26.2.md).
 - [Avance del grupo 1 y decisiones tomadas](docs/technical/group1.md).
+- [Avance del grupo 2 y decisiones tomadas](docs/technical/group2.md).
 - [Registro de cambios](CHANGELOG.md).
 
 ## Plataforma y comprobaciones

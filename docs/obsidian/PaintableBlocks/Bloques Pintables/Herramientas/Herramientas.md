@@ -17,6 +17,6 @@ Antes de actuar se destacan exactamente los subcubos o superficies afectados. Te
 
 ## Desarrollo por herramienta
 
-Primero se implementan el ítem y todas sus funciones, con selección, persistencia y mensajes necesarios. Después se crean el modelo 3D y la textura definitiva de 16×16. Durante la función se usa una representación provisional identificable. La dependencia es individual y se extiende también a [[Rasquetas]] y [[Pinceles]]; no exige terminar todas las herramientas antes de texturizar una ya funcional.
+Primero se implementan el ítem y todas sus funciones, con selección, persistencia y mensajes necesarios. Por instrucción posterior del usuario, ninguna herramienta tendrá por ahora modelos ni texturas, tampoco provisionales: se acepta missing model/texture. El frente de recursos se realizará individualmente al terminar los otros frentes. Después se crearán modelos 3D y texturas de 16×16.
 
 [[Plan de Fases]] · [[Modelos y Texturas]]

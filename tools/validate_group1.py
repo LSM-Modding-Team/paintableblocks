@@ -40,7 +40,7 @@ def main():
         assert parsed[f'assets/paintableblocks/blockstates/{name}.json']['variants']['']['type'] == 'paintableblocks:design'
         assert parsed[f'assets/paintableblocks/items/{name}.json']['model']['type'] == 'paintableblocks:design'
     mineable = parsed['data/minecraft/tags/block/mineable/pickaxe.json']
-    assert mineable['replace'] is False and set(mineable['values']) == {f'paintableblocks:{n}' for n in names}
+    assert mineable['replace'] is False and set(mineable['values']) == {f'paintableblocks:{n}' for n in names} | {f'paintableblocks:{n}_paint_bucket' for n in ['copper','gold','diamond','netherite']}
     for path in JAVA.rglob('*.java'):
         if 'client' not in path.relative_to(JAVA).parts:
             assert not re.search(r'import\s+net\.minecraft\.client\.', path.read_text()), f'Client import in common code: {path}'

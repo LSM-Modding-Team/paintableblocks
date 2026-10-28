@@ -90,6 +90,11 @@ public final class BlockDesign {
         if(paint==0)next.remove(cell*6+face.ordinal());else next.put(cell*6+face.ordinal(),paint);
         return new BlockDesign(resolution,occupied,next,orientation);
     }
+    public BlockDesign paintFaces(Map<Integer,Integer> changes){
+        TreeMap<Integer,Integer> next=new TreeMap<>(paints);
+        changes.forEach((key,id)->{if(id==0)next.remove(key);else next.put(key,id);});
+        return new BlockDesign(resolution,occupied,next,orientation);
+    }
     public BlockDesign remove(BitSet cells){
         BitSet next=(BitSet)occupied.clone();next.andNot(cells);
         TreeMap<Integer,Integer> paint=new TreeMap<>(paints);paint.keySet().removeIf(k->!next.get(k/6));

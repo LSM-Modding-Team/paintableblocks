@@ -7,6 +7,7 @@ Esta guía organiza la implementación de PaintableBlocks para Minecraft **26.2*
 - Elegir trabajos por dependencias y resultados observables; no seguir una secuencia fija de fases.
 - Antes de iniciar un bloque de trabajo, explicar las alternativas disponibles, sus dependencias y qué desbloquea cada una. La elección explícita del usuario tiene prioridad.
 - En todas las herramientas, implementar primero el ítem y sus funciones. Solo después abordar su modelo y textura definitivos. Esta dependencia se aplica individualmente, sin esperar a terminar las demás herramientas.
+- Por instrucción posterior del usuario, no crear ahora ningún modelo ni textura de herramienta, tampoco provisional. El frente visual se realizará individualmente después de los demás frentes; se admite missing model/texture.
 - Mantener separados el estado de implementación y la evidencia de verificación. Una revisión estática no acredita funcionamiento dentro de Minecraft.
 - Resolver decisiones técnicas rutinarias dentro de los requisitos aceptados. Consultar únicamente si falta una regla que afecte al comportamiento del mod; no pedir otra aprobación de decisiones ya aceptadas.
 - Leer las partes de documentación pertinentes al trabajo, respetando el `AGENTS.md` de la raíz.

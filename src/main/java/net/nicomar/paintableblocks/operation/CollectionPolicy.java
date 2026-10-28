@@ -36,7 +36,7 @@ public final class CollectionPolicy {
         if(!block.design().complete())return List.of();
         // Use vanilla's explosion loot survival probability without applying it to tools.
         Float radius=params.getOptionalParameter(LootContextParams.EXPLOSION_RADIUS);
-        if(radius!=null&&params.getLevel().random.nextFloat()>1.0F/radius)return List.of();
+        if(radius!=null&&params.getLevel().getRandom().nextFloat()>1.0F/radius)return List.of();
         return List.of(block.toItem(false));
     }
 }

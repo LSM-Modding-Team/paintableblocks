@@ -50,6 +50,17 @@ public final class DesignOrientation {
         for(int i=0;i<24;i++) if(compose(i,orientation)==0) return i;
         throw new IllegalStateException("Cube rotation has no inverse");
     }
+    public static int quarterTurn(Direction axis,boolean reverse){
+        int ax=axis.getStepX()*(reverse?-1:1), ay=axis.getStepY()*(reverse?-1:1), az=axis.getStepZ()*(reverse?-1:1);
+        Direction[] positive={Direction.EAST,Direction.UP,Direction.SOUTH};
+        Direction[] rotated=new Direction[3];
+        for(int i=0;i<3;i++){
+            Direction d=positive[i];int x=d.getStepX(),y=d.getStepY(),z=d.getStepZ(),dot=ax*x+ay*y+az*z;
+            rotated[i]=Direction.getNearest(ay*z-az*y+dot*ax,az*x-ax*z+dot*ay,ax*y-ay*x+dot*az,Direction.UP);
+        }
+        for(int i=0;i<24;i++)if(direction(i,positive[0])==rotated[0]&&direction(i,positive[1])==rotated[1]&&direction(i,positive[2])==rotated[2])return i;
+        throw new IllegalStateException("Quarter turn must be a proper cube rotation");
+    }
     public static int placement(Direction facing, boolean upsideDown) {
         // Local north faces the player-facing direction; inverted is a half-turn around local Z.
         for(int i=0;i<24;i++) if(direction(i,Direction.NORTH)==facing && direction(i,Direction.UP)==(upsideDown?Direction.DOWN:Direction.UP)) return i;

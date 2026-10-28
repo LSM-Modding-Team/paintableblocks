@@ -2,6 +2,40 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Grupo 2: herramientas y pinturas
+
+### Correcciones solicitadas
+
+- Corregido el acceso protegido de `CollectionPolicy`: usa `Level.getRandom()`.
+- Integrado el original `unpainted.png` de 16×16 sin modificar y conectado al bloque sin pintar.
+- Eliminadas las definiciones visuales de tenazas y guantes. Todas las herramientas y recipientes nuevos quedan sin modelos ni texturas, tampoco provisionales, aceptando missing model/texture.
+
+### Código incorporado
+
+- Planes compartidos y selección previa para martillo, mazo, cincel, raspador, esponja y llave; capas fijas, columnas con profundidades distintas, limpieza interior y giros propios con rechazo de colisiones.
+- Seis rasquetas con usos persistentes y extracción de uno u ocho bloques idénticos; desgaste exacto, agotamiento y devolución del cubo de nieve en polvo.
+- Seis pinceles con identidad/unidades reales, selección de esquinas en el mismo bloque/plano, aplicación sin consumo parcial, sustitución y cancelación. Creativo selecciona sin crear stock transferible; supervivencia valida disponibilidad de la pintura.
+- Cuatro cubos colocables y portátiles, paletas con límites de identidades/capacidad, carga/devolución de pinceles, depósitos y retiradas de ítems completos, fracciones conservadas y selección por jugador.
+- Menú/pantalla con botones nativos y fondos sólidos; portabilidad, tooltips, copia creativa, conservación al romper y manejo no recuperable de datos inválidos.
+- Receta de herrería con plantilla para mejorar pincel, rasqueta y cubo de diamante a netherite, conservando componentes y contenido/proporción de usos.
+- Red de intenciones y confirmación de selección; servidor recalcula impacto/plan y revalida protección, alcance, chunks, estado e inventario. Contornos extraídos sin capturar entidades de mundo.
+- Acceso creativo, nombres y mensajes en español/inglés; tag de pico ampliado a cubos. Las recetas generales y máquinas siguen correspondiendo al grupo 3.
+
+### Decisiones tomadas por autorización del usuario
+
+- Seleccionar pintura creativa con clic derecho de inventario sobre el pincel sustituye la receta sin forma: permite comprobar el modo del jugador sin exponer una receta global a supervivencia.
+- Menú de cubos sin ranuras temporales ni recursos visuales propios; inserción limitada al inventario real, sin descarte creativo de sobrantes.
+- La preferencia de pintura es individual y recuerda el último cubo de la sesión; al cambiar de cubo o agotarse una identidad se elige la primera disponible.
+- No se convierten ingredientes con componentes personalizados en pintura anónima; se preservan intactos para evitar pérdida de datos.
+- Una selección pendiente se invalida también si otro cambio modifica las pinturas, además de forma/orientación.
+
+### Documentación y comprobaciones
+
+- Actualizados AGENTS, README, mapa de código, plan, política visual y selección creativa; informe detallado en [Grupo 2](docs/technical/group2.md). Las decisiones provisionales del grupo 1 quedan sustituidas explícitamente.
+- Validador estático del grupo 1 actualizado para los cubos y nuevo validador del grupo 2; comprobados catálogo, recursos, traducciones, PNG original y separación común/cliente. Revisadas sintaxis e importaciones/API de referencia.
+- Añadido un arnés de contratos de herramientas/pintura, sin ejecutar. La revisión estática no acredita compilación ni funcionamiento en juego.
+- Sin Gradle, compilación, builds, Java, CI, clientes ni servidores. Publicación directa online únicamente en `26.2`; sin commits locales.
+
 ## Sin publicar — Grupo 1: bloques y diseños
 
 ### Frentes implementados en código

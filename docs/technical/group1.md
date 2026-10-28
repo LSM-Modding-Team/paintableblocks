@@ -1,5 +1,7 @@
 # Grupo 1: bloques y diseños
 
+> Actualización posterior: el grupo 2 incorpora el original `unpainted.png`, retira las referencias visuales de tenazas/guantes y corrige `Level.random` a `getRandom()`. Las decisiones 1 y 5 de esta entrega quedan sustituidas; véase [Grupo 2](group2.md).
+
 ## Alcance y estado
 
 Se avanzan los cinco frentes elegidos: **catálogo y balance**, **datos de diseño**, **geometría y selección**, **guardado y conservación** y **representación del diseño**. Estado: implementados en código y recursos, con comprobaciones estáticas; **sin compilación, carga ni pruebas en Minecraft**.
