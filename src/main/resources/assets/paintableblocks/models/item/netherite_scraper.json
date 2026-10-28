@@ -1,6 +1,6 @@
 {
   "parent": "paintableblocks:item/scraper_base",
   "textures": {
-    "tier": "paintableblocks:material/netherite"
+    "tier": "paintableblocks:block/material/netherite"
   }
 }

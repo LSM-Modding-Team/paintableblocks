@@ -3,10 +3,10 @@
   "ambientocclusion": false,
   "gui_light": "side",
   "textures": {
-    "wood": "paintableblocks:material/wood",
-    "dark_leather": "paintableblocks:material/dark_leather",
-    "tier": "paintableblocks:material/iron",
-    "bristles": "paintableblocks:material/bristles",
+    "wood": "paintableblocks:block/material/wood",
+    "dark_leather": "paintableblocks:block/material/dark_leather",
+    "tier": "paintableblocks:block/material/iron",
+    "bristles": "paintableblocks:block/material/bristles",
     "particle": "#wood"
   },
   "display": {

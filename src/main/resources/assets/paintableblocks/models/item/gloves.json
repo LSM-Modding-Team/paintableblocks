@@ -3,9 +3,9 @@
   "ambientocclusion": false,
   "gui_light": "side",
   "textures": {
-    "dark_leather": "paintableblocks:material/dark_leather",
-    "iron": "paintableblocks:material/iron",
-    "leather": "paintableblocks:material/leather",
+    "dark_leather": "paintableblocks:block/material/dark_leather",
+    "iron": "paintableblocks:block/material/iron",
+    "leather": "paintableblocks:block/material/leather",
     "particle": "#dark_leather"
   },
   "display": {

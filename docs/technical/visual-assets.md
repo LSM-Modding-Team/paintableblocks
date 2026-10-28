@@ -50,3 +50,17 @@ Las formas son comunes al cliente y servidor; hay que actualizar ambos lados par
 Resultado estático: 33 archivos de modelo con superficies —incluidos padres/variantes—, 20 654 parches unitarios revisados, **cero solapes coplanares** en los recursos revisados y nueve modelos de colisión coincidentes. Sintaxis Java e importaciones de la integración revisadas con la referencia 26.2.
 
 No se compilaron ni ejecutaron Java, Gradle, CI o Minecraft. Siguen pendientes las comprobaciones en juego de iluminación, oclusión, manos, animaciones, recursos recargados y cámara desde distintas distancias. Publicación directa online en la rama `26.2`, sin commits locales.
+
+## Corrección posterior: atlas de texturas
+
+La revisión posterior detectó un fallo de carga que la comprobación anterior de PNG existentes no cubría. Los 14 materiales compartidos estaban bajo `textures/material/`; 13 de ellos estaban referenciados por los modelos. El atlas de bloques de Minecraft 26.2 carga por defecto el directorio `block/` y el de ítems carga `item/`: no descubren automáticamente `material/`.
+
+Se trasladan los 14 PNG a `textures/block/material/` y se actualizan los identificadores a `paintableblocks:block/material/...`, incluidos modelos padre, variantes, partículas y generador. Sus bytes, píxeles, tamaño y opacidad permanecen idénticos. No se añaden atlas globales ni copias duplicadas de las imágenes. El original `unpainted.png` permanece intacto.
+
+`validate_visual_assets.py --minecraft-jar /ruta/minecraft-26.2-client.jar` lee los JSON de atlas del cliente oficial cuyo SHA-1 se verifica; ahora exige que cada sprite del modelo sea descubierto por una fuente del atlas, además de existir en disco. La nueva comprobación falló con las rutas anteriores y pasa con las corregidas: 28 sprites referenciados disponibles en el atlas de bloques. Sin el argumento se utilizan las reglas de directorio de referencia de 26.2. El helper también reconoce fuentes locales explícitas de directorio y de sprite individual; no simula paquetes de recursos externos arbitrarios.
+
+`python -m unittest discover -s tools/tests -p 'test_texture_atlas.py'` ejecuta seis regresiones Python: archivo existente fuera del atlas, subdirectorios, namespace, alias sin registrar, separación de atlas de ítems/bloques y fuentes explícitas. Pasan las seis.
+
+Se volvió a revisar la geometría: los 33 modelos conservan exactamente sus elementos y transformaciones; siguen sin detectarse solapes en 20 654 parches y coinciden las nueve colisiones. La lámina técnica es idéntica en bytes al regenerarla: abrir un PNG directamente en una herramienta de inspección no demostraba que Minecraft lo incluyera en el atlas. Por eso ahora se comprueba también esa frontera de carga.
+
+No se modifican mecánicas, código Java, protocolo ni dibujos. Decisión adoptada: utilizar la estructura estándar `block/material/` para compartir sprites de modelos de bloques e ítems 3D, en vez de alterar el atlas global. Sin compilación ni ejecución de Minecraft; la comprobación de carga/recarga dentro del juego continúa pendiente.

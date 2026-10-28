@@ -3,9 +3,9 @@
   "ambientocclusion": true,
   "gui_light": "side",
   "textures": {
-    "wood": "paintableblocks:material/wood",
-    "dark_wood": "paintableblocks:material/dark_wood",
-    "iron": "paintableblocks:material/iron",
+    "wood": "paintableblocks:block/material/wood",
+    "dark_wood": "paintableblocks:block/material/dark_wood",
+    "iron": "paintableblocks:block/material/iron",
     "bench_side": "paintableblocks:block/workbench_side",
     "bench_top": "paintableblocks:block/workbench_top",
     "particle": "#wood"

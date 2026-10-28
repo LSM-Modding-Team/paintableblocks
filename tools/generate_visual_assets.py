@@ -117,7 +117,7 @@ def block(name,modelpath):write_json(Path('blockstates')/(name+'.json'),{'varian
 
 def generate():
  common={}
- for i,(name,c) in enumerate(COLORS.items()):common[name]=texture('material/'+name,c,'wood' if 'wood'in name else 'stone' if name in ['cobblestone','stone'] else 'sponge' if name=='sponge' else 'bristle' if name=='bristles' else 'cloth' if 'leather'in name else 'metal',i)
+ for i,(name,c) in enumerate(COLORS.items()):common[name]=texture('block/material/'+name,c,'wood' if 'wood'in name else 'stone' if name in ['cobblestone','stone'] else 'sponge' if name=='sponge' else 'bristle' if name=='bristles' else 'cloth' if 'leather'in name else 'metal',i)
  # Distinct tool silhouettes. Materials replace occupied cells; they are never layered as decals.
  tools={}
  tools['hammer']=Solid().box(7,1,7,9,11,9,'wood').box(6,8,6,10,11,10,'dark_leather').box(3,10,5,13,14,11,'iron').box(2,11,5,3,14,11,'iron').box(13,11,6,14,13,10,'iron')

@@ -2,6 +2,16 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Corrección de carga de texturas compartidas
+
+- Detectado que los PNG de `textures/material/` no eran descubiertos por los atlas estándar de Minecraft 26.2, aunque existieran en disco. Trece materiales referenciados podían mostrarse como textura ausente; el directorio contenía 14 PNG.
+- Trasladados los 14 materiales a `textures/block/material/` y actualizadas referencias de modelos, herencia, partículas, manifiesto y generador. Se conservan exactamente los bytes/píxeles de las imágenes y el original `unpainted.png`.
+- Nuevo helper `tools/texture_atlas.py` y validación de pertenencia real al atlas, usando los JSON del cliente oficial 26.2 con SHA-1 comprobado. La nueva comprobación reproduce el fallo antes de corregirlo y confirma 28 sprites de modelos disponibles después.
+- Añadidas seis pruebas de regresión Python para directorios, namespaces, alias, separación de atlas y fuentes explícitas; pasan todas. Pasan también los validadores de grupos 1–3 y de superficies/UV/colisión.
+- Revisados otra vez los modelos: se mantienen idénticos elementos y transformaciones de 33 archivos, sin solapes en 20 654 parches. Las nueve formas físicas coinciden y la vista técnica regenerada permanece idéntica.
+- Decisión adoptada: usar rutas convencionales de sprites de bloque, sin modificar atlas globales ni duplicar PNG. No fue necesario rediseñar texturas o geometría.
+- Informe actualizado en [recursos visuales](docs/technical/visual-assets.md). Sin cambios Java, protocolo, mecánicas o recetas; sin Gradle, compilación, Java, CI o Minecraft. Publicación directa online únicamente en `26.2`, sin commits locales.
+
 ## 2026-10-28 — Recursos visuales de bloques y herramientas
 
 - Completados modelos 3D de 20 herramientas: ocho de edición/conservación/giro, seis pinceles y seis rasquetas, con materiales y siluetas diferenciados.

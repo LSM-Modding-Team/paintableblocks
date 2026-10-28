@@ -3,7 +3,7 @@
   "ambientocclusion": false,
   "gui_light": "side",
   "textures": {
-    "sponge": "paintableblocks:material/sponge",
+    "sponge": "paintableblocks:block/material/sponge",
     "particle": "#sponge"
   },
   "display": {

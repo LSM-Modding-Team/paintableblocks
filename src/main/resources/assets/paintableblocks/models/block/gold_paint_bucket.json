@@ -2,6 +2,6 @@
   "parent": "paintableblocks:block/paint_bucket_base",
   "textures": {
     "body": "paintableblocks:block/gold_paint_bucket",
-    "tier": "paintableblocks:material/gold"
+    "tier": "paintableblocks:block/material/gold"
   }
 }

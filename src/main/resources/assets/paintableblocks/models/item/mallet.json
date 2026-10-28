@@ -3,8 +3,8 @@
   "ambientocclusion": false,
   "gui_light": "side",
   "textures": {
-    "dark_wood": "paintableblocks:material/dark_wood",
-    "wood": "paintableblocks:material/wood",
+    "dark_wood": "paintableblocks:block/material/dark_wood",
+    "wood": "paintableblocks:block/material/wood",
     "particle": "#dark_wood"
   },
   "display": {

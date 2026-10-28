@@ -3,8 +3,8 @@
   "ambientocclusion": false,
   "gui_light": "side",
   "textures": {
-    "iron": "paintableblocks:material/iron",
-    "wood": "paintableblocks:material/wood",
+    "iron": "paintableblocks:block/material/iron",
+    "wood": "paintableblocks:block/material/wood",
     "particle": "#iron"
   },
   "display": {

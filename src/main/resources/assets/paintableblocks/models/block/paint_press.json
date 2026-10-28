@@ -5,12 +5,12 @@
   "textures": {
     "body": "paintableblocks:block/paint_press_side",
     "top": "paintableblocks:block/paint_press_top",
-    "iron": "paintableblocks:material/iron",
-    "copper": "paintableblocks:material/copper",
-    "diamond": "paintableblocks:material/diamond",
-    "stone": "paintableblocks:material/stone",
-    "dark_wood": "paintableblocks:material/dark_wood",
-    "wood": "paintableblocks:material/wood",
+    "iron": "paintableblocks:block/material/iron",
+    "copper": "paintableblocks:block/material/copper",
+    "diamond": "paintableblocks:block/material/diamond",
+    "stone": "paintableblocks:block/material/stone",
+    "dark_wood": "paintableblocks:block/material/dark_wood",
+    "wood": "paintableblocks:block/material/wood",
     "particle": "#body"
   },
   "elements": [

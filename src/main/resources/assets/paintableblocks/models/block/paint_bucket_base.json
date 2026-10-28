@@ -4,8 +4,8 @@
   "gui_light": "side",
   "textures": {
     "body": "paintableblocks:block/copper_paint_bucket",
-    "tier": "paintableblocks:material/copper",
-    "iron": "paintableblocks:material/iron",
+    "tier": "paintableblocks:block/material/copper",
+    "iron": "paintableblocks:block/material/iron",
     "particle": "#body"
   },
   "elements": [

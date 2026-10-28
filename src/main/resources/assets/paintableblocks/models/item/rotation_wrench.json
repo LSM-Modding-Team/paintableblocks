@@ -3,8 +3,8 @@
   "ambientocclusion": false,
   "gui_light": "side",
   "textures": {
-    "copper": "paintableblocks:material/copper",
-    "iron": "paintableblocks:material/iron",
+    "copper": "paintableblocks:block/material/copper",
+    "iron": "paintableblocks:block/material/iron",
     "particle": "#copper"
   },
   "display": {

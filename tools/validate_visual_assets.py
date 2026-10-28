@@ -2,7 +2,8 @@
 from pathlib import Path
 from functools import lru_cache
 from collections import Counter
-import hashlib,json,re
+import argparse,hashlib,json,re
+from texture_atlas import TextureAtlases
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1];ASSETS=ROOT/'src/main/resources/assets/paintableblocks'
 NORMAL={'down':(0,-1,0),'up':(0,1,0),'north':(0,0,-1),'south':(0,0,1),'west':(-1,0,0),'east':(1,0,0)}
@@ -35,6 +36,18 @@ def faces(model):
  return out
 
 def main():
+ parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--minecraft-jar',type=Path,help='Read the verified official 26.2 atlas JSON without running Java');args=parser.parse_args()
+ atlases=TextureAtlases(ASSETS.parent,args.minecraft_jar);sprite_refs=set()
+ for model_file in (ASSETS/'models').rglob('*.json'):
+  model=resolve(str(model_file.relative_to(ASSETS/'models'))[:-5])
+  for sprite in model.get('textures',{}).values():
+   visited=set()
+   while sprite.startswith('#'):
+    assert sprite not in visited,('Cyclic texture alias',model_file,sprite)
+    visited.add(sprite);sprite=model['textures'][sprite[1:]]
+   if sprite.startswith('paintableblocks:'):
+    sprite_refs.add(sprite)
+    assert atlases.resolve(sprite,'blocks') is not None,('PNG exists but model sprite is not loaded into the block atlas',model_file,sprite)
  manifest=json.loads((ROOT/'tools/visual_assets_manifest.json').read_text());checked=0;face_count=0
  original=ASSETS/'textures/block/unpainted.png';assert hashlib.sha256(original.read_bytes()).hexdigest()=='aca1bd691809249ca928990bca71ea1cee4a150e409bd2d14e664baaa2472afa'
  for path in (ASSETS/'textures').rglob('*.png'):
@@ -67,6 +80,6 @@ def main():
   definition=json.loads((ASSETS/'items'/(name+'.json')).read_text());assert definition['model']['type']=='minecraft:model'
   model=resolve(definition['model']['model'].split(':',1)[1]);assert model['elements'],'Flat/generated icon instead of 3D geometry'
  cap=faces(resolve('item/paint_cap'));assert not any(f=='down' and p==10 and 4<=x<12 and 4<=z<12 for f,p,x,z in cap),'Hidden bottle-cap contact retained'
- print(json.dumps({'registered_variants_completed':29,'model_files_with_shells':checked,'unit_surface_patches_checked':face_count,'new_textures_16px':len(manifest['textures']),'world_collision_models_matching':len(manifest['world_blocks']),'coplanar_overlaps':0,'original_unpainted':'unchanged','java_or_minecraft_execution':False}))
+ print(json.dumps({'registered_variants_completed':29,'model_files_with_shells':checked,'unit_surface_patches_checked':face_count,'new_textures_16px':len(manifest['textures']),'world_collision_models_matching':len(manifest['world_blocks']),'coplanar_overlaps':0,'original_unpainted':'unchanged','atlas_sprites_checked':len(sprite_refs),'official_atlas_sources':atlases.official,'java_or_minecraft_execution':False}))
 
 if __name__=='__main__':main()

@@ -2,6 +2,6 @@
   "parent": "paintableblocks:block/paint_bucket_base",
   "textures": {
     "body": "paintableblocks:block/netherite_paint_bucket",
-    "tier": "paintableblocks:material/netherite"
+    "tier": "paintableblocks:block/material/netherite"
   }
 }

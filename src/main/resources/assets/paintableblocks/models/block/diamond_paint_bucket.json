@@ -2,6 +2,6 @@
   "parent": "paintableblocks:block/paint_bucket_base",
   "textures": {
     "body": "paintableblocks:block/diamond_paint_bucket",
-    "tier": "paintableblocks:material/diamond"
+    "tier": "paintableblocks:block/material/diamond"
   }
 }

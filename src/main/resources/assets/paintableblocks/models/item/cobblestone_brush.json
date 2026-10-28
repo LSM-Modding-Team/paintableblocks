@@ -1,6 +1,6 @@
 {
   "parent": "paintableblocks:item/brush_base",
   "textures": {
-    "tier": "paintableblocks:material/cobblestone"
+    "tier": "paintableblocks:block/material/cobblestone"
   }
 }
