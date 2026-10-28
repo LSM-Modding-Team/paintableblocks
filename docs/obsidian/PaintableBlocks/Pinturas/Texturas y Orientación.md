@@ -24,3 +24,23 @@ Las siguientes familias reúnen 55 entradas del [[Catálogo de Pinturas]]:
 | Pilares | Cuarzo y purpur |
 | Otros bloques con eje | Bloque de huesos y bala de heno |
 | Ranaluces | Ocre, nacarada y verde |
+
+## Colocación y giro
+
+La orientación inicial sigue la colocación de escaleras. La [[Llave de Giro]] permite alcanzar 24 orientaciones mediante giros de 90° en tres ejes, sin reflejos. Giran juntos la geometría, las pinturas y sus ejes; no se habilitan orientaciones independientes por cuadrado.
+
+## Estados visuales del catálogo
+
+Cada pintura utiliza una apariencia estable, independiente del entorno:
+
+| Bloque o familia | Apariencia |
+|---|---|
+| Lámparas y lámparas de cobre | Apagadas |
+| Nexo de reaparición | Sin carga |
+| Observador | Sin activar |
+| Cobre | Oxidación de su entrada del catálogo |
+| Césped y otros tintes ambientales | Color fijo predeterminado, igual en mundo e inventario |
+
+Las texturas animadas conservan su animación visual, pero ninguna pintura emite luz ni aporta funciones. Los packs de recursos pueden cambiar las texturas sin alterar las reglas de proyección.
+
+Las texturas propias son de 16×16 píxeles y los modelos de ítems son 3D. La superficie sin pintar utiliza la textura original `unpainted.png`; véase [[Modelos y Texturas]].

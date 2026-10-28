@@ -1,5 +1,11 @@
 # Banco
 
-Produce más bloques pintables al mismo coste que la alternativa anterior: [[Fabricación Manual]]. [[Cortadora]] ofrece un rendimiento superior al mismo coste.
+Multiplica por **2** el rendimiento manual del mismo lote. Fabrica directamente 1×1, 2×2, 4×4, 8×8 o 16×16, sin variar propiedades, coste o rendimiento según la subdivisión. El funcionamiento es instantáneo y sin combustible.
 
-Permite la [[Conversión de Subdivisiones]] de bloques completos y sin pintura.
+Almacena hasta **1 024 bloques** entre las cinco variantes, con capacidad compartida y solo bloques nuevos sin personalización.
+
+Permite convertir bloques completos y sin pintura, 1:1 y sin coste adicional. No consume materiales si el lote completo no cabe; al retirar, conserva el sobrante que no admita el inventario.
+
+Al recogerlo conserva el contenido en un único ítem. Es el primer nivel de estación especializada.
+
+Véanse [[Fabricación]], [[Conversión de Subdivisiones]] y [[Recetas]].

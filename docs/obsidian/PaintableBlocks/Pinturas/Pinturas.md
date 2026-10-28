@@ -1,6 +1,6 @@
 # Pinturas
 
-Cada pintura representa una textura y tiene su propio ítem. Su acabado es únicamente visual: no transmite las propiedades del bloque de origen.
+Cada pintura representa una textura. Se utiliza un único tipo de ítem con una identidad de pintura guardada en sus datos. Su acabado es únicamente visual: no transmite las propiedades del bloque de origen.
 
 La unidad base corresponde a un cuadrado de un bloque de 16×16. Un ítem de pintura contiene **256 unidades**, suficientes para una cara completa de un bloque, independientemente de su subdivisión.
 
@@ -13,3 +13,11 @@ Aplicar pintura sobre otra la sustituye directamente y consume las unidades corr
 - [[Pinceles]]
 - [[Catálogo de Pinturas]]
 - [[Texturas y Orientación]]
+
+## Consumo e identidad
+
+Aplicar la misma pintura no consume unidades. En áreas mixtas solo se cobra la superficie que cambia. Si falta pintura, no se ejecuta una aplicación parcial ni se consume nada.
+
+Cada identidad tiene nombre y aspecto propios, pero comparte el tipo de ítem con el resto del catálogo. El estado decorativo de cada pintura es fijo, según [[Texturas y Orientación]].
+
+[[Pintura en Creativo]]

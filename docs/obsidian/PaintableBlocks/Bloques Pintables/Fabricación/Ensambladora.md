@@ -1,5 +1,11 @@
 # Ensambladora
 
-Produce más bloques pintables al mismo coste que la alternativa anterior: [[Cortadora]].
+Multiplica por **8** el rendimiento manual del mismo lote. Fabrica directamente 1×1, 2×2, 4×4, 8×8 o 16×16, sin variar propiedades, coste o rendimiento según la subdivisión. El funcionamiento es instantáneo y sin combustible.
 
-Permite la [[Conversión de Subdivisiones]] de bloques completos y sin pintura.
+Almacena hasta **16 384 bloques** entre las cinco variantes, con capacidad compartida y solo bloques nuevos sin personalización.
+
+Permite convertir bloques completos y sin pintura, 1:1 y sin coste adicional. No consume materiales si el lote completo no cabe; al retirar, conserva el sobrante que no admita el inventario.
+
+Al recogerlo conserva el contenido en un único ítem. Su mejora consume un [[Cortadora]] vacío.
+
+Véanse [[Fabricación]], [[Conversión de Subdivisiones]] y [[Recetas]].
