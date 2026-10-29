@@ -37,3 +37,13 @@ Los IDs del catálogo se toman del CSV: nieve en polvo es `paint_id` 232; 233 co
 El usuario autorizó decidir sin consulta durante este avance. Se documentaron las resoluciones de textura provisional, pinturas exclusivas de creativo, iluminación de recortes, datos inválidos y caché en [Grupo 1](../../../../technical/group1.md).
 
 El original `unpainted.png` sigue pendiente de integrar; no se ha recreado. Tenazas y guantes ya tienen funciones en código y habilitan sus recursos definitivos individuales. Las recetas sin patrones concretos corresponden al futuro frente de recetas; no impiden el acceso creativo al contenido preparado.
+
+## Estado vigente tras acordar las ampliaciones
+
+Las decisiones de [[Recorte Volumétrico]], [[Pendientes]], [[Pintura de Pendientes]] y [[Pestañas del Creativo]] están aceptadas y no necesitan aprobación posterior. No están implementadas por esta entrega.
+
+Quedan como decisiones de producto el **nombre definitivo, receta y durabilidad máxima del formador**. Su nombre actual es provisional; no inventar cifras ni ingredientes. Equilibrar juntos receta y durabilidad respecto al martillo y la progresión.
+
+La colisión a 1/16, el comportamiento de uniones y el rendimiento de selecciones grandes requieren verificación posterior. Presupuesto por tick, tamaño de lote y detalle de previsualización son ajustes técnicos sujetos a medición, no funciones nuevas por aprobar.
+
+Las notas anteriores sobre PNG original pendiente y recetas generales ausentes son históricas: el original ya está integrado, los grupos 1–3 y recursos visuales están publicados; las recetas concretadas se recogen en [recetas del grupo 3](../../../../technical/group3-recipes.md). No confundirlas con la receta todavía ausente del formador.

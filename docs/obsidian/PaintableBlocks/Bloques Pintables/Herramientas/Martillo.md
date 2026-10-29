@@ -7,3 +7,7 @@ El recorte es irreversible y no devuelve materiales ni pintura. La nueva superfi
 No tiene durabilidad ni niveles por material y se apila de una en una. La selección destaca el subcubo que se retirará antes de actuar. Sus ingredientes conocidos son hierro y palos; no se ha concretado el patrón.
 
 Primero se implementan el ítem, operación, selección y guardado; después el modelo 3D y la textura definitiva de 16×16. Véanse [[Herramientas]], [[Recetas]] y [[Criterios de División]].
+
+## Ampliación aceptada: selección volumétrica
+
+Se mantiene el uso individual. [[Recorte Volumétrico]] añade selección por dos esquinas con Ctrl + clic derecho y confirmación posterior, hasta 256×256×256 bloques. Su ejecución por lotes, cancelación, permisos y selección entre subdivisiones están definidos en esa página. Pendiente de implementación.

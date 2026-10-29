@@ -22,3 +22,7 @@ El coste es proporcional a la superficie que cambia: los cuadrados ya pintados c
 La vista previa y la acción efectiva utilizan las mismas reglas para enumerar las superficies y calcular unidades. La confirmación se valida contra la geometría real; no se aplica una selección cancelada por un cambio del diseño.
 
 La pintura resultante se guarda con el diseño y se representa en su ítem cuando se conserva. El desarrollo funcional del pincel incluye esta selección antes de sus recursos definitivos.
+
+## Superficies inclinadas
+
+[[Pintura de Pendientes]] extiende esta selección a planos inclinados del mismo bloque, tomando los fragmentos cuyos centros estén dentro del rectángulo. No amplía el pintado a varios bloques. El límite volumétrico de 256³ pertenece al martillo; la comparación inicial con 256×256 no sustituye la regla vigente de pintura limitada a un bloque y plano.

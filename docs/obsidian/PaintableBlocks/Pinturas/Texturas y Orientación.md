@@ -50,3 +50,7 @@ Las texturas propias son de 16×16 píxeles y los modelos de ítems son 3D. La s
 El diseño conservado debe mostrar la misma forma y pinturas en inventario que al colocarse, ajustadas a la orientación del bloque. La vista previa de giro y el resultado usan la misma transformación, sin reinterpretar la pintura por cada cuadrado.
 
 Las texturas definitivas de herramientas se generan después de completar sus funciones; esa secuencia no altera las reglas de proyección del catálogo ni retrasa los frentes funcionales independientes. Véanse [[Arquitectura]] y [[Modelos y Texturas]].
+
+## Pendientes aceptadas
+
+En [[Pintura de Pendientes]] se proyecta desde el eje dominante conservando coordenadas del bloque; se acepta estiramiento en la inclinación. Se mantienen continuidad y orientación conjunta. Esta extensión está pendiente de implementación.

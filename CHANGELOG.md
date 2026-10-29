@@ -2,6 +2,15 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Acuerdos de recorte volumétrico, pendientes y creativo
+
+- Documentadas las reglas aceptadas del martillo volumétrico: dos esquinas, máximo 256³ posiciones, selección por centros, permisos, ejecución por lotes, progreso e interrupciones sin revertir lo ejecutado.
+- Añadidas pendientes rectas de plano único, cinco subdivisiones, dimensiones de 1 a 16 por eje/operación, piezas independientes, compatibilidad de herramientas, selección real y colisión aproximada a 1/16.
+- Documentado el formador provisional: transformación que solo retira volumen, interfaz y previsualización, un punto por bloque modificado y modo creativo. Nombre definitivo, receta y durabilidad máxima siguen pendientes.
+- Definidas proyección, selección y consumo por área de fragmentos inclinados; conservación, copia y rotación conjunta del plano; compatibilidad del formato con diseños anteriores.
+- Definidas tres pestañas propias: bloques, herramientas y pinturas vanilla; otras pestañas condicionadas a las integraciones disponibles.
+- Actualizados índices, arquitectura, dependencias y pendientes, distinguiendo requisitos aceptados de implementación. Solo Markdown: sin Java, recursos, configuración, compilación, CI ni Minecraft. Commit directo online en `26.2`, sin commit local.
+
 ## 2026-10-28 — Corrección de carga de texturas compartidas
 
 - Detectado que los PNG de `textures/material/` no eran descubiertos por los atlas estándar de Minecraft 26.2, aunque existieran en disco. Trece materiales referenciados podían mostrarse como textura ausente; el directorio contenía 14 PNG.

@@ -10,6 +10,10 @@ Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes co
 
 Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **4**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
 
+## Ampliaciones acordadas
+
+Se han documentado el recorte volumétrico del martillo, las pendientes y su formador, la pintura de superficies inclinadas y tres pestañas del creativo. **Pendientes de implementación**: esta ampliación documental no modifica código ni recursos. Véase la [especificación](docs/obsidian/PaintableBlocks/PaintableBlocks.md).
+
 ## Guías
 
 - [Instrucciones del agente](AGENTS.md).

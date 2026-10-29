@@ -33,3 +33,7 @@ La apariencia original utiliza `unpainted.png`, no una pintura del catálogo. V�
 ## Desarrollo de estas reglas
 
 Vista previa y acción real deben calcular los mismos resultados, validados por el servidor. El diseño persistente conserva subdivisión, forma y pinturas. La implementación se divide por dependencias y resultados observables, no por una lista rígida de fases; véanse [[Arquitectura]] y [[Plan de Fases]].
+
+## Extensión a pendientes
+
+[[Pendientes]] amplía las reglas de geometría: admite fragmentos inclinados incluso en la variante 1×1 mediante el formador. La prohibición de recortar 1×1 con martillo, mazo y cincel permanece. Su selección usa geometría real; su colisión usa cajas a precisión 1/16, en vez de afirmar colisión exacta de subcubos completos. Las propiedades comunes, ausencia de agua por celda y bloqueo de pistones siguen vigentes.

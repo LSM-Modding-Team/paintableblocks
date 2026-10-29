@@ -16,3 +16,7 @@ Esta es la especificación acordada previa a la creación del código. Sus regla
 La primera versión incluirá todo el alcance acordado, desarrollado mediante frentes elegibles, sin un orden global estricto. Para cada herramienta se completa primero el ítem y sus funciones y después sus recursos definitivos.
 
 Los commits se crean directamente online en la rama `26.2`, sin commits locales. Compilar, generar builds o iniciar el juego requiere petición expresa; véanse [[Agente]] y [[Plan de Fases]].
+
+## Ampliaciones aceptadas, pendientes de implementación
+
+[[Recorte Volumétrico]], [[Pendientes]], [[Formador de Pendientes]], [[Pintura de Pendientes]] y [[Pestañas del Creativo]] definen el nuevo alcance acordado. Su aprobación y documentación no acreditan código ni recursos nuevos. Los informes técnicos y el README distinguen lo ya implementado de estas ampliaciones.

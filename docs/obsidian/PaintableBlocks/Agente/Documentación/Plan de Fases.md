@@ -124,3 +124,18 @@ Por petición del usuario se completan los recursos de 20 herramientas, cuatro c
 Estado: recursos implementados; inspección técnica y validación estática de geometría/colisión realizadas. Comprobación en Minecraft pendiente. Esta petición sustituye las restricciones temporales de recursos de las entregas anteriores.
 
 Las alternativas siguientes son inspección de manos/cámara/recarga, pruebas de integración autorizadas y correcciones según sus resultados. No se declara verificación en juego. Evidencia y decisiones: [recursos visuales](../../../../technical/visual-assets.md).
+
+## Nuevas alternativas aceptadas — pendientes de implementación
+
+| Frente elegible | Dependencias mínimas | Resultado |
+|---|---|---|
+| Pestañas propias | Registros actuales; integrar después el nuevo contenido | Tres pestañas, orden, traducciones e integraciones condicionales |
+| Recorte volumétrico | Selección, operaciones y autoridad existentes | Selección 3D, validación, lotes, progreso y cancelación |
+| Datos y geometría de pendientes | Diseño versionado y superficies recortadas | Plano, cinco resoluciones, migración, selección y colisión |
+| Formador | Geometría de pendientes, permisos y previsualización | Transformación, configuración, desgaste y modo creativo |
+| Pintura y conservación de pendientes | Superficies inclinadas y diseño persistente | Coste por área, proyección, herramientas y objetos conservados |
+| Recursos del formador y pendientes | Funciones correspondientes completadas | Ítems 3D, texturas propias 16×16 y ausencia de parpadeo |
+
+Sin orden global obligatorio: las pestañas y el martillo volumétrico son alternativas independientes; el trabajo de pendientes puede preparar datos y geometría sin esperar a ellas. La selección y previsualización volumétricas pueden reutilizarse en el formador. El orden sugerido pestañas → martillo → pendientes es una recomendación, no una obligación.
+
+Esta entrega modifica únicamente documentación. Las filas nuevas siguen pendientes, y la migración, suavidad de colisión y rendimiento necesitan comprobaciones posteriores. No ejecutar compilación ni juego sin petición expresa.

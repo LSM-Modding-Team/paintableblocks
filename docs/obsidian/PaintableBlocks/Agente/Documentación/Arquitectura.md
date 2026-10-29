@@ -52,3 +52,15 @@ La representación de mundo e inventario debe interpretar el mismo diseño. Las 
 No simular agua por subcubo ni movimiento por pistones. No añadir ejes de pintura independientes, reflejos, reparación de rasquetas o combustible a la prensa. Los documentos adjuntos anteriores no autorizan importar reglas incompatibles, clases o recetas ausentes en la documentación acordada.
 
 El orden de construcción se decide mediante [[Plan de Fases]], y la evidencia de cierre mediante [[Criterios de División]].
+
+## Ampliaciones aceptadas pendientes de implementación
+
+- Diseño: añadir plano inclinado opcional y superficies de fragmentos, manteniendo ocupación, subdivisión, pinturas y orientación conjunta. Una pieza admite un solo plano; rotarlo no añade cortes nuevos.
+- Geometría: selección y render de pendiente real, colisión mediante cajas a 1/16 independiente de resolución, eliminación de superficies internas entre piezas contiguas y límites compartidos sin solapes.
+- Operaciones: [[Recorte Volumétrico]] recorre bloques por lotes; una operación activa por jugador y presupuesto global de servidor. No materializar todos los minicubos ni cargar chunks. Las interrupciones conservan lo ya ejecutado y descartan lo pendiente.
+- Pintura: mantener costes actuales en cuadrados y aplicar techo(256 × área) por fragmento inclinado. Usar el mismo cálculo en vista previa y servidor.
+- Desgaste: el [[Formador de Pendientes]] se suma a las rasquetas como herramienta con durabilidad; un punto por bloque realmente modificado, suficiente para toda la transformación antes de empezar.
+- Guardado: versionar el formato para el plano; leer diseños anteriores como piezas sin plano y preparar pruebas de compatibilidad. Conservar plano y pinturas al recoger/copiar/colocar. Las operaciones activas son temporales y no se reanudan al abrir mundos.
+- Presentación: tres [[Pestañas del Creativo]], configuración de pendientes y vistas previas simplificadas para volúmenes grandes. No declarar disponible una función solo por documentarla.
+
+Esta ampliación modifica la afirmación anterior de que solo se desgastan las rasquetas y de que toda geometría es un conjunto de cubos completos. Las demás reglas continúan vigentes.
