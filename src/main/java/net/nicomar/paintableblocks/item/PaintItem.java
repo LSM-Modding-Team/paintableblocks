@@ -11,6 +11,6 @@ public final class PaintItem extends Item {
     public PaintItem(Properties properties){super(properties);}
     @Override public Component getName(ItemStack stack){
         Integer id=stack.get(ModContent.PAINT_ID.get());
-        return id!=null&&PaintCatalog.validId(id)?Component.translatable("item.paintableblocks.paint_of",Component.translatable(PaintCatalog.byId(id).translationKey())):super.getName(stack);
+        return id!=null&&PaintCatalog.validId(id)?Component.translatable("item.paintableblocks.paint_of",Component.translatable(PaintCatalog.byId(id).translationKey())).append(PaintCatalog.byId(id).survivalAvailable()?Component.empty():Component.translatable("item.paintableblocks.creative_only")):super.getName(stack);
     }
 }

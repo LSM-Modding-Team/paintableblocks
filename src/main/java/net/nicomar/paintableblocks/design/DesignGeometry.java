@@ -11,7 +11,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** Exact occupancy geometry: greedy boxes reduce collision complexity without filling holes. */
 public final class DesignGeometry {
-    public record Surface(int cell,Direction face) {}
+    public record Surface(int cell,Direction face,boolean slope) {
+        public Surface(int cell,Direction face){this(cell,face,false);}
+        public int key(){return slope?BlockDesign.SLOPE_KEY+cell:cell*6+face.ordinal();}
+    }
     public record Box(int x0,int y0,int z0,int x1,int y1,int z1) {}
     private DesignGeometry() {}
     private static final java.util.LinkedHashMap<BlockDesign.GeometryKey,List<Surface>> SURFACES=new java.util.LinkedHashMap<>(16,.75F,true);
@@ -20,6 +23,9 @@ public final class DesignGeometry {
         var key=design.geometryKey();synchronized(SURFACES){var cached=SURFACES.get(key);if(cached!=null)return cached;}
         List<Surface> out=new ArrayList<>();int n=design.resolution();
         for(int c=0;c<n*n*n;c++)if(design.occupied(c))for(Direction face:Direction.values())if(design.exposed(c,face))out.add(new Surface(c,face));
+        if(design.slope()!=null)for(int c=0;c<n*n*n;c++)if(design.occupied(c)){
+            var surface=new Surface(c,design.slope().dominant(),true);if(SlopeGeometry.area(SlopeGeometry.polygon(design,surface))>1e-12)out.add(surface);
+        }
         var result=List.copyOf(out);
         synchronized(SURFACES){
             var raced=SURFACES.get(key);if(raced!=null)return raced;
@@ -42,12 +48,33 @@ public final class DesignGeometry {
     }
     private static boolean free(BlockDesign d,boolean[] used,int x,int y,int z){return d.occupied(x,y,z)&&!used[d.index(x,y,z)];}
     public static VoxelShape shape(BlockDesign d){
+        if(d.slope()!=null)return slopeShape(d);
         double n=d.resolution();VoxelShape out=Shapes.empty();
         for(Box b:boxes(d))out=Shapes.joinUnoptimized(out,Shapes.box(b.x0()/n,b.y0()/n,b.z0()/n,b.x1()/n,b.y1()/n,b.z1()/n),BooleanOp.OR);
         return out.optimize();
     }
+    private static VoxelShape slopeShape(BlockDesign d){
+        VoxelShape out=Shapes.empty();int inverse=DesignOrientation.inverse(d.orientation());
+        // Every collision voxel is 1/16 regardless of the paintable resolution.
+        for(int z=0;z<16;z++)for(int y=0;y<16;y++)for(int x=0;x<16;x++){
+            var p=DesignOrientation.rotate(inverse,new Vec3((x+.5)/16,(y+.5)/16,(z+.5)/16));int n=d.resolution();
+            if(d.occupied(Math.min(n-1,(int)(p.x*n)),Math.min(n-1,(int)(p.y*n)),Math.min(n-1,(int)(p.z*n)))&&d.slope().value(p)<=1e-10)
+                out=Shapes.joinUnoptimized(out,Shapes.box(x/16.0,y/16.0,z/16.0,(x+1)/16.0,(y+1)/16.0,(z+1)/16.0),BooleanOp.OR);
+        }return out.optimize();
+    }
+    public static VoxelShape supportShape(BlockDesign d){
+        if(d.slope()==null)return shape(d);
+        // Only full axis-aligned outer faces support attachments; never the stepped incline.
+        VoxelShape out=Shapes.empty();
+        for(Direction face:Direction.values()){
+            final Direction f=face;var polygons=surfaces(d).stream().filter(s->!s.slope()&&s.face()==f).map(s->SlopeGeometry.polygon(d,s)).filter(p->!p.isEmpty()&&p.stream().allMatch(v->Math.abs((f.getAxis()==Direction.Axis.X?v.x:f.getAxis()==Direction.Axis.Y?v.y:v.z)-(f.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0))<1e-9)).toList();
+            double area=polygons.stream().mapToDouble(SlopeGeometry::area).sum();
+            if(Math.abs(area-1)<1e-8){double[] min={0,0,0},max={1,1,1};int ax=SlopeGeometry.axis(f);if(f.getAxisDirection()==Direction.AxisDirection.POSITIVE)min[ax]=15.0/16;else max[ax]=1.0/16;out=Shapes.joinUnoptimized(out,Shapes.box(min[0],min[1],min[2],max[0],max[1],max[2]),BooleanOp.OR);}
+        }return out.optimize();
+    }
     /** Hit must already have been ray-traced against the remaining shape; never targets hidden faces. */
     public static Optional<Surface> target(BlockDesign local,Vec3 point,Direction normal){
+        if(local.slope()!=null)return SlopeGeometry.target(local,point);
         int inverse=DesignOrientation.inverse(local.orientation());Vec3 p=DesignOrientation.rotate(inverse,point);
         Direction face=DesignOrientation.direction(inverse,normal);int n=local.resolution();double epsilon=1.0e-6;
         int x=(int)Math.floor((p.x-face.getStepX()*epsilon)*n);

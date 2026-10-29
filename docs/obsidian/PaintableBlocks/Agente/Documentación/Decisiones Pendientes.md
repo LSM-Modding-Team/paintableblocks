@@ -47,3 +47,9 @@ Quedan como decisiones de producto el **nombre definitivo, receta y durabilidad 
 La colisión a 1/16, el comportamiento de uniones y el rendimiento de selecciones grandes requieren verificación posterior. Presupuesto por tick, tamaño de lote y detalle de previsualización son ajustes técnicos sujetos a medición, no funciones nuevas por aprobar.
 
 Las notas anteriores sobre PNG original pendiente y recetas generales ausentes son históricas: el original ya está integrado, los grupos 1–3 y recursos visuales están publicados; las recetas concretadas se recogen en [recetas del grupo 3](../../../../technical/group3-recipes.md). No confundirlas con la receta todavía ausente del formador.
+
+## Resolución durante la implementación de ampliaciones
+
+La autorización del usuario permite resolver los datos antes ausentes del formador: nombre definitivo **Formador de pendientes**, 4096 puntos y receta de tres hierros arriba, diamante central y palo inferior. Las menciones anteriores a esos datos pendientes quedan sustituidas por esta resolución. La creación creativa se ancla junto a la cara inicial y requiere aire sin fluidos, sin sustituir construcciones.
+
+Código y recursos preparados para pestañas, recorte volumétrico, pendientes, pintura y conservación. Siguen pendientes pruebas autorizadas de compilación y juego, rendimiento, suavidad de colisión e integración multijugador. Véase [informe de ampliaciones](../../../../technical/slopes-and-volumes.md).

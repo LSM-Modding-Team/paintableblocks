@@ -17,6 +17,6 @@ La primera versión incluirá todo el alcance acordado, desarrollado mediante fr
 
 Los commits se crean directamente online en la rama `26.2`, sin commits locales. Compilar, generar builds o iniciar el juego requiere petición expresa; véanse [[Agente]] y [[Plan de Fases]].
 
-## Ampliaciones aceptadas, pendientes de implementación
+## Ampliaciones aceptadas e implementadas en código
 
-[[Recorte Volumétrico]], [[Pendientes]], [[Formador de Pendientes]], [[Pintura de Pendientes]] y [[Pestañas del Creativo]] definen el nuevo alcance acordado. Su aprobación y documentación no acreditan código ni recursos nuevos. Los informes técnicos y el README distinguen lo ya implementado de estas ampliaciones.
+[[Recorte Volumétrico]], [[Pendientes]], [[Formador de Pendientes]], [[Pintura de Pendientes]] y [[Pestañas del Creativo]] definen el nuevo alcance acordado. Código y recursos preparados; sin compilación ni prueba dentro del juego. Los informes técnicos y el README distinguen lo ya implementado de estas ampliaciones.

@@ -23,4 +23,4 @@ Primero se implementan el ítem y todas sus funciones, con selección, persisten
 
 ## Nueva herramienta aceptada
 
-[[Formador de Pendientes]] es una excepción a la ausencia de durabilidad de las herramientas anteriores: una sola variante inicial, un punto por bloque modificado y comprobación de durabilidad suficiente antes de comenzar. Nombre definitivo, receta y máximo aún pendientes. El [[Martillo]] incorpora [[Recorte Volumétrico]]. Ambas ampliaciones están pendientes de código.
+[[Formador de Pendientes]] es una excepción a la ausencia de durabilidad de las herramientas anteriores: una sola variante inicial, un punto por bloque modificado y comprobación de durabilidad suficiente antes de comenzar. Nombre definitivo Formador de pendientes, receta de tres hierros/diamante/palo y máximo de 4096 resueltos durante la implementación autorizada. El [[Martillo]] incorpora [[Recorte Volumétrico]]. Ambas ampliaciones están pendientes de código.

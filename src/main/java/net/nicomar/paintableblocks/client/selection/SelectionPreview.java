@@ -33,14 +33,16 @@ import net.nicomar.paintableblocks.registry.ModContent;
 public final class SelectionPreview {
     private static ModNetworking.Selection selection;
     private static long nextRequest,lastSent;
+    public static long requestId(){return ++nextRequest;}
+    public static void discardBrushSelection(){selection=null;invalidate();}
     private static boolean overlayOwned;
     private static Key cachedKey;
     private static DesignOperations.Plan cachedPlan;
     private static VoxelShape cachedShape=Shapes.empty();
     private record Key(Identifier dimension,BlockPos pos,UUID block,long revision,DesignGeometry.Surface surface,InteractionHand hand,Object tool,int paint,boolean reverse,long selection){}
     private SelectionPreview(){}
-    public static void register(){NeoForge.EVENT_BUS.addListener(SelectionPreview::input);NeoForge.EVENT_BUS.addListener(SelectionPreview::outline);NeoForge.EVENT_BUS.addListener(SelectionPreview::tick);}
-    public static void payloads(RegisterClientPayloadHandlersEvent event){event.register(ModNetworking.Selection.TYPE,(v,ctx)->{
+    public static void register(){VolumePreview.register();NeoForge.EVENT_BUS.addListener(SelectionPreview::input);NeoForge.EVENT_BUS.addListener(SelectionPreview::outline);NeoForge.EVENT_BUS.addListener(SelectionPreview::tick);}
+    public static void payloads(RegisterClientPayloadHandlersEvent event){VolumePreview.payloads(event);event.register(ModNetworking.Selection.TYPE,(v,ctx)->{
         if(v.request()!=lastSent)return;selection=v.active()?v:null;invalidate();
     });}
     private static void feedback(Component message){Minecraft.getInstance().gui.hud.setOverlayMessage(message,false);overlayOwned=true;}
@@ -50,9 +52,10 @@ public final class SelectionPreview {
     private static boolean control(){return key(GLFW.GLFW_KEY_LEFT_CONTROL,GLFW.GLFW_KEY_RIGHT_CONTROL);}
     private static boolean reverse(){return key(GLFW.GLFW_KEY_LEFT_SHIFT,GLFW.GLFW_KEY_RIGHT_SHIFT);}
     private static InteractionHand activeHand(){var p=Minecraft.getInstance().player;return p!=null&&ServerInteractions.tool(p.getMainHandItem())?InteractionHand.MAIN_HAND:InteractionHand.OFF_HAND;}
+    private static boolean formerActive(){var p=Minecraft.getInstance().player;return p!=null&&(p.getMainHandItem().getItem() instanceof SlopeFormerItem||!ServerInteractions.tool(p.getMainHandItem())&&p.getOffhandItem().getItem() instanceof SlopeFormerItem);}
     private static boolean selectionValid(){
         var c=Minecraft.getInstance();var s=selection;if(s==null)return true;
-        if(c.player==null||c.level==null||!s.dimension().equals(c.level.dimension().identifier())||!c.level.hasChunkAt(s.pos())||!c.player.isWithinBlockInteractionRange(s.pos(),0)||s.face()<0||s.face()>=6)return false;
+        if(c.player==null||c.level==null||!s.dimension().equals(c.level.dimension().identifier())||!c.level.hasChunkAt(s.pos())||!c.player.isWithinBlockInteractionRange(s.pos(),0)||s.face()<0||s.face()>=12)return false;
         var held=c.player.getItemInHand(s.hand());
         return BuiltInRegistries.ITEM.getKey(held.getItem()).equals(s.item())&&(s.hand()!=InteractionHand.MAIN_HAND||c.player.getInventory().getSelectedSlot()==s.slot())
                 &&held.getItem() instanceof BrushItem brush&&brush.valid(held)&&brush.content(held).paint()==s.paint()
@@ -65,6 +68,7 @@ public final class SelectionPreview {
         selection=null;invalidate();
     }
     private static void input(InputEvent.InteractionKeyMappingTriggered e){
+        if(VolumePreview.input(e))return;
         var c=Minecraft.getInstance();if(c.player==null||c.level==null||c.gui.screen()!=null||!e.isUseItem())return;
         if(selection!=null&&!selectionValid()){cancel();e.setCanceled(true);e.setSwingHand(false);return;}
         if(selection!=null&&control()){if(e.getHand()==selection.hand())cancel();e.setCanceled(true);e.setSwingHand(false);return;}
@@ -76,6 +80,7 @@ public final class SelectionPreview {
         ClientPacketDistributor.sendToServer(ModNetworking.Use.capture(c.player,hand,hit,lastSent,selection==null?0:selection.selection(),control(),reverse(),false));
     }
     private static void tick(ClientTickEvent.Post event){
+        if(VolumePreview.state()!=null||formerActive()){discardBrushSelection();return;}
         var c=Minecraft.getInstance();if(c.player==null||c.level==null){selection=null;invalidate();clearFeedback();return;}
         if(selection!=null&&(!selectionValid()||c.gui.screen()!=null))cancel();
         if(c.gui.screen()!=null||!(c.hitResult instanceof BlockHitResult hit)||hit.getType()!=HitResult.Type.BLOCK||!(c.level.getBlockEntity(hit.getBlockPos()) instanceof PaintableBlockEntity be)){invalidate();clearFeedback();return;}
@@ -97,14 +102,14 @@ public final class SelectionPreview {
         try{
             if(held.getItem() instanceof BrushItem){
                 if(!PaintCatalog.validId(paint)||selection!=null&&(!selectionValid()||selection.hand()!=hand||!selection.pos().equals(hit.getBlockPos())))return false;
-                var faces=selection==null?List.of(target.get()):DesignOperations.area(d,new DesignGeometry.Surface(selection.cell(),Direction.values()[selection.face()]),target.get());
+                var faces=selection==null?List.of(target.get()):DesignOperations.area(d,new DesignGeometry.Surface(selection.cell(),Direction.values()[selection.face()%6],selection.face()>=6),target.get());
                 cachedPlan=DesignOperations.paint(d,faces,paint);cachedShape=surfaces(d,cachedPlan.faces());
             }else{cachedPlan=DesignOperations.tool(d,target.get(),((EditingToolItem)held.getItem()).action(),hit.getDirection(),reverse());cachedShape=held.getItem() instanceof RotationWrenchItem?DesignGeometry.shape(cachedPlan.after()):shape(cachedPlan);}
             cachedKey=key;return true;
         }catch(IllegalArgumentException invalid){invalidate();return false;}
     }
     private static void outline(ExtractBlockOutlineRenderStateEvent event){
-        var c=Minecraft.getInstance();if(c.player==null||c.player.isSpectator()||!(event.getLevel().getBlockEntity(event.getBlockPos()) instanceof PaintableBlockEntity be)||!prepare(event.getHitResult(),be))return;
+        var c=Minecraft.getInstance();if(VolumePreview.state()!=null||formerActive())return;if(c.player==null||c.player.isSpectator()||!(event.getLevel().getBlockEntity(event.getBlockPos()) instanceof PaintableBlockEntity be)||!prepare(event.getHitResult(),be))return;
         var held=c.player.getItemInHand(activeHand());VoxelShape shape=cachedShape;
         boolean insufficient=held.getItem() instanceof BrushItem b&&!c.player.isCreative()&&(b.content(held).units()<cachedPlan.units()||!PaintCatalog.byId(cachedKey.paint).survivalAvailable());
         boolean obstructed=false;
@@ -116,6 +121,7 @@ public final class SelectionPreview {
         });
     }
     private static int physicalCell(BlockDesign d,int cell){int[] xyz=DesignOrientation.cell(d.orientation(),d.x(cell),d.y(cell),d.z(cell),d.resolution());return d.index(xyz[0],xyz[1],xyz[2]);}
+    public static VoxelShape cells(DesignOperations.Plan plan){return shape(plan);}
     private static VoxelShape shape(DesignOperations.Plan plan){
         if(!plan.cells().isEmpty()){
             var d=plan.before();int n=d.resolution();VoxelShape out=Shapes.empty();
@@ -124,6 +130,7 @@ public final class SelectionPreview {
         return !plan.faces().isEmpty()?surfaces(plan.before(),plan.faces()):Shapes.empty();
     }
     private static VoxelShape surfaces(BlockDesign d,List<DesignGeometry.Surface> faces){
+        if(d.slope()!=null)return new net.nicomar.paintableblocks.design.SurfaceOutlineShape(d,faces);
         int n=d.resolution();double thin=.0005;VoxelShape out=Shapes.empty();
         for(var face:faces){int c=physicalCell(d,face.cell());var dir=DesignOrientation.direction(d.orientation(),face.face());
             double x=d.x(c)/(double)n,y=d.y(c)/(double)n,z=d.z(c)/(double)n;double[] min={x,y,z},max={x+1.0/n,y+1.0/n,z+1.0/n};int axis=dir.getAxis()==Direction.Axis.X?0:dir.getAxis()==Direction.Axis.Y?1:2;

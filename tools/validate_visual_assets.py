@@ -80,6 +80,6 @@ def main():
   definition=json.loads((ASSETS/'items'/(name+'.json')).read_text());assert definition['model']['type']=='minecraft:model'
   model=resolve(definition['model']['model'].split(':',1)[1]);assert model['elements'],'Flat/generated icon instead of 3D geometry'
  cap=faces(resolve('item/paint_cap'));assert not any(f=='down' and p==10 and 4<=x<12 and 4<=z<12 for f,p,x,z in cap),'Hidden bottle-cap contact retained'
- print(json.dumps({'registered_variants_completed':29,'model_files_with_shells':checked,'unit_surface_patches_checked':face_count,'new_textures_16px':len(manifest['textures']),'world_collision_models_matching':len(manifest['world_blocks']),'coplanar_overlaps':0,'original_unpainted':'unchanged','atlas_sprites_checked':len(sprite_refs),'official_atlas_sources':atlases.official,'java_or_minecraft_execution':False}))
+ print(json.dumps({'registered_variants_completed':len(manifest['tools'])+len(manifest['world_blocks']),'model_files_with_shells':checked,'unit_surface_patches_checked':face_count,'new_textures_16px':len(manifest['textures']),'world_collision_models_matching':len(manifest['world_blocks']),'coplanar_overlaps':0,'original_unpainted':'unchanged','atlas_sprites_checked':len(sprite_refs),'official_atlas_sources':atlases.official,'java_or_minecraft_execution':False}))
 
 if __name__=='__main__':main()

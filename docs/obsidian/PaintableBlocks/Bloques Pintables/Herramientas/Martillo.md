@@ -10,4 +10,4 @@ Primero se implementan el ítem, operación, selección y guardado; después el 
 
 ## Ampliación aceptada: selección volumétrica
 
-Se mantiene el uso individual. [[Recorte Volumétrico]] añade selección por dos esquinas con Ctrl + clic derecho y confirmación posterior, hasta 256×256×256 bloques. Su ejecución por lotes, cancelación, permisos y selección entre subdivisiones están definidos en esa página. Pendiente de implementación.
+Se mantiene el uso individual. [[Recorte Volumétrico]] añade selección por dos esquinas con Ctrl + clic derecho y confirmación posterior, hasta 256×256×256 bloques. Su ejecución por lotes, cancelación, permisos y selección entre subdivisiones están definidos en esa página. Código preparado; sin verificación en Minecraft.

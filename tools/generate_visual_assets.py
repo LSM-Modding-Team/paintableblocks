@@ -132,6 +132,7 @@ def generate():
   for k in [0,2,4]:s.box(x+k,10,7,x+k+1,14-(k==4),9,'leather').box(x+k,8,6,x+k+1,10,7,'iron')
  s.box(1,7,6,3,10,9,'leather').box(13,7,6,15,10,9,'leather');tools['gloves']=s
  tools['rotation_wrench']=Solid().box(7,3,7,9,11,9,'copper').box(5,0,7,11,4,9,'iron').cut(7,1,7,9,3,9).box(3,10,6,13,12,10,'iron').box(3,12,6,6,16,10,'iron').box(10,12,6,13,16,10,'iron')
+ tools['slope_former']=Solid().box(6,1,7,10,10,9,'wood').box(4,9,6,12,12,10,'iron').box(3,11,6,13,13,10,'iron').box(3,13,6,5,16,10,'iron').box(11,13,6,13,16,10,'iron').box(5,12,7,11,14,9,'diamond')
  for name,s in tools.items():model('item/'+name,s,{k:common[k] for k in sorted(set(s.cells.values()))},display=TOOL_DISPLAY);item(name,'item/'+name)
  brush=Solid().box(7,0,7,9,9,9,'wood').box(6,1,7,10,3,9,'dark_leather').box(5,8,6,11,11,10,'tier').box(4,11,6,12,15,10,'bristles')
  for x in range(4,12,2):brush.box(x,15,6,x+1,16,10,'bristles')
@@ -231,7 +232,7 @@ public final class VisualShapes {
  p=ROOT/'src/main/java/net/nicomar/paintableblocks/design/VisualShapes.java';p.parent.mkdir(parents=True,exist_ok=True);p.write_text(java)
  manifest={'schema':1,'texture_size':[16,16],'tools':list(tools)+[t+'_'+k for t in TIERS for k in ['brush','scraper']],'world_blocks':sorted(WORLDS),'textures':sorted(TEXTURES),'shape_boxes':shape_data,'generator':'tools/generate_visual_assets.py'}
  p=ROOT/'tools/visual_assets_manifest.json';p.write_text(json.dumps(manifest,indent=2)+'\n')
- print(json.dumps({'tool_items':20,'bucket_blocks':4,'production_blocks':5,'original_textures':len(TEXTURES),'shell_templates':len(MODELS),'shape_boxes':sum(map(len,shape_data.values()))}))
+ print(json.dumps({'tool_items':21,'bucket_blocks':4,'production_blocks':5,'original_textures':len(TEXTURES),'shell_templates':len(MODELS),'shape_boxes':sum(map(len,shape_data.values()))}))
  return manifest
 
 if __name__=='__main__':generate()

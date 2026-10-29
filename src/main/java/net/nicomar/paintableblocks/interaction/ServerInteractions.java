@@ -63,7 +63,7 @@ public final class ServerInteractions {
             if(!p.level().hasChunkAt(new BlockPos(cx*16,(int)Math.floor(eye.y),cz*16)))return eye.lerp(end,Math.max(0,entry-1e-7));}
         return end;
     }
-    private static BlockHitResult hit(ServerPlayer p){
+    public static BlockHitResult hit(ServerPlayer p){
         var eye=p.getEyePosition();double range=p.blockInteractionRange();if(!Double.isFinite(range)||range<=0||range>128)return null;
         var end=loadedEnd(p,eye,eye.add(p.getViewVector(1).scale(range)));
         var hit=p.level().clip(new ClipContext(eye,end,ClipContext.Block.OUTLINE,ClipContext.Fluid.NONE,p));
@@ -80,7 +80,7 @@ public final class ServerInteractions {
     private static void reply(ServerPlayer p,long request){
         var s=PENDING.get(p);
         ModNetworking.selection(p,s==null?new ModNetworking.Selection(request,0,false,p.level().dimension().identifier(),InteractionHand.MAIN_HAND,0,Identifier.parse("minecraft:air"),0,BlockPos.ZERO,ModNetworking.NO_BLOCK,0,0,0):
-                new ModNetworking.Selection(request,s.id,true,s.dimension,s.hand,s.slot,s.item,s.paint,s.pos,s.block,s.revision,s.first.cell(),s.first.face().ordinal()));
+                new ModNetworking.Selection(request,s.id,true,s.dimension,s.hand,s.slot,s.item,s.paint,s.pos,s.block,s.revision,s.first.cell(),s.first.face().ordinal()+(s.first.slope()?6:0)));
     }
     private static void tick(PlayerTickEvent.Post e){if(e.getEntity() instanceof ServerPlayer p){var pending=PENDING.get(p);if(pending!=null&&!pendingValid(p,pending)){PENDING.remove(p);reply(p,LAST_REQUEST.getOrDefault(p,0L));}}}
     public static void use(Player player,ModNetworking.Use request){
@@ -100,6 +100,7 @@ public final class ServerInteractions {
         return r.block().equals(ModNetworking.NO_BLOCK)&&p.level().getBlockEntity(r.pos()) instanceof PaintBucketBlockEntity;
     }
     private static void dispatch(ServerPlayer p,ModNetworking.Use r){
+        if(VolumeEditing.use(p,r))return;
         var pending=PENDING.get(p);
         if(r.cancel()){if(pending!=null&&r.selection()==pending.id)PENDING.remove(p);return;}
         // Invalidating a confirmation must consume the click, never turn it into single-face painting.

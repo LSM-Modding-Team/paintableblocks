@@ -2,6 +2,17 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Implementación de pendientes, recorte volumétrico y creativo
+
+- Añadido martillo volumétrico: dos esquinas, máximo inclusivo 256³, centros de celdas, resoluciones mezcladas, validación previa, permisos/eventos y ejecución por lotes sin cargar chunks. Cancelación, descarga y desconexión conservan lo realizado.
+- Añadidas pendientes de plano único, cinco resoluciones y operaciones de hasta 16³: polígonos reales, selección exacta, colisión a 1/16, apoyo axial, huecos/recortes conservados, rotación/copia/colocación y bloqueo de conversión como pieza recortada.
+- Integrada pintura por fragmentos y planos inclinados, consumo por área real, limpieza y proyección continua con normales inclinadas. Ocultación de contactos entre piezas y actualización de vecinos.
+- Formador funcional con interfaz, previsualización, transformación y creación creativa configurable. Decisiones: nombre definitivo Formador de pendientes, 4096 puntos y receta de tres hierros, diamante y palo; creación en aire sin fluidos junto a la cara inicial. Un punto por bloque modificado, suficiencia previa para todo el lote, sin coste creativo.
+- Tres pestañas propias: bloques, herramientas y pinturas vanilla; cinco pendientes básicas, catálogo ordenado y distintivo creativo. Integraciones no disponibles no generan pestañas vacías.
+- Formato de diseño 2 con lectura de datos 1; protocolo 5, actualizar ambos lados. Modelo 3D del formador posterior a sus funciones, materiales de 16×16 existentes y cero modificaciones a PNG/original.
+- Añadidas regresiones Java preparadas y validación estática de integración. Pasan análisis de sintaxis/imports, validadores de grupos 1–3, recursos/atlas y seis pruebas Python de atlas. Sin compilación, Java, Gradle, CI ni Minecraft: falta verificación de tipos, juego y rendimiento.
+- [Informe completo, decisiones y límites](docs/technical/slopes-and-volumes.md). Commit directo online en `26.2`, sin commit local.
+
 ## 2026-10-28 — Acuerdos de recorte volumétrico, pendientes y creativo
 
 - Documentadas las reglas aceptadas del martillo volumétrico: dos esquinas, máximo 256³ posiciones, selección por centros, permisos, ejecución por lotes, progreso e interrupciones sin revertir lo ejecutado.

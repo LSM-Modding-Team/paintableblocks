@@ -1,6 +1,6 @@
 # Pintura de pendientes
 
-Ampliación aceptada, pendiente de implementación. Cada fragmento de superficie expuesta dentro de una celda es una zona pintable, aunque sea triangular. No confundir celda tridimensional con cada una de sus superficies.
+Ampliación aceptada, con código preparado y revisión estática; sin verificación en Minecraft. Cada fragmento de superficie expuesta dentro de una celda es una zona pintable, aunque sea triangular. No confundir celda tridimensional con cada una de sus superficies.
 
 ## Textura y orientación
 
@@ -19,3 +19,8 @@ Cobrar solo los fragmentos cuya identidad cambia. Repintar sustituye directament
 Selección por dos esquinas dentro del **mismo bloque y plano**, admitiendo ahora planos inclinados. Pintar los fragmentos cuyos centros estén dentro del rectángulo seleccionado sobre ese plano. Mantener exclusión de huecos y de superficies de otro plano o profundidad, así como las reglas de cancelación de [[Por Área]].
 
 El raspador limpia todas las superficies del mismo plano dentro del bloque apuntado, aunque estén separadas por huecos; nunca alcanza bloques vecinos. La esponja limpia todas las superficies expuestas, interiores e inclinadas.
+
+
+## Estado y evidencia
+
+Implementación y decisiones: [Pendientes y volúmenes](../../../technical/slopes-and-volumes.md). No se ha compilado ni ejecutado Java/Minecraft; las reglas no equivalen a comportamiento probado.

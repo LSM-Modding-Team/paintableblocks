@@ -24,7 +24,8 @@
     "diamond_brush",
     "diamond_scraper",
     "netherite_brush",
-    "netherite_scraper"
+    "netherite_scraper",
+    "slope_former"
   ],
   "world_blocks": [
     "assembler",

@@ -34,11 +34,11 @@ public final class PaintableBlock extends BaseEntityBlock {
     @Override public BlockEntity newBlockEntity(BlockPos pos,BlockState state){return new PaintableBlockEntity(pos,state);}
     @Override protected RenderShape getRenderShape(BlockState state){return RenderShape.MODEL;}
     @Override protected VoxelShape getShape(BlockState state,BlockGetter level,BlockPos pos,CollisionContext context){
-        return level.getBlockEntity(pos) instanceof PaintableBlockEntity entity?entity.shape():Shapes.block();
+        return level.getBlockEntity(pos) instanceof PaintableBlockEntity entity?entity.outlineShape():Shapes.block();
     }
-    @Override protected VoxelShape getCollisionShape(BlockState state,BlockGetter level,BlockPos pos,CollisionContext context){return getShape(state,level,pos,context);}
+    @Override protected VoxelShape getCollisionShape(BlockState state,BlockGetter level,BlockPos pos,CollisionContext context){return level.getBlockEntity(pos) instanceof PaintableBlockEntity entity?entity.shape():Shapes.block();}
     @Override protected VoxelShape getVisualShape(BlockState state,BlockGetter level,BlockPos pos,CollisionContext context){return getShape(state,level,pos,context);}
-    @Override protected VoxelShape getBlockSupportShape(BlockState state,BlockGetter level,BlockPos pos){return getShape(state,level,pos,CollisionContext.empty());}
+    @Override protected VoxelShape getBlockSupportShape(BlockState state,BlockGetter level,BlockPos pos){return level.getBlockEntity(pos) instanceof PaintableBlockEntity entity?entity.supportShape():Shapes.block();}
     @Override protected VoxelShape getInteractionShape(BlockState state,BlockGetter level,BlockPos pos){return Shapes.empty();}
     @Override protected VoxelShape getOcclusionShape(BlockState state){return Shapes.empty();}
     @Override protected List<ItemStack> getDrops(BlockState state,LootParams.Builder params){

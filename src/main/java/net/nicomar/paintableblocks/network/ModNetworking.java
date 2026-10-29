@@ -59,10 +59,24 @@ public final class ModNetworking {
         public static final StreamCodec<RegistryFriendlyByteBuf,ProductionAction> CODEC=StreamCodec.of((b,v)->{b.writeVarInt(v.container);b.writeVarInt(v.action);b.writeVarInt(v.variant);b.writeVarInt(v.expectedResolution);b.writeVarInt(v.expectedMaterial);},b->new ProductionAction(b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt()));
         @Override public Type<ProductionAction> type(){return TYPE;}
     }
+    /** No client-supplied geometry: only configuration of a server-owned selection. */
+    public record VolumeAction(long id,int action,int direction,boolean upper,boolean create,int width,int height,int depth,int resolution) implements CustomPacketPayload {
+        public static final Type<VolumeAction> TYPE=new Type<>(Identifier.fromNamespaceAndPath("paintableblocks","volume_action"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,VolumeAction> CODEC=StreamCodec.of((b,v)->{b.writeLong(v.id);b.writeVarInt(v.action);b.writeVarInt(v.direction);b.writeBoolean(v.upper);b.writeBoolean(v.create);b.writeVarInt(v.width);b.writeVarInt(v.height);b.writeVarInt(v.depth);b.writeVarInt(v.resolution);},b->new VolumeAction(b.readLong(),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readBoolean(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt()));
+        @Override public Type<VolumeAction> type(){return TYPE;}
+    }
+    public record VolumeState(long id,int phase,boolean former,InteractionHand hand,Identifier dimension,BlockPos first,BlockPos last,
+            int x0,int y0,int z0,int x1,int y1,int z1,int direction,boolean upper,boolean create,int resolution,long reviewed,long modified,long ignored,long affected) implements CustomPacketPayload {
+        public static final Type<VolumeState> TYPE=new Type<>(Identifier.fromNamespaceAndPath("paintableblocks","volume_state"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,VolumeState> CODEC=StreamCodec.of((b,v)->{b.writeLong(v.id);b.writeVarInt(v.phase);b.writeBoolean(v.former);b.writeEnum(v.hand);b.writeIdentifier(v.dimension);b.writeBlockPos(v.first);b.writeBlockPos(v.last);b.writeInt(v.x0);b.writeInt(v.y0);b.writeInt(v.z0);b.writeInt(v.x1);b.writeInt(v.y1);b.writeInt(v.z1);b.writeVarInt(v.direction);b.writeBoolean(v.upper);b.writeBoolean(v.create);b.writeVarInt(v.resolution);b.writeVarLong(v.reviewed);b.writeVarLong(v.modified);b.writeVarLong(v.ignored);b.writeVarLong(v.affected);},b->new VolumeState(b.readLong(),b.readVarInt(),b.readBoolean(),b.readEnum(InteractionHand.class),b.readIdentifier(),b.readBlockPos(),b.readBlockPos(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readVarInt(),b.readBoolean(),b.readBoolean(),b.readVarInt(),b.readVarLong(),b.readVarLong(),b.readVarLong(),b.readVarLong()));
+        @Override public Type<VolumeState> type(){return TYPE;}
+    }
     public static void register(RegisterPayloadHandlersEvent event){
-        var registrar=event.registrar("4");
+        var registrar=event.registrar("5");
         registrar.playToServer(Use.TYPE,Use.CODEC,(v,ctx)->ServerInteractions.use(ctx.player(),v));
         registrar.playToClient(Selection.TYPE,Selection.CODEC);
+        registrar.playToClient(VolumeState.TYPE,VolumeState.CODEC);
+        registrar.playToServer(VolumeAction.TYPE,VolumeAction.CODEC,(v,ctx)->net.nicomar.paintableblocks.interaction.VolumeEditing.action(ctx.player(),v));
         registrar.playToServer(ProductionAction.TYPE,ProductionAction.CODEC,(v,ctx)->{var p=ctx.player();if(p.containerMenu instanceof net.nicomar.paintableblocks.menu.WorkstationMenu menu&&menu.containerId==v.container)menu.action(p,v.action,v.variant,v.expectedResolution,v.expectedMaterial);});
         registrar.playToServer(BucketAction.TYPE,BucketAction.CODEC,(v,ctx)->{
             var player=ctx.player();if(player.containerMenu instanceof net.nicomar.paintableblocks.menu.PaintBucketMenu menu&&menu.containerId==v.container)menu.clickMenuButton(player,v.button);

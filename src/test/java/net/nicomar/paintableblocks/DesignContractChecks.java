@@ -16,7 +16,7 @@ public final class DesignContractChecks {
     private static void check(boolean result,String message){checks++;if(!result)throw new AssertionError(message);}
     private static void rejects(Runnable action){try{action.run();throw new AssertionError("Invalid design accepted");}catch(IllegalArgumentException|IllegalStateException expected){checks++;}}
     public static void main(String[] args){
-        rotations();geometry();persistence();
+        rotations();geometry();persistence();SlopeVolumeContractChecks.run();
         System.out.println("Design contract checks: "+checks);
     }
     private static void rotations(){
@@ -72,7 +72,7 @@ public final class DesignContractChecks {
         BlockDesign original=BlockDesign.full(4).paint(0,Direction.DOWN,337).paint(0,Direction.NORTH,1).withOrientation(17);
         var encoded=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,original).getOrThrow();
         check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow().equals(original),"Versioned codec round trip");
-        var invalid=encoded.deepCopy().getAsJsonObject();invalid.addProperty("version",2);
+        var invalid=encoded.deepCopy().getAsJsonObject();invalid.addProperty("version",BlockDesign.VERSION+1);
         check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,invalid).error().isPresent(),"Unknown format rejected");
         invalid=encoded.deepCopy().getAsJsonObject();var faces=invalid.getAsJsonArray("paints");faces.add(faces.get(0).deepCopy());
         check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,invalid).error().isPresent(),"Duplicate face rejected");

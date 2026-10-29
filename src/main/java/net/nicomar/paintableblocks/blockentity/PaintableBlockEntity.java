@@ -33,13 +33,17 @@ public final class PaintableBlockEntity extends BlockEntity {
     public long revision(){return revision;}
     private Dynamic<?> rejected;
     private boolean valid=true;
-    private VoxelShape shape;
+    private VoxelShape shape,outline,support;
+    public VoxelShape supportShape(){if(!valid)return Shapes.block();if(support==null)support=DesignGeometry.supportShape(design);return support;}
+    public VoxelShape outlineShape(){if(!valid)return Shapes.block();if(outline==null)outline=design.slope()==null?shape():new net.nicomar.paintableblocks.design.DesignOutlineShape(design);return outline;}
     public PaintableBlockEntity(BlockPos pos,BlockState state){
         super(ModContent.PAINTABLE_ENTITY.get(),pos,state);
         int n=((PaintableBlock)state.getBlock()).resolution();
         var placing=net.nicomar.paintableblocks.design.PlacementDesign.current(pos,n);
         design=placing==null?BlockDesign.full(n):placing;
     }
+    @Override public void setLevel(net.minecraft.world.level.Level next){super.setLevel(next);net.nicomar.paintableblocks.interaction.VolumeEditing.changed(next,worldPosition);}
+    @Override public void setRemoved(){net.nicomar.paintableblocks.interaction.VolumeEditing.changed(level,worldPosition);super.setRemoved();}
     public boolean valid(){return valid;}
     public BlockDesign design(){return design;}
     public VoxelShape shape(){
@@ -48,6 +52,7 @@ public final class PaintableBlockEntity extends BlockEntity {
     }
     public void setDesign(BlockDesign next){
         if(level!=null && level.isClientSide())throw new IllegalStateException("Only the server changes block designs");
+        net.nicomar.paintableblocks.interaction.VolumeEditing.changed(level,worldPosition);
         BlockDesign before=design;boolean wasValid=valid;
         accept(next);revision++;boolean geometryChanged=!wasValid||!before.sameGeometry(design);
         if(level!=null && design.empty()){level.removeBlock(worldPosition,false);return;}
@@ -68,16 +73,17 @@ public final class PaintableBlockEntity extends BlockEntity {
         if(placing!=null)next=placing;
         if(next.resolution()!=((PaintableBlock)getBlockState().getBlock()).resolution())throw new IllegalArgumentException("Design resolution does not match block");
         VoxelShape previous=valid && design!=null && design.sameGeometry(next)?shape:null;
-        design=next;valid=true;rejected=null;shape=previous;refreshClientMesh();
+        outline=null;support=null;design=next;valid=true;rejected=null;shape=previous;refreshClientMesh();
     }
     private void refreshClientMesh(){
         requestModelDataUpdate();
         if(level!=null&&level.isClientSide()){
             level.setBlocksDirty(worldPosition,getBlockState(),getBlockState());
+            for(var direction:net.minecraft.core.Direction.values()){var p=worldPosition.relative(direction);if(level.hasChunkAt(p)){var state=level.getBlockState(p);level.setBlocksDirty(p,state,state);}}
             level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_ALL);
         }
     }
-    private void refresh(){shape=null;refreshClientMesh();}
+    private void refresh(){shape=null;outline=null;support=null;refreshClientMesh();}
     @Override protected void saveAdditional(ValueOutput output){
         super.saveAdditional(output);
         output.store("edit_identity",net.minecraft.core.UUIDUtil.CODEC,editIdentity);

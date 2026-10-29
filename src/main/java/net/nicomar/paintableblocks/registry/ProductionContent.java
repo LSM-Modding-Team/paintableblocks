@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.*;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.nicomar.paintableblocks.balance.PaintingBalance;
@@ -50,6 +49,5 @@ public final class ProductionContent {
     public static final DeferredHolder<RecipeSerializer<?>,RecipeSerializer<PaintableCraftingRecipe>> MANUAL=ModRegistries.RECIPE_SERIALIZERS.register("paintable_crafting",()->new RecipeSerializer<>(MapCodec.unit(PaintableCraftingRecipe::new),StreamCodec.unit(new PaintableCraftingRecipe())));
     public static final DeferredHolder<RecipeSerializer<?>,RecipeSerializer<ProgressionRecipe>> PROGRESSION=ModRegistries.RECIPE_SERIALIZERS.register("progression",()->new RecipeSerializer<>(MapCodec.unit(ProgressionRecipe::new),StreamCodec.unit(new ProgressionRecipe())));
     private ProductionContent(){}
-    public static void initialize(IEventBus bus){bus.addListener(ProductionContent::creative);}
-    private static void creative(BuildCreativeModeTabContentsEvent event){if(event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)){for(var item:STATION_ITEMS.values())event.accept(new ItemStack(item.get()));for(var item:MACHINE_ITEMS.values())event.accept(new ItemStack(item.get()));}}
+    public static void initialize(IEventBus bus){}
 }

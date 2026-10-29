@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -17,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -65,6 +63,7 @@ public final class ModContent {
                     Set.copyOf(BLOCKS.values().stream().map(DeferredBlock::get).toList())));
     public static final DeferredHolder<MapCodec<? extends Block>,MapCodec<PaintableBlock>> PAINTABLE_TYPE =
             ModRegistries.BLOCK_TYPES.register("paintable",()->PaintableBlock.CODEC);
+    public static final DeferredItem<SlopeFormerItem> SLOPE_FORMER=ModRegistries.ITEMS.registerItem("slope_former",SlopeFormerItem::new,()->new Item.Properties().durability(4096));
     public static final DeferredItem<TongsItem> TONGS = ModRegistries.ITEMS.registerItem("tongs",TongsItem::new,()->new Item.Properties().stacksTo(1));
     public static final DeferredItem<GlovesItem> GLOVES = ModRegistries.ITEMS.registerItem("gloves",GlovesItem::new,()->new Item.Properties().stacksTo(1));
     public static final DeferredItem<PaintItem> PAINT = ModRegistries.ITEMS.registerItem("paint",PaintItem::new);
@@ -100,13 +99,6 @@ public final class ModContent {
     private ModContent(){}
     public static PaintableBlock block(int n){return BLOCKS.get(PaintingBalance.requireResolution(n)).get();}
     public static ItemStack stack(BlockDesign design){ItemStack out=new ItemStack(ITEMS.get(design.resolution()).get());out.set(DESIGN.get(),design);return out;}
-    public static void initialize(IEventBus bus){ProductionContent.initialize(bus);bus.addListener(ModContent::creative);bus.addListener(ModContent::setup);bus.addListener(net.nicomar.paintableblocks.network.ModNetworking::register);net.nicomar.paintableblocks.interaction.ServerInteractions.register();}
+    public static void initialize(IEventBus bus){ProductionContent.initialize(bus);CreativeTabs.register(bus);net.nicomar.paintableblocks.interaction.VolumeEditing.register();bus.addListener(ModContent::setup);bus.addListener(net.nicomar.paintableblocks.network.ModNetworking::register);net.nicomar.paintableblocks.interaction.ServerInteractions.register();}
     private static void setup(FMLCommonSetupEvent event){event.enqueueWork(PaintCatalog::validateRegistries);}
-    private static void creative(BuildCreativeModeTabContentsEvent event){
-        if(event.getTabKey().equals(CreativeModeTabs.BUILDING_BLOCKS))for(var item:ITEMS.values())event.accept(new ItemStack(item.get()));
-        if(event.getTabKey().equals(CreativeModeTabs.TOOLS_AND_UTILITIES)){event.accept(new ItemStack(TONGS.get()));event.accept(new ItemStack(GLOVES.get()));for(var i:EDITORS)event.accept(new ItemStack(i.get()));for(var i:BRUSHES.values())event.accept(new ItemStack(i.get()));for(var i:SCRAPERS.values())event.accept(new ItemStack(i.get()));for(var i:BUCKET_ITEMS.values())event.accept(new ItemStack(i.get()));}
-        if(event.getTabKey().equals(CreativeModeTabs.INGREDIENTS))for(var entry:PaintCatalog.entries()){
-            ItemStack paint=new ItemStack(PAINT.get());paint.set(PAINT_ID.get(),entry.paintId());event.accept(paint);
-        }
-    }
 }

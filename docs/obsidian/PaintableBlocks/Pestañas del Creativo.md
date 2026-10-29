@@ -1,6 +1,6 @@
 # Pestañas del creativo
 
-Organización aceptada, pendiente de implementación. Tres pestañas propias con nombres traducibles, orden estable e iconos propios.
+Organización implementada en código; sin verificación en Minecraft. Tres pestañas propias con nombres traducibles, orden estable e iconos propios.
 
 | Orden | Pestaña | Contenido |
 |---|---|---|
@@ -13,3 +13,8 @@ Los cubos pertenecen a herramientas por su función de almacenamiento y transfer
 Ordenar pinturas según el catálogo y señalar claramente las exclusivas de creativo. Las pinturas de integraciones con otros mods tendrán otras pestañas, visibles solo cuando esté disponible la integración correspondiente. Esto no añade nuevas integraciones ni modifica el catálogo aprobado.
 
 La copia mediante Ctrl + clic central conserva la pieza completa con forma, plano inclinado, subdivisión y pinturas; su ítem muestra el diseño. No copia estructuras enteras.
+
+
+## Estado y evidencia
+
+Implementación y decisiones: [Pendientes y volúmenes](../../technical/slopes-and-volumes.md). No se ha compilado ni ejecutado Java/Minecraft; las reglas no equivalen a comportamiento probado.

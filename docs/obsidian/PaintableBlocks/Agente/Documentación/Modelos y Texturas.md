@@ -57,3 +57,7 @@ El bote de pintura mantiene su cuerpo dinámico; se remalla la tapa y se suprime
 Informe, decisiones, lámina técnica y validadores: [recursos visuales](../../../../technical/visual-assets.md). La lámina es un render de inspección por software, no una captura del juego. El modelo y la textura creados no acreditan comprobación de iluminación, oclusión, manos, cámara o recarga en Minecraft.
 
 No compilar ni iniciar clientes/servidores sin petición expresa, según [[Agente]]. Los commits se publican online únicamente en `26.2`.
+
+## Recurso del formador
+
+Funciones preparadas antes del recurso definitivo. El formador de pendientes dispone de modelo 3D propio y materiales existentes de 16×16 incluidos en atlas; sin nuevos PNG ni cambios al original. Validación estática de caras/UV sin solapes; inspección en Minecraft pendiente. La vista técnica anterior corresponde a los 29 recursos originales; el formador se añade como trigésima variante.

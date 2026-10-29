@@ -1,6 +1,6 @@
 # Pendientes
 
-Familia aceptada, **pendiente de implementación**. Una pendiente es una superficie realmente inclinada, no una escalera visual de minicubos. Se obtiene en creativo o transformando bloques pintables con el [[Formador de Pendientes]].
+Familia aceptada, con código preparado y revisión estática; sin verificación en Minecraft. Una pendiente es una superficie realmente inclinada, no una escalera visual de minicubos. Se obtiene en creativo o transformando bloques pintables con el [[Formador de Pendientes]].
 
 ## Forma y dimensiones
 
@@ -45,3 +45,8 @@ Ocultar caras internas entre piezas contiguas y compartir límites exactos para 
 Se conserva la colocación similar a escaleras y el acceso a 24 orientaciones. Geometría, plano y pinturas giran juntos. La pendiente cuenta como bloque recortado: no admite conversión de subdivisión en estaciones y su recuperación exige las herramientas de conservación correspondientes.
 
 Guantes y Ctrl + clic central copian **una pieza individual**, no toda la rampa. El ítem representa su diseño y lo restaura al colocarse. Véanse [[Recolección y Conservación]] y [[Colocación y Rotación]].
+
+
+## Estado y evidencia
+
+Implementación y decisiones: [Pendientes y volúmenes](../../../technical/slopes-and-volumes.md). No se ha compilado ni ejecutado Java/Minecraft; las reglas no equivalen a comportamiento probado.

@@ -13,7 +13,7 @@ Bloques propios con geometría editable por subcubos y superficies pintables ind
 
 Las superficies interiores descubiertas por recortes también se pintan y nacen con la textura original `unpainted.png`. Un diseño conservado muestra su forma y pinturas como ítem y las restaura al colocar. El 1×1 no se recorta; las otras cuatro resoluciones sí.
 
-## Ampliaciones aceptadas pendientes de código
+## Ampliaciones implementadas en código
 
 - [[Recorte Volumétrico]]: martillo sobre un volumen de hasta 256³ posiciones.
 - [[Pendientes]]: superficie inclinada real, cinco subdivisiones y operaciones de hasta 16³ bloques.

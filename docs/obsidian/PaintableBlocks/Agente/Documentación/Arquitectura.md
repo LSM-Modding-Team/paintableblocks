@@ -64,3 +64,7 @@ El orden de construcción se decide mediante [[Plan de Fases]], y la evidencia d
 - Presentación: tres [[Pestañas del Creativo]], configuración de pendientes y vistas previas simplificadas para volúmenes grandes. No declarar disponible una función solo por documentarla.
 
 Esta ampliación modifica la afirmación anterior de que solo se desgastan las rasquetas y de que toda geometría es un conjunto de cubos completos. Las demás reglas continúan vigentes.
+
+## Implementación de las ampliaciones
+
+Formato 2 con migración desde 1, plano entero normalizado, cara inclinada independiente, selección por polígonos, colisión a 1/16 y protocolo 5 preparados. Ejecución volumétrica con presupuesto compartido y tres pestañas propias. La representación resta contactos completos y parciales entre piezas y mantiene cachés acotadas por geometría. Ver [informe](../../../../technical/slopes-and-volumes.md); sin ejecución Java/Minecraft.

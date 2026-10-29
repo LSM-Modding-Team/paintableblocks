@@ -8,7 +8,7 @@ import struct
 ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / 'src/main/java/net/nicomar/paintableblocks'
 ASSETS = ROOT / 'src/main/resources/assets/paintableblocks'
-TOOLS = ['tongs', 'gloves', 'hammer', 'mallet', 'chisel', 'face_scraper', 'cleaning_sponge', 'rotation_wrench']
+TOOLS = ['tongs', 'gloves', 'hammer', 'mallet', 'chisel', 'face_scraper', 'cleaning_sponge', 'rotation_wrench', 'slope_former']
 MATERIALS = ['cobblestone', 'copper', 'iron', 'gold', 'diamond', 'netherite']
 TOOLS += [f'{m}_{tool}' for m in MATERIALS for tool in ['brush', 'scraper']]
 TOOLS += [f'{m}_paint_bucket' for m in ['copper', 'gold', 'diamond', 'netherite']]

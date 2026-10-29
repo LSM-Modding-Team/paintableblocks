@@ -139,3 +139,9 @@ Las alternativas siguientes son inspección de manos/cámara/recarga, pruebas de
 Sin orden global obligatorio: las pestañas y el martillo volumétrico son alternativas independientes; el trabajo de pendientes puede preparar datos y geometría sin esperar a ellas. La selección y previsualización volumétricas pueden reutilizarse en el formador. El orden sugerido pestañas → martillo → pendientes es una recomendación, no una obligación.
 
 Esta entrega modifica únicamente documentación. Las filas nuevas siguen pendientes, y la migración, suavidad de colisión y rendimiento necesitan comprobaciones posteriores. No ejecutar compilación ni juego sin petición expresa.
+
+## Ejecución de las nuevas alternativas
+
+Por elección del usuario se implementan pestañas, recorte volumétrico, datos/geometría, formador, pintura/conservación y recursos del formador. Estado: **código y recursos preparados**, revisión estática; compilación y Minecraft no ejecutados. Formato 2 compatible con datos 1, protocolo 5. Se resuelven nombre, receta y durabilidad del formador con autorización para decidir.
+
+Siguientes alternativas: revisión estática adicional, correcciones concretas o comprobaciones de marcha, guardado, red y rendimiento cuando se autorice ejecución. No se impone un orden global. [Evidencia y límites](../../../../technical/slopes-and-volumes.md).

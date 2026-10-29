@@ -10,6 +10,7 @@ import net.nicomar.paintableblocks.balance.PaintingBalance;
 import net.nicomar.paintableblocks.design.BlockDesign;
 import net.nicomar.paintableblocks.design.DesignGeometry;
 import net.nicomar.paintableblocks.design.DesignOrientation;
+import net.nicomar.paintableblocks.design.SlopeGeometry;
 import net.nicomar.paintableblocks.paint.PaintCatalog;
 
 /** Pure plans, shared by the preview and authoritative actions. No access to players or levels. */
@@ -27,14 +28,13 @@ public final class DesignOperations {
             return new Plan(d,after,List.of(),List.of(),0);
         }
         if(action==Action.CLEAN){
-            var faces=DesignGeometry.surfaces(d).stream().filter(f->d.paint(f.cell(),f.face())!=0).toList();
+            var faces=DesignGeometry.surfaces(d).stream().filter(f->d.paint(f)!=0).toList();
             return new Plan(d,d.withoutPaint(),List.of(),faces,0);
         }
-        if(!d.exposed(hit.cell(),hit.face()))throw new IllegalArgumentException("Target is not exposed");
+        if(!d.validSurfaceKey(hit.key()))throw new IllegalArgumentException("Target is not exposed");
         if(action==Action.SCRAPE){
-            var faces=DesignGeometry.surfaces(d).stream().filter(f->f.face()==hit.face()
-                    &&coordinate(d,f.cell(),f.face().getAxis())==coordinate(d,hit.cell(),hit.face().getAxis())&&d.paint(f.cell(),f.face())!=0).toList();
-            TreeMap<Integer,Integer> changes=new TreeMap<>();for(var f:faces)changes.put(f.cell()*6+f.face().ordinal(),0);
+            var faces=DesignGeometry.surfaces(d).stream().filter(f->SlopeGeometry.coplanar(d,f,hit)&&d.paint(f)!=0).toList();
+            TreeMap<Integer,Integer> changes=new TreeMap<>();for(var f:faces)changes.put(f.key(),0);
             return new Plan(d,d.paintFaces(changes),List.of(),faces,0);
         }
         if(d.resolution()==1)return new Plan(d,d,List.of(),List.of(),0);
@@ -53,22 +53,21 @@ public final class DesignOperations {
         return new Plan(d,d.remove(cells),selected,List.of(),0);
     }
     public static List<DesignGeometry.Surface> area(BlockDesign d,DesignGeometry.Surface first,DesignGeometry.Surface last){
-        if(first.face()!=last.face()||coordinate(d,first.cell(),first.face().getAxis())!=coordinate(d,last.cell(),last.face().getAxis()))throw new IllegalArgumentException("Area is not coplanar");
-        if(!d.exposed(first.cell(),first.face())||!d.exposed(last.cell(),last.face()))throw new IllegalArgumentException("Area corner is not exposed");
-        int minX=Math.min(d.x(first.cell()),d.x(last.cell())),maxX=Math.max(d.x(first.cell()),d.x(last.cell()));
-        int minY=Math.min(d.y(first.cell()),d.y(last.cell())),maxY=Math.max(d.y(first.cell()),d.y(last.cell()));
-        int minZ=Math.min(d.z(first.cell()),d.z(last.cell())),maxZ=Math.max(d.z(first.cell()),d.z(last.cell()));
-        return DesignGeometry.surfaces(d).stream().filter(f->f.face()==first.face()&&d.x(f.cell())>=minX&&d.x(f.cell())<=maxX
-                &&d.y(f.cell())>=minY&&d.y(f.cell())<=maxY&&d.z(f.cell())>=minZ&&d.z(f.cell())<=maxZ).toList();
+        if(!d.validSurfaceKey(first.key())||!d.validSurfaceKey(last.key())||!SlopeGeometry.coplanar(d,first,last))throw new IllegalArgumentException("Area is not coplanar");
+        var normal=SlopeGeometry.normal(d,first).normalize();
+        var u=first.slope()?normal.cross(Math.abs(normal.y)<.9?new net.minecraft.world.phys.Vec3(0,1,0):new net.minecraft.world.phys.Vec3(1,0,0)).normalize():new net.minecraft.world.phys.Vec3(first.face().getAxis()==Direction.Axis.X?0:1,0,first.face().getAxis()==Direction.Axis.X?1:0);
+        var v=normal.cross(u);var a=SlopeGeometry.centroid(SlopeGeometry.polygon(d,first));var b=SlopeGeometry.centroid(SlopeGeometry.polygon(d,last));
+        double minU=Math.min(a.dot(u),b.dot(u)),maxU=Math.max(a.dot(u),b.dot(u)),minV=Math.min(a.dot(v),b.dot(v)),maxV=Math.max(a.dot(v),b.dot(v));
+        return DesignGeometry.surfaces(d).stream().filter(f->SlopeGeometry.coplanar(d,first,f)).filter(f->{var center=SlopeGeometry.centroid(SlopeGeometry.polygon(d,f));return center.dot(u)>=minU-1e-8&&center.dot(u)<=maxU+1e-8&&center.dot(v)>=minV-1e-8&&center.dot(v)<=maxV+1e-8;}).toList();
     }
     public static Plan paint(BlockDesign d,List<DesignGeometry.Surface> surfaces,int id){
         if(!PaintCatalog.validId(id))throw new IllegalArgumentException("Invalid paint identity");
         TreeMap<Integer,Integer> changes=new TreeMap<>();List<DesignGeometry.Surface> affected=new ArrayList<>();
         for(var f:surfaces){
-            if(!d.exposed(f.cell(),f.face()))throw new IllegalArgumentException("Hidden paint surface");
-            int key=f.cell()*6+f.face().ordinal();
-            if(d.paint(f.cell(),f.face())!=id && changes.put(key,id)==null)affected.add(f);
+            if(!d.validSurfaceKey(f.key()))throw new IllegalArgumentException("Hidden paint surface");
+            int key=f.key();
+            if(d.paint(f)!=id && changes.put(key,id)==null)affected.add(f);
         }
-        return new Plan(d,d.paintFaces(changes),List.of(),affected,Math.multiplyExact(changes.size(),PaintingBalance.surfaceUnits(d.resolution())));
+        return new Plan(d,d.paintFaces(changes),List.of(),affected,affected.stream().mapToInt(f->SlopeGeometry.units(d,f)).sum());
     }
 }

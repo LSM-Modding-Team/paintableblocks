@@ -1,6 +1,6 @@
 # Recorte volumétrico
 
-Reglas aceptadas, pendientes de implementación. Amplía el [[Martillo]] sin sustituir su recorte individual. No se limita a superficies planas y alcanza minicubos interiores.
+Reglas aceptadas, con código preparado y revisión estática; sin verificación en Minecraft. Amplía el [[Martillo]] sin sustituir su recorte individual. No se limita a superficies planas y alcanza minicubos interiores.
 
 ## Selección y confirmación
 
@@ -28,3 +28,8 @@ Una operación activa por jugador, procesada por lotes con presupuesto compartid
 Cancelar, desconectarse, descargar una zona necesaria o perder permisos detiene los lotes pendientes. **Lo ya recortado permanece**; avisarlo antes de confirmar. No hay reversión ni reanudación automática al abrir el mundo.
 
 Mostrar contorno global, tipos ignorados, disponibilidad y progreso en bloques revisados/modificados. Detallar minicubos cercanos sin intentar representar individualmente todos los del volumen. Vista previa y operación comparten el cálculo del resultado.
+
+
+## Estado y evidencia
+
+Implementación y decisiones: [Pendientes y volúmenes](../../../technical/slopes-and-volumes.md). No se ha compilado ni ejecutado Java/Minecraft; las reglas no equivalen a comportamiento probado.

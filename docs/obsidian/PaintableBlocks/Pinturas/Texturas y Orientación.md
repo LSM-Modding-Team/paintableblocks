@@ -53,4 +53,4 @@ Las texturas definitivas de herramientas se generan después de completar sus fu
 
 ## Pendientes aceptadas
 
-En [[Pintura de Pendientes]] se proyecta desde el eje dominante conservando coordenadas del bloque; se acepta estiramiento en la inclinación. Se mantienen continuidad y orientación conjunta. Esta extensión está pendiente de implementación.
+En [[Pintura de Pendientes]] se proyecta desde el eje dominante conservando coordenadas del bloque; se acepta estiramiento en la inclinación. Se mantienen continuidad y orientación conjunta. Esta extensión está implementada en código; sin verificación en Minecraft.
