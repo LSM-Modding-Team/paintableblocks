@@ -17,22 +17,24 @@ public final class DesignGeometry {
     }
     public record Box(int x0,int y0,int z0,int x1,int y1,int z1) {}
     private DesignGeometry() {}
-    private static final java.util.LinkedHashMap<BlockDesign.GeometryKey,List<Surface>> SURFACES=new java.util.LinkedHashMap<>(16,.75F,true);
-    private static int cachedSurfaces;
-    public static List<Surface> surfaces(BlockDesign design){
-        var key=design.geometryKey();synchronized(SURFACES){var cached=SURFACES.get(key);if(cached!=null)return cached;}
+    private static final net.nicomar.paintableblocks.performance.WorkCache<BlockDesign.GeometryKey,List<Surface>> SURFACES=new net.nicomar.paintableblocks.performance.WorkCache<>("surfaces",256,262144);
+    private record ShapeKey(BlockDesign.GeometryKey geometry,int orientation){}
+    private static final net.nicomar.paintableblocks.performance.WorkCache<ShapeKey,VoxelShape> SHAPES=new net.nicomar.paintableblocks.performance.WorkCache<>("collision",256,1048576);
+    private static final net.nicomar.paintableblocks.performance.WorkCache<ShapeKey,VoxelShape> SUPPORT=new net.nicomar.paintableblocks.performance.WorkCache<>("support",256,1048576);
+    private static final net.nicomar.paintableblocks.performance.WorkCache<BlockDesign.GeometryKey,List<List<Surface>>> CELLS=new net.nicomar.paintableblocks.performance.WorkCache<>("cell-surfaces",128,262144);
+    public static List<Surface> surfaces(BlockDesign design){return SURFACES.get(design.geometryKey(),()->{
         List<Surface> out=new ArrayList<>();int n=design.resolution();
-        for(int c=0;c<n*n*n;c++)if(design.occupied(c))for(Direction face:Direction.values())if(design.exposed(c,face))out.add(new Surface(c,face));
-        if(design.slope()!=null)for(int c=0;c<n*n*n;c++)if(design.occupied(c)){
-            var surface=new Surface(c,design.slope().dominant(),true);if(SlopeGeometry.area(SlopeGeometry.polygon(design,surface))>1e-12)out.add(surface);
-        }
-        var result=List.copyOf(out);
-        synchronized(SURFACES){
-            var raced=SURFACES.get(key);if(raced!=null)return raced;
-            while(!SURFACES.isEmpty()&&(SURFACES.size()>=64||cachedSurfaces+result.size()>65536)){var iterator=SURFACES.entrySet().iterator();cachedSurfaces-=iterator.next().getValue().size();iterator.remove();}
-            if(result.size()<=65536){SURFACES.put(key,result);cachedSurfaces+=result.size();}
-        }
-        return result;
+        for(int c=0;c<n*n*n;c++)if(design.occupied(c)){
+            for(Direction face:Direction.values())if(design.exposed(c,face))out.add(new Surface(c,face));
+            if(design.slope()!=null){var surface=new Surface(c,design.slope().dominant(),true);if(SlopeGeometry.area(SlopeGeometry.polygon(design,surface))>1e-12)out.add(surface);}
+        }return List.copyOf(out);
+    },List::size);}
+    public static List<Surface> cellSurfaces(BlockDesign d,int cell){
+        var index=CELLS.get(d.geometryKey(),()->{
+            List<List<Surface>> cells=new ArrayList<>();for(int c=0;c<d.resolution()*d.resolution()*d.resolution();c++)cells.add(new ArrayList<>());
+            for(var surface:surfaces(d))cells.get(surface.cell()).add(surface);
+            return cells.stream().map(List::copyOf).toList();
+        },cells->cells.size()+surfaces(d).size());return cell>=0&&cell<index.size()?index.get(cell):List.of();
     }
     public static List<Box> boxes(BlockDesign local){
         BlockDesign d=local.withoutPaint().physical();int n=d.resolution();boolean[] used=new boolean[n*n*n];List<Box> out=new ArrayList<>();
@@ -47,22 +49,18 @@ public final class DesignGeometry {
         return List.copyOf(out);
     }
     private static boolean free(BlockDesign d,boolean[] used,int x,int y,int z){return d.occupied(x,y,z)&&!used[d.index(x,y,z)];}
-    public static VoxelShape shape(BlockDesign d){
-        if(d.slope()!=null)return slopeShape(d);
-        double n=d.resolution();VoxelShape out=Shapes.empty();
-        for(Box b:boxes(d))out=Shapes.joinUnoptimized(out,Shapes.box(b.x0()/n,b.y0()/n,b.z0()/n,b.x1()/n,b.y1()/n,b.z1()/n),BooleanOp.OR);
-        return out.optimize();
-    }
-    private static VoxelShape slopeShape(BlockDesign d){
-        VoxelShape out=Shapes.empty();int inverse=DesignOrientation.inverse(d.orientation());
-        // Every collision voxel is 1/16 regardless of the paintable resolution.
-        for(int z=0;z<16;z++)for(int y=0;y<16;y++)for(int x=0;x<16;x++){
-            var p=DesignOrientation.rotate(inverse,new Vec3((x+.5)/16,(y+.5)/16,(z+.5)/16));int n=d.resolution();
-            if(d.occupied(Math.min(n-1,(int)(p.x*n)),Math.min(n-1,(int)(p.y*n)),Math.min(n-1,(int)(p.z*n)))&&d.slope().value(p)<=1e-10)
-                out=Shapes.joinUnoptimized(out,Shapes.box(x/16.0,y/16.0,z/16.0,(x+1)/16.0,(y+1)/16.0,(z+1)/16.0),BooleanOp.OR);
-        }return out.optimize();
-    }
-    public static VoxelShape supportShape(BlockDesign d){
+    public static VoxelShape shape(BlockDesign d){return SHAPES.get(new ShapeKey(d.geometryKey(),d.orientation()),()->{
+        int n=d.slope()==null?d.resolution():16;var grid=new net.minecraft.world.phys.shapes.BitSetDiscreteVoxelShape(n,n,n);
+        if(d.slope()==null){for(int cell=0;cell<n*n*n;cell++)if(d.occupied(cell)){int[] p=DesignOrientation.cell(d.orientation(),d.x(cell),d.y(cell),d.z(cell),n);grid.fill(p[0],p[1],p[2]);}}
+        else{int inverse=DesignOrientation.inverse(d.orientation());int resolution=d.resolution();
+            for(int z=0;z<n;z++)for(int y=0;y<n;y++)for(int x=0;x<n;x++){
+                var p=DesignOrientation.rotate(inverse,new Vec3((x+.5)/n,(y+.5)/n,(z+.5)/n));
+                if(d.occupied(Math.min(resolution-1,(int)(p.x*resolution)),Math.min(resolution-1,(int)(p.y*resolution)),Math.min(resolution-1,(int)(p.z*resolution)))&&d.slope().value(p)<=1e-10)grid.fill(x,y,z);
+            }
+        }return new GridShape(grid,n).optimize();
+    },shape->d.slope()==null?d.resolution()*d.resolution()*d.resolution():4096);}
+    public static VoxelShape supportShape(BlockDesign d){return SUPPORT.get(new ShapeKey(d.geometryKey(),d.orientation()),()->buildSupport(d),s->4096);}
+    private static VoxelShape buildSupport(BlockDesign d){
         if(d.slope()==null)return shape(d);
         // Only full axis-aligned outer faces support attachments; never the stepped incline.
         VoxelShape out=Shapes.empty();

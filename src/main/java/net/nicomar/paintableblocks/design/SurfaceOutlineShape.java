@@ -7,6 +7,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 public final class SurfaceOutlineShape extends DesignOutlineShape {
     private final BlockDesign design;
     private final List<DesignGeometry.Surface> surfaces;
-    public SurfaceOutlineShape(BlockDesign d,List<DesignGeometry.Surface> surfaces){super(d);design=d;this.surfaces=List.copyOf(surfaces);}
+    public SurfaceOutlineShape(BlockDesign d,List<DesignGeometry.Surface> surfaces){super(d);design=d.withoutPaint();this.surfaces=List.copyOf(surfaces);}
     @Override public void forAllEdges(Shapes.DoubleLineConsumer consumer){for(var surface:surfaces)emit(design,surface,consumer);}
 }

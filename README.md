@@ -8,11 +8,15 @@ Base del mod y grupos **1: bloques y diseños**, **2: herramientas y pinturas** 
 
 Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes completos en 80 ticks. Se incorporan recetas y mejoras con conservación de datos. Los recursos de 20 herramientas, cuatro cubos y cinco bloques de producción están implementados: modelos 3D, texturas originales de 16×16 y colisión coincidente. Se validan caras y UV para evitar superficies superpuestas. [Vista técnica y detalles](docs/technical/visual-assets.md).
 
-Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **5**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
+Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **6**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
 
 ## Ampliaciones acordadas
 
 Se han documentado el recorte volumétrico del martillo, las pendientes y su formador, la pintura de superficies inclinadas y tres pestañas del creativo. **Código y recursos preparados, sin compilación ni pruebas en Minecraft**. Formato de diseño 2 con lectura de datos 1; [detalles, controles y decisiones](docs/technical/slopes-and-volumes.md). Véase la [especificación](docs/obsidian/PaintableBlocks/PaintableBlocks.md).
+
+## Rendimiento
+
+Optimización preparada de geometría compartida, mallas, selección volumétrica, producción y sincronización incremental. [Cobertura, presupuestos y límites](docs/technical/performance.md). Revisión estática; sin mediciones ni ejecución en Minecraft.
 
 ## Guías
 

@@ -8,7 +8,14 @@ import net.minecraft.world.phys.Vec3;
 /** The 24 proper cube rotations: rows are images of local +X,+Y,+Z. No reflections. */
 public final class DesignOrientation {
     private static final List<int[]> ROTATIONS = rotations();
+    private static final Direction[][] DIRECTIONS=directionTable();
+    private static final int[][] COMPOSITIONS=compositionTable();
+    private static final int[] INVERSES=inverseTable();
     private DesignOrientation() {}
+    private static Direction[][] directionTable(){var out=new Direction[24][6];for(int i=0;i<24;i++)for(var d:Direction.values()){int[] m=ROTATIONS.get(i);int x=d.getStepX(),y=d.getStepY(),z=d.getStepZ();out[i][d.ordinal()]=Direction.getNearest(m[0]*x+m[1]*y+m[2]*z,m[3]*x+m[4]*y+m[5]*z,m[6]*x+m[7]*y+m[8]*z,Direction.UP);}return out;}
+    private static int[][] compositionTable(){int[][] out=new int[24][24];for(int outer=0;outer<24;outer++)for(int inner=0;inner<24;inner++){int[] a=ROTATIONS.get(outer),b=ROTATIONS.get(inner),c=new int[9];for(int row=0;row<3;row++)for(int col=0;col<3;col++)for(int k=0;k<3;k++)c[row*3+col]+=a[row*3+k]*b[k*3+col];for(int i=0;i<24;i++)if(java.util.Arrays.equals(c,ROTATIONS.get(i))){out[outer][inner]=i;break;}}return out;}
+    private static int[] inverseTable(){int[] out=new int[24];for(int a=0;a<24;a++)for(int b=0;b<24;b++)if(COMPOSITIONS[a][b]==0){out[a]=b;break;}return out;}
+
     public static int require(int orientation) {
         if (orientation < 0 || orientation >= 24) throw new IllegalArgumentException("Invalid cube orientation");
         return orientation;
@@ -32,24 +39,12 @@ public final class DesignOrientation {
         return new Vec3(m[0]*x+m[1]*y+m[2]*z+.5, m[3]*x+m[4]*y+m[5]*z+.5, m[6]*x+m[7]*y+m[8]*z+.5);
     }
     public static int[] cell(int orientation, int x, int y, int z, int n) {
-        Vec3 v = rotate(orientation, new Vec3((x+.5)/n, (y+.5)/n, (z+.5)/n));
-        return new int[]{(int)Math.floor(v.x*n), (int)Math.floor(v.y*n), (int)Math.floor(v.z*n)};
+        int[] m=ROTATIONS.get(require(orientation));int[] out=new int[3];
+        for(int row=0;row<3;row++){int i=row*3;out[row]=m[i]*x+m[i+1]*y+m[i+2]*z+(m[i]+m[i+1]+m[i+2]<0?n-1:0);}return out;
     }
-    public static Direction direction(int orientation, Direction direction) {
-        int[] m = ROTATIONS.get(require(orientation));
-        int x=direction.getStepX(), y=direction.getStepY(), z=direction.getStepZ();
-        return Direction.getNearest(m[0]*x+m[1]*y+m[2]*z, m[3]*x+m[4]*y+m[5]*z, m[6]*x+m[7]*y+m[8]*z, Direction.UP);
-    }
-    public static int compose(int outer, int inner) {
-        int[] a=ROTATIONS.get(require(outer)), b=ROTATIONS.get(require(inner)), c=new int[9];
-        for(int row=0;row<3;row++) for(int col=0;col<3;col++) for(int k=0;k<3;k++) c[row*3+col]+=a[row*3+k]*b[k*3+col];
-        for(int i=0;i<24;i++) if(java.util.Arrays.equals(c,ROTATIONS.get(i))) return i;
-        throw new IllegalStateException("Cube rotations must be closed");
-    }
-    public static int inverse(int orientation) {
-        for(int i=0;i<24;i++) if(compose(i,orientation)==0) return i;
-        throw new IllegalStateException("Cube rotation has no inverse");
-    }
+    public static Direction direction(int orientation,Direction direction){return DIRECTIONS[require(orientation)][direction.ordinal()];}
+    public static int compose(int outer,int inner){return COMPOSITIONS[require(outer)][require(inner)];}
+    public static int inverse(int orientation){return INVERSES[require(orientation)];}
     public static int quarterTurn(Direction axis,boolean reverse){
         int ax=axis.getStepX()*(reverse?-1:1), ay=axis.getStepY()*(reverse?-1:1), az=axis.getStepZ()*(reverse?-1:1);
         Direction[] positive={Direction.EAST,Direction.UP,Direction.SOUTH};

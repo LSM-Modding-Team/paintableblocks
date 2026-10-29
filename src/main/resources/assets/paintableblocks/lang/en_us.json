@@ -424,5 +424,7 @@
   "message.paintableblocks.volume_denied": "Permission or state changed. Already changed: %s.",
   "message.paintableblocks.volume_done": "Operation complete. Blocks changed: %s.",
   "button.paintableblocks.preview": "Preview",
-  "message.paintableblocks.volume_planned": "Planned blocks / durability: %s (creative: 0)"
+  "message.paintableblocks.volume_planned": "Planned blocks / durability: %s (creative: 0)",
+  "message.paintableblocks.preview_simplified": " Visual detail simplified; the complete operation is unchanged.",
+  "message.paintableblocks.preview_loading": " Preparing nearby detail…"
 }

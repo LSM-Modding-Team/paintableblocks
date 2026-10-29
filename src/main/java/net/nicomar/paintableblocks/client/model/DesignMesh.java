@@ -29,15 +29,9 @@ import org.joml.Vector3f;
 
 /** A resource-reload-scoped mesh factory shared by world and inventory projections. */
 public final class DesignMesh {
-    private static final int MAX_ENTRIES=64, MAX_CACHED_QUADS=65536;
     private final BlockStateModelPart base;
     private final Map<Integer,List<BakedQuad>> samples=new ConcurrentHashMap<>();
-    private final LinkedHashMap<MeshKey,Mesh> meshes=new LinkedHashMap<>(16,.75F,true);
-    private int cachedQuads;
-    private final Map<MeshKey,java.util.concurrent.CompletableFuture<Mesh>> building=new ConcurrentHashMap<>();
-    private record SurfaceKey(int resolution,int cell,Direction face,int paint,int orientation,boolean slope,SlopePlane plane){}
-    private final LinkedHashMap<SurfaceKey,List<BakedQuad>> projected=new LinkedHashMap<>(16,.75F,true);
-    private int projectedQuads;
+    private final net.nicomar.paintableblocks.performance.WorkCache<MeshKey,Mesh> meshes=new net.nicomar.paintableblocks.performance.WorkCache<>("meshes",256,262144);
     public record Mesh(QuadCollection quads,BlockStateModelPart part){}
     private record Part(List<BakedQuad> quads,Material.Baked particleMaterial,int materialFlags) implements BlockStateModelPart {
         @Override public List<BakedQuad> getQuads(Direction side){return side==null?quads:List.of();}
@@ -52,51 +46,17 @@ public final class DesignMesh {
     private record MeshKey(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior){}
     public Mesh mesh(BlockDesign design){return mesh(design,Map.of());}
     public Mesh mesh(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior){
-        var key=new MeshKey(design,exterior);
-        synchronized(meshes){var present=meshes.get(key);if(present!=null)return present;}
-        var future=new java.util.concurrent.CompletableFuture<Mesh>();var existing=building.putIfAbsent(key,future);
-        if(existing!=null)return existing.join();
-        try{
-            synchronized(meshes){var raced=meshes.get(key);if(raced!=null){future.complete(raced);return raced;}}
-            // Rendering different designs never shares a mesh-generation monitor.
-            Mesh result=build(design,exterior);int count=result.quads().getAll().size();
-            if(count<=MAX_CACHED_QUADS)synchronized(meshes){
-                while(!meshes.isEmpty()&&(meshes.size()>=MAX_ENTRIES||cachedQuads+count>MAX_CACHED_QUADS)){
-                    var first=meshes.entrySet().iterator();cachedQuads-=first.next().getValue().quads().getAll().size();first.remove();
-                }
-                meshes.put(key,result);cachedQuads+=count;
-            }
-            future.complete(result);return result;
-        }catch(RuntimeException|Error failure){future.completeExceptionally(failure);throw failure;}
-        finally{building.remove(key,future);}
+        return meshes.get(new MeshKey(design,exterior),()->build(design,exterior),m->m.quads().getAll().size()+exterior.size()+design.paints().size()+64);
     }
     private Mesh build(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior){
         List<BakedQuad> quads=new ArrayList<>();
-        for(var surface:DesignGeometry.surfaces(design)){
-            var fragments=exterior.get(surface.key());if(fragments==null)quads.addAll(surfaceQuads(design,surface));
-            else for(var polygon:fragments){int id=design.paint(surface);var source=samples.computeIfAbsent(id*6+surface.face().ordinal(),k->sample(id,surface.face()));int before=quads.size();for(var quad:source)project(design,surface,quad,quads,polygon);if(quads.size()==before)for(var quad:baseQuads(surface.face()))project(design,surface,quad,quads,polygon);}
+        for(var patch:net.nicomar.paintableblocks.design.SurfaceGroups.merge(design,exterior)){
+            var surface=patch.surface();int id=design.paint(surface);var source=samples.computeIfAbsent(id*6+surface.face().ordinal(),k->sample(id,surface.face()));int before=quads.size();
+            for(var quad:source)project(design,surface,quad,quads,patch.polygon());if(quads.size()==before)for(var quad:baseQuads(surface.face()))project(design,surface,quad,quads,patch.polygon());
         }
         QuadCollection.Builder builder=new QuadCollection.Builder();int flags=0;
         for(BakedQuad quad:quads){builder.addUnculledFace(quad);flags|=quad.materialInfo().flags();}
         return new Mesh(builder.build(),new Part(List.copyOf(quads),particle(),flags));
-    }
-    private List<BakedQuad> surfaceQuads(BlockDesign design,DesignGeometry.Surface surface){
-        int id=design.paint(surface);
-        var key=new SurfaceKey(design.resolution(),surface.cell(),surface.face(),id,design.orientation(),surface.slope(),design.slope());
-        synchronized(projected){var present=projected.get(key);if(present!=null)return present;}
-        List<BakedQuad> quads=new ArrayList<>();
-        var source=samples.computeIfAbsent(id*6+surface.face().ordinal(),k->sample(id,surface.face()));
-        for(var quad:source)project(design,surface,quad,quads);
-        if(quads.isEmpty())for(var quad:baseQuads(surface.face()))project(design,surface,quad,quads);
-        var result=List.copyOf(quads);
-        synchronized(projected){
-            var raced=projected.get(key);if(raced!=null)return raced;
-            while(!projected.isEmpty()&&(projected.size()>=8192||projectedQuads+result.size()>16384)){
-                var first=projected.entrySet().iterator();projectedQuads-=first.next().getValue().size();first.remove();
-            }
-            if(result.size()<=16384){projected.put(key,result);projectedQuads+=result.size();}
-        }
-        return result;
     }
     private List<BakedQuad> baseQuads(Direction face){
         List<BakedQuad> out=new ArrayList<>(base.getQuads(face));
@@ -138,23 +98,12 @@ public final class DesignMesh {
     }
     private static int lerpColor(int a,int b,double t){int out=0;for(int s=0;s<32;s+=8)out|=(int)Math.round(((a>>>s)&255)+(((b>>>s)&255)-((a>>>s)&255))*t)<<s;return out;}
     private static double coordinate(Vec3 p,int axis){return axis==0?p.x:axis==1?p.y:p.z;}
-    private static List<Vertex> clip(List<Vertex> polygon,int axis,double edge,boolean greater){
-        if(polygon.isEmpty())return polygon;List<Vertex> out=new ArrayList<>();Vertex a=polygon.getLast();
-        double da=coordinate(a.position,axis)-edge;boolean ia=greater?da>=-1e-8:da<=1e-8;
-        for(Vertex b:polygon){double db=coordinate(b.position,axis)-edge;boolean ib=greater?db>=-1e-8:db<=1e-8;
-            if(ia!=ib)out.add(a.interpolate(b,da/(da-db)));if(ib)out.add(b);a=b;da=db;ia=ib;
-        }
-        return out;
-    }
     private static void project(BlockDesign design,DesignGeometry.Surface surface,BakedQuad source,List<BakedQuad> output){project(design,surface,source,output,SlopeGeometry.polygon(design,surface));}
     private static void project(BlockDesign design,DesignGeometry.Surface surface,BakedQuad source,List<BakedQuad> output,List<Vec3> polygon){
         Direction face=surface.face();int axis=face.getAxis()==Direction.Axis.X?0:face.getAxis()==Direction.Axis.Y?1:2;
-        int u=axis==0?2:0,v=axis==1?2:1;int n=design.resolution(),cell=surface.cell();
-        int[] xyz={design.x(cell),design.y(cell),design.z(cell)};
+        int u=axis==0?2:0,v=axis==1?2:1;
         List<Vertex> vertices=new ArrayList<>();
         for(int i=0;i<4;i++){var p=source.position(i);long uv=source.packedUV(i);vertices.add(new Vertex(new Vec3(p.x(),p.y(),p.z()),UVPair.unpackU(uv),UVPair.unpackV(uv),source.bakedColors().color(i)));}
-        vertices=clip(vertices,u,xyz[u]/(double)n,true);vertices=clip(vertices,u,(xyz[u]+1)/(double)n,false);
-        vertices=clip(vertices,v,xyz[v]/(double)n,true);vertices=clip(vertices,v,(xyz[v]+1)/(double)n,false);
         if(polygon.size()<3)return;
         // Clip texture-layer footprints in the dominant projection before lifting onto the real polygon.
         double signed=0;for(int i=0;i<polygon.size();i++){var a=polygon.get(i);var b=polygon.get((i+1)%polygon.size());signed+=coordinate(a,u)*coordinate(b,v)-coordinate(b,u)*coordinate(a,v);}

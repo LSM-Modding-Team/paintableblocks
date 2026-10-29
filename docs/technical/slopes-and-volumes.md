@@ -41,3 +41,7 @@ Interrupción, descarga, pérdida de permiso o desconexión detienen lo pendient
 Se revisan sintaxis Java con tree-sitter, imports contra el cliente oficial y firmas nuevas contra metadatos del cliente/patches exactos NeoForge; sin ejecutar clases. La receta se compara sin coincidencias con 733 patrones vanilla. Pasan validadores estáticos de grupos 1–3, atlas, recursos y ampliaciones; seis pruebas Python del atlas. El modelo del formador eleva a 30 las variantes de recursos revisadas, con 21 014 parches y cero solapes coplanares en modelos JSON.
 
 `SlopeVolumeContractChecks` prepara regresiones de migración, planos y sus 24 giros, área inclinada, consumo, herramientas, límites inclusivos, ray tracing y contacto entre resoluciones. **No ejecutado**. Antes de afirmar verificación en juego faltan compilación autorizada y pruebas de marcha/uniones, selección y UI, multijugador/protecciones, guardado/copia y rendimiento con volúmenes grandes. No se afirma comprobación completa de tipos ni funcionamiento visual por el análisis de sintaxis.
+
+## Optimización posterior
+
+La implementación de rendimiento sustituye los algoritmos y presupuestos iniciales aquí descritos: geometría compartida, vistas preparadas, recorrido por chunks y protocolo **6** con diferencias. Persistencia 2 y reglas funcionales se conservan. Véase [rendimiento](performance.md); no se ha ejecutado Java ni Minecraft.

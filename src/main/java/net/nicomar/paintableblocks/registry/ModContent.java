@@ -99,6 +99,6 @@ public final class ModContent {
     private ModContent(){}
     public static PaintableBlock block(int n){return BLOCKS.get(PaintingBalance.requireResolution(n)).get();}
     public static ItemStack stack(BlockDesign design){ItemStack out=new ItemStack(ITEMS.get(design.resolution()).get());out.set(DESIGN.get(),design);return out;}
-    public static void initialize(IEventBus bus){ProductionContent.initialize(bus);CreativeTabs.register(bus);net.nicomar.paintableblocks.interaction.VolumeEditing.register();bus.addListener(ModContent::setup);bus.addListener(net.nicomar.paintableblocks.network.ModNetworking::register);net.nicomar.paintableblocks.interaction.ServerInteractions.register();}
+    public static void initialize(IEventBus bus){ProductionContent.initialize(bus);CreativeTabs.register(bus);net.nicomar.paintableblocks.interaction.VolumeEditing.register();net.nicomar.paintableblocks.network.DesignUpdates.register();net.nicomar.paintableblocks.performance.PhysicalNotifications.register();bus.addListener(ModContent::setup);bus.addListener(net.nicomar.paintableblocks.network.ModNetworking::register);net.nicomar.paintableblocks.interaction.ServerInteractions.register();}
     private static void setup(FMLCommonSetupEvent event){event.enqueueWork(PaintCatalog::validateRegistries);}
 }

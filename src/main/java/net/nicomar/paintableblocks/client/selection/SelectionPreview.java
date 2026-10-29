@@ -41,8 +41,8 @@ public final class SelectionPreview {
     private static VoxelShape cachedShape=Shapes.empty();
     private record Key(Identifier dimension,BlockPos pos,UUID block,long revision,DesignGeometry.Surface surface,InteractionHand hand,Object tool,int paint,boolean reverse,long selection){}
     private SelectionPreview(){}
-    public static void register(){VolumePreview.register();NeoForge.EVENT_BUS.addListener(SelectionPreview::input);NeoForge.EVENT_BUS.addListener(SelectionPreview::outline);NeoForge.EVENT_BUS.addListener(SelectionPreview::tick);}
-    public static void payloads(RegisterClientPayloadHandlersEvent event){VolumePreview.payloads(event);event.register(ModNetworking.Selection.TYPE,(v,ctx)->{
+    public static void register(){ClientDesignUpdates.install();VolumePreview.register();NeoForge.EVENT_BUS.addListener(SelectionPreview::input);NeoForge.EVENT_BUS.addListener(SelectionPreview::outline);NeoForge.EVENT_BUS.addListener(SelectionPreview::tick);}
+    public static void payloads(RegisterClientPayloadHandlersEvent event){ClientDesignUpdates.register(event);VolumePreview.payloads(event);event.register(ModNetworking.Selection.TYPE,(v,ctx)->{
         if(v.request()!=lastSent)return;selection=v.active()?v:null;invalidate();
     });}
     private static void feedback(Component message){Minecraft.getInstance().gui.hud.setOverlayMessage(message,false);overlayOwned=true;}
@@ -124,8 +124,8 @@ public final class SelectionPreview {
     public static VoxelShape cells(DesignOperations.Plan plan){return shape(plan);}
     private static VoxelShape shape(DesignOperations.Plan plan){
         if(!plan.cells().isEmpty()){
-            var d=plan.before();int n=d.resolution();VoxelShape out=Shapes.empty();
-            for(int cell:plan.cells()){int c=physicalCell(d,cell);double x=d.x(c)/(double)n,y=d.y(c)/(double)n,z=d.z(c)/(double)n;out=Shapes.joinUnoptimized(out,Shapes.box(x,y,z,x+1.0/n,y+1.0/n,z+1.0/n),BooleanOp.OR);}return out.optimize();
+            var d=plan.before();int n=d.resolution();var absent=new java.util.BitSet(n*n*n);absent.set(0,n*n*n);for(int cell:plan.cells())absent.clear(cell);
+            return DesignGeometry.shape(BlockDesign.full(n).remove(absent).withOrientation(d.orientation()));
         }
         return !plan.faces().isEmpty()?surfaces(plan.before(),plan.faces()):Shapes.empty();
     }

@@ -32,7 +32,7 @@ public final class PaintableBlockEntity extends BlockEntity {
     public java.util.UUID editIdentity(){return editIdentity;}
     public long revision(){return revision;}
     private Dynamic<?> rejected;
-    private boolean valid=true;
+    private boolean valid=true,loadedFromStorage;
     private VoxelShape shape,outline,support;
     public VoxelShape supportShape(){if(!valid)return Shapes.block();if(support==null)support=DesignGeometry.supportShape(design);return support;}
     public VoxelShape outlineShape(){if(!valid)return Shapes.block();if(outline==null)outline=design.slope()==null?shape():new net.nicomar.paintableblocks.design.DesignOutlineShape(design);return outline;}
@@ -42,7 +42,7 @@ public final class PaintableBlockEntity extends BlockEntity {
         var placing=net.nicomar.paintableblocks.design.PlacementDesign.current(pos,n);
         design=placing==null?BlockDesign.full(n):placing;
     }
-    @Override public void setLevel(net.minecraft.world.level.Level next){super.setLevel(next);net.nicomar.paintableblocks.interaction.VolumeEditing.changed(next,worldPosition);}
+    @Override public void setLevel(net.minecraft.world.level.Level next){boolean restored=loadedFromStorage;loadedFromStorage=false;super.setLevel(next);if(!restored)net.nicomar.paintableblocks.interaction.VolumeEditing.changed(next,worldPosition);}
     @Override public void setRemoved(){net.nicomar.paintableblocks.interaction.VolumeEditing.changed(level,worldPosition);super.setRemoved();}
     public boolean valid(){return valid;}
     public BlockDesign design(){return design;}
@@ -52,38 +52,42 @@ public final class PaintableBlockEntity extends BlockEntity {
     }
     public void setDesign(BlockDesign next){
         if(level!=null && level.isClientSide())throw new IllegalStateException("Only the server changes block designs");
-        net.nicomar.paintableblocks.interaction.VolumeEditing.changed(level,worldPosition);
-        BlockDesign before=design;boolean wasValid=valid;
+        if(valid&&design.equals(next))return;
+        BlockDesign before=design;boolean wasValid=valid;long previousRevision=revision;
         accept(next);revision++;boolean geometryChanged=!wasValid||!before.sameGeometry(design);
         if(level!=null && design.empty()){level.removeBlock(worldPosition,false);return;}
-        boolean cut=!design.complete();
+        boolean cut=!design.complete();boolean stateChanged=level!=null&&getBlockState().getValue(PaintableBlock.CUT)!=cut;
         if(level!=null && getBlockState().getValue(PaintableBlock.CUT)!=cut) {
             level.setBlock(worldPosition,getBlockState().setValue(PaintableBlock.CUT,cut),Block.UPDATE_ALL);
         }
-        if(level!=null&&geometryChanged){
+        if(level!=null&&geometryChanged&&!stateChanged){
             // Same BlockState can have a different support/collision shape after any edit.
             var state=getBlockState();state.updateNeighbourShapes(level,worldPosition,Block.UPDATE_ALL);
             state.updateIndirectNeighbourShapes(level,worldPosition,Block.UPDATE_ALL);
         }
         setChanged();
-        if(level!=null){level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_ALL);level.updateNeighborsAt(worldPosition,getBlockState().getBlock(),null);}
+        if(level!=null){if(stateChanged)net.nicomar.paintableblocks.network.DesignUpdates.nativeUpdate(this);else net.nicomar.paintableblocks.network.DesignUpdates.changed(this,wasValid?before:null,previousRevision);if(geometryChanged&&!stateChanged&&level instanceof net.minecraft.server.level.ServerLevel server)net.nicomar.paintableblocks.performance.PhysicalNotifications.add(server,worldPosition);}
     }
     private void accept(BlockDesign next){
         var placing=net.nicomar.paintableblocks.design.PlacementDesign.current(worldPosition,((PaintableBlock)getBlockState().getBlock()).resolution());
         if(placing!=null)next=placing;
         if(next.resolution()!=((PaintableBlock)getBlockState().getBlock()).resolution())throw new IllegalArgumentException("Design resolution does not match block");
-        VoxelShape previous=valid && design!=null && design.sameGeometry(next)?shape:null;
-        outline=null;support=null;design=next;valid=true;rejected=null;shape=previous;refreshClientMesh();
+        var before=valid?design:null;boolean same=before!=null&&before.sameGeometry(next);
+        if(level!=null&&!level.isClientSide()&&before!=null&&!before.equals(next))net.nicomar.paintableblocks.interaction.VolumeEditing.changed(level,worldPosition);
+        if(!same){shape=null;outline=null;support=null;}design=next;valid=true;rejected=null;refreshClientMesh(before);
     }
-    private void refreshClientMesh(){
+    private void refreshClientMesh(BlockDesign before){
         requestModelDataUpdate();
         if(level!=null&&level.isClientSide()){
-            level.setBlocksDirty(worldPosition,getBlockState(),getBlockState());
-            for(var direction:net.minecraft.core.Direction.values()){var p=worldPosition.relative(direction);if(level.hasChunkAt(p)){var state=level.getBlockState(p);level.setBlocksDirty(p,state,state);}}
-            level.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),Block.UPDATE_ALL);
+            net.nicomar.paintableblocks.performance.VisualInvalidation.add(level,worldPosition);
+            if(before==null||!before.sameGeometry(design))for(var direction:net.minecraft.core.Direction.values()){
+                if(before!=null&&net.nicomar.paintableblocks.design.BoundaryGeometry.faces(before).get(direction.ordinal()).coverage().equals(net.nicomar.paintableblocks.design.BoundaryGeometry.faces(design).get(direction.ordinal()).coverage()))continue;
+                var p=worldPosition.relative(direction);if(level.hasChunkAt(p)){net.nicomar.paintableblocks.performance.VisualInvalidation.add(level,p);}
+            }
+
         }
     }
-    private void refresh(){shape=null;outline=null;support=null;refreshClientMesh();}
+    private void refresh(){shape=null;outline=null;support=null;refreshClientMesh(null);}
     @Override protected void saveAdditional(ValueOutput output){
         super.saveAdditional(output);
         output.store("edit_identity",net.minecraft.core.UUIDUtil.CODEC,editIdentity);
@@ -92,6 +96,7 @@ public final class PaintableBlockEntity extends BlockEntity {
         else output.store("design",Codec.PASSTHROUGH,rejected==null?new Dynamic<>(NbtOps.INSTANCE,new CompoundTag()):rejected);
     }
     @Override protected void loadAdditional(ValueInput input){
+        if(level==null&&net.nicomar.paintableblocks.design.PlacementDesign.current(worldPosition,design.resolution())==null)loadedFromStorage=true;
         super.loadAdditional(input);
         if(net.nicomar.paintableblocks.design.PlacementDesign.current(worldPosition,design.resolution())==null){
             editIdentity=input.read("edit_identity",net.minecraft.core.UUIDUtil.CODEC).orElse(editIdentity);
@@ -114,6 +119,16 @@ public final class PaintableBlockEntity extends BlockEntity {
     @Override public void removeComponentsFromTag(ValueOutput output){super.removeComponentsFromTag(output);output.discard("design");output.discard("edit_identity");output.discard("edit_revision");}
     @Override public CompoundTag getUpdateTag(HolderLookup.Provider registries){return saveWithoutMetadata(registries);}
     @Override public ClientboundBlockEntityDataPacket getUpdatePacket(){return ClientboundBlockEntityDataPacket.create(this);}
+    public boolean applySync(net.nicomar.paintableblocks.network.ModNetworking.DesignSync packet){
+        if(level==null||!level.isClientSide())return false;
+        if(valid&&editIdentity.equals(packet.block())&&packet.after()<=revision)return true;
+        if(packet.full()==null&&(!valid||!editIdentity.equals(packet.block())||revision!=packet.before()))return false;
+        if(editIdentity.equals(packet.block())&&packet.after()<revision)return true;
+        try{
+            BlockDesign next=packet.full();if(next==null){next=design;if(packet.plane()!=null)next=next.withSlope(packet.plane());next=next.remove(java.util.BitSet.valueOf(packet.removed().stream().mapToLong(Long::longValue).toArray())).withOrientation(packet.orientation());var changes=new java.util.TreeMap<Integer,Integer>();for(var e:packet.paints().entrySet())if(next.validSurfaceKey(e.getKey())||e.getValue()!=0)changes.put(e.getKey(),e.getValue());next=next.paintFaces(changes);}
+            if(next.resolution()!=design.resolution()||next.empty())return false;accept(next);editIdentity=packet.block();revision=packet.after();return true;
+        }catch(IllegalArgumentException|IllegalStateException invalid){return false;}
+    }
     @Override public ModelData getModelData(){return valid?ModelData.builder().with(DESIGN_PROPERTY,design).build():ModelData.EMPTY;}
     public ItemStack toItem(boolean keepPaint){
         if(!valid)return ItemStack.EMPTY;

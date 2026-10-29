@@ -16,7 +16,7 @@ public final class DesignContractChecks {
     private static void check(boolean result,String message){checks++;if(!result)throw new AssertionError(message);}
     private static void rejects(Runnable action){try{action.run();throw new AssertionError("Invalid design accepted");}catch(IllegalArgumentException|IllegalStateException expected){checks++;}}
     public static void main(String[] args){
-        rotations();geometry();persistence();SlopeVolumeContractChecks.run();
+        rotations();geometry();persistence();SlopeVolumeContractChecks.run();PerformanceContractChecks.run();
         System.out.println("Design contract checks: "+checks);
     }
     private static void rotations(){

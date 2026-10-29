@@ -13,12 +13,12 @@ def main():
   for imported in re.findall(r'import\s+(net\.minecraft\.[\w.]+);',text):assert imported.replace('.','/')+'.class' in native,(source,imported)
   if 'client' not in source.relative_to(JAVA).parts:assert not re.search(r'import\s+net\.minecraft\.client\.',text)
  assert 'VERSION = 2' in (JAVA/'design/BlockDesign.java').read_text()
- network=(JAVA/'network/ModNetworking.java').read_text();assert 'event.registrar("5")' in network
- for payload in ['Use','Selection','VolumeAction','VolumeState','BucketAction','ProductionAction']:
+ network=(JAVA/'network/ModNetworking.java').read_text();assert 'event.registrar("6")' in network
+ for payload in ['Use','Selection','VolumeAction','VolumeState','BucketAction','ProductionAction','DesignRequest','DesignSync']:
   assert 'record '+payload+'(' in network
- for payload in ['VolumeAction','VolumeState']:
+ for payload in ['VolumeAction','VolumeState','DesignRequest','DesignSync']:
   assert f'{payload}.TYPE,{payload}.CODEC' in network
-  assert f'{payload}.TYPE' in (JAVA/'client/selection/VolumePreview.java').read_text() or payload=='VolumeAction'
+  assert payload in ['VolumeAction','DesignRequest'] or f'{payload}.TYPE' in ((JAVA/'client/selection/ClientDesignUpdates.java') if payload=='DesignSync' else (JAVA/'client/selection/VolumePreview.java')).read_text()
  assets=ROOT/'src/main/resources/assets/paintableblocks';strings=[json.loads((assets/f'lang/{lang}.json').read_text()) for lang in ['es_es','en_us']]
  for source in JAVA.rglob('*.java'):
   for key in re.findall(r'"((?:message|button|tab|item)\.paintableblocks\.[\w]+)"',source.read_text()):
@@ -50,7 +50,7 @@ def main():
  assert 'CreativeModeTabs.' not in (JAVA/'registry/ModContent.java').read_text()
  assert 'CreativeModeTabs.' not in (JAVA/'registry/ProductionContent.java').read_text()
  raw=(assets/'textures/block/unpainted.png').read_bytes();assert hashlib.sha256(raw).hexdigest()=='aca1bd691809249ca928990bca71ea1cee4a150e409bd2d14e664baaa2472afa'
- print(json.dumps({'creative_tabs':3,'slope_variants':5,'protocol':5,'design_format':2,'recipe':'slope_former','official_imports':'resolved','localized_keys':'resolved','java_or_minecraft_execution':False}))
+ print(json.dumps({'creative_tabs':3,'slope_variants':5,'protocol':6,'design_format':2,'recipe':'slope_former','official_imports':'resolved','localized_keys':'resolved','java_or_minecraft_execution':False}))
  print('Geometry/interaction Java regression cases are PREPARED, NOT EXECUTED. No runtime or compilation claim.')
 
 if __name__=='__main__':main()

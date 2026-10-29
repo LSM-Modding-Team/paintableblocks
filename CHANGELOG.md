@@ -2,6 +2,18 @@
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
+## 2026-10-28 — Optimización de geometría, edición, producción y sincronización
+
+- Geometría y polígonos compartidos, cuadrículas de colisión agrupadas, fronteras preparadas, firmas/hash precalculados y fusión visual de superficies compatibles sin cambiar celdas ni UV.
+- Ray tracing por celdas; geometría validada reutilizada al pintar/girar, extremos de plano sin objetos de esquina y caché de serialización. Recorte de pendientes reanudable.
+- Previsualización volumétrica almacenada y preparada por etapas, contornos deduplicados y límite visual de detalle señalado al jugador. La selección real y sus límites se conservan.
+- Recorrido volumétrico por índices de chunks, planes puros con presupuesto global e invalidación de sesiones indexada por chunk. Permisos, eventos y estado mutable se verifican al ejecutar.
+- Agrupación de reconstrucciones por sección, notificaciones generales por posición y mensajes de diseño por bloque. Se mantienen apoyo/colisión inmediatos y la vía nativa de actualizaciones para carga/estado/comandos.
+- Diferencias de diseño con recuperación completa y formato binario de red versionado. Protocolo 6; persistencia 2 compatible con datos 1. Límites de memoria retenida, envío y reintentos; sin cargar chunks.
+- Molino/prensa recalculan salidas al cambiar inventarios, con respaldo periódico y comprobación final. Progreso persistente sin simular inventarios cada tick.
+- Cachés ponderadas, cálculos concurrentes compartidos y contadores bajo demanda sin logs periódicos. Regresiones geométricas, de formato y concurrencia preparadas, no ejecutadas.
+- Revisión estática y recursos sin modificar PNG, recetas o modelos. Sin Java, Gradle, builds, CI ni Minecraft; no se afirman mejoras medidas de FPS o tiempos. [Detalles, decisiones y plan de medición](docs/technical/performance.md). Commit directamente online en `26.2`, sin commits locales.
+
 ## 2026-10-28 — Implementación de pendientes, recorte volumétrico y creativo
 
 - Añadido martillo volumétrico: dos esquinas, máximo inclusivo 256³, centros de celdas, resoluciones mezcladas, validación previa, permisos/eventos y ejecución por lotes sin cargar chunks. Cancelación, descarga y desconexión conservan lo realizado.

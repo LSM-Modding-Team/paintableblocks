@@ -71,11 +71,35 @@ public final class ModNetworking {
         public static final StreamCodec<RegistryFriendlyByteBuf,VolumeState> CODEC=StreamCodec.of((b,v)->{b.writeLong(v.id);b.writeVarInt(v.phase);b.writeBoolean(v.former);b.writeEnum(v.hand);b.writeIdentifier(v.dimension);b.writeBlockPos(v.first);b.writeBlockPos(v.last);b.writeInt(v.x0);b.writeInt(v.y0);b.writeInt(v.z0);b.writeInt(v.x1);b.writeInt(v.y1);b.writeInt(v.z1);b.writeVarInt(v.direction);b.writeBoolean(v.upper);b.writeBoolean(v.create);b.writeVarInt(v.resolution);b.writeVarLong(v.reviewed);b.writeVarLong(v.modified);b.writeVarLong(v.ignored);b.writeVarLong(v.affected);},b->new VolumeState(b.readLong(),b.readVarInt(),b.readBoolean(),b.readEnum(InteractionHand.class),b.readIdentifier(),b.readBlockPos(),b.readBlockPos(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readVarInt(),b.readBoolean(),b.readBoolean(),b.readVarInt(),b.readVarLong(),b.readVarLong(),b.readVarLong(),b.readVarLong()));
         @Override public Type<VolumeState> type(){return TYPE;}
     }
+    public record DesignRequest(Identifier dimension,BlockPos pos) implements CustomPacketPayload {
+        public static final Type<DesignRequest> TYPE=new Type<>(Identifier.fromNamespaceAndPath("paintableblocks","design_request"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,DesignRequest> CODEC=StreamCodec.of((b,v)->{b.writeIdentifier(v.dimension);b.writeBlockPos(v.pos);},b->new DesignRequest(b.readIdentifier(),b.readBlockPos()));
+        @Override public Type<DesignRequest> type(){return TYPE;}
+    }
+    public record DesignSync(Identifier dimension,BlockPos pos,UUID block,long before,long after,net.nicomar.paintableblocks.design.BlockDesign full,
+            java.util.List<Long> removed,java.util.Map<Integer,Integer> paints,int orientation,net.nicomar.paintableblocks.design.SlopePlane plane) implements CustomPacketPayload {
+        public static final Type<DesignSync> TYPE=new Type<>(Identifier.fromNamespaceAndPath("paintableblocks","design_sync"));
+        public static final StreamCodec<RegistryFriendlyByteBuf,DesignSync> CODEC=StreamCodec.of((b,v)->{
+            b.writeIdentifier(v.dimension);b.writeBlockPos(v.pos);b.writeUUID(v.block);b.writeLong(v.before);b.writeLong(v.after);b.writeBoolean(v.full!=null);
+            if(v.full!=null){DesignWireCodec.write(b,v.full);return;}
+            b.writeVarInt(v.removed.size());for(long word:v.removed)b.writeLong(word);b.writeVarInt(v.paints.size());for(var e:v.paints.entrySet()){b.writeVarInt(e.getKey());b.writeVarInt(e.getValue());}b.writeVarInt(v.orientation);b.writeBoolean(v.plane!=null);if(v.plane!=null)DesignWireCodec.plane(b,v.plane);
+        },b->{
+            var dimension=b.readIdentifier();var pos=b.readBlockPos();var block=b.readUUID();long before=b.readLong(),after=b.readLong();
+            if(b.readBoolean())return new DesignSync(dimension,pos,block,before,after,DesignWireCodec.read(b),java.util.List.of(),java.util.Map.of(),0,null);
+            int count=b.readVarInt();if(count<0||count>64)throw new IllegalArgumentException("Invalid occupation delta");var removed=new java.util.ArrayList<Long>();for(int i=0;i<count;i++)removed.add(b.readLong());
+            count=b.readVarInt();if(count<0||count>1024)throw new IllegalArgumentException("Invalid paint delta");var paints=new java.util.TreeMap<Integer,Integer>();for(int i=0;i<count;i++){int key=b.readVarInt(),id=b.readVarInt();if(paints.put(key,id)!=null)throw new IllegalArgumentException("Duplicate paint delta");}
+            int orientation=b.readVarInt();var plane=b.readBoolean()?DesignWireCodec.plane(b):null;
+            return new DesignSync(dimension,pos,block,before,after,null,java.util.List.copyOf(removed),java.util.Map.copyOf(paints),orientation,plane);
+        });
+        @Override public Type<DesignSync> type(){return TYPE;}
+    }
     public static void register(RegisterPayloadHandlersEvent event){
-        var registrar=event.registrar("5");
+        var registrar=event.registrar("6");
         registrar.playToServer(Use.TYPE,Use.CODEC,(v,ctx)->ServerInteractions.use(ctx.player(),v));
         registrar.playToClient(Selection.TYPE,Selection.CODEC);
         registrar.playToClient(VolumeState.TYPE,VolumeState.CODEC);
+        registrar.playToClient(DesignSync.TYPE,DesignSync.CODEC);
+        registrar.playToServer(DesignRequest.TYPE,DesignRequest.CODEC,(v,ctx)->DesignUpdates.resync(ctx.player(),v));
         registrar.playToServer(VolumeAction.TYPE,VolumeAction.CODEC,(v,ctx)->net.nicomar.paintableblocks.interaction.VolumeEditing.action(ctx.player(),v));
         registrar.playToServer(ProductionAction.TYPE,ProductionAction.CODEC,(v,ctx)->{var p=ctx.player();if(p.containerMenu instanceof net.nicomar.paintableblocks.menu.WorkstationMenu menu&&menu.containerId==v.container)menu.action(p,v.action,v.variant,v.expectedResolution,v.expectedMaterial);});
         registrar.playToServer(BucketAction.TYPE,BucketAction.CODEC,(v,ctx)->{

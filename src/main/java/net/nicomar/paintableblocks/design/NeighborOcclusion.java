@@ -8,63 +8,52 @@ import net.minecraft.world.phys.Vec3;
 /** Surface coverage across independent neighboring pieces, including mixed subdivisions. */
 public final class NeighborOcclusion {
     private NeighborOcclusion(){}
-    private record Stamp(BlockDesign.GeometryKey geometry,int orientation){}
-    private record Key(Stamp design,List<Stamp> neighbors){}
-    private static final LinkedHashMap<Key,Map<Integer,List<List<Vec3>>>> CACHE=new LinkedHashMap<>(16,.75F,true);
-    private static int cachedVertices;
-    private static Stamp stamp(BlockDesign d){return d==null?new Stamp(null,0):new Stamp(d.geometryKey(),d.orientation());}
-    private static int vertices(Map<Integer,List<List<Vec3>>> value){return value.values().stream().flatMap(List::stream).mapToInt(List::size).sum();}
-    public static List<BlockDesign> neighbors(java.util.function.Function<BlockPos,BlockDesign> lookup,BlockPos pos){var out=new ArrayList<BlockDesign>();for(var direction:Direction.values())out.add(lookup.apply(pos.relative(direction)));return java.util.Collections.unmodifiableList(out);}
-    public static Set<Integer> hidden(BlockDesign design,List<BlockDesign> neighbors){
-        var hidden=new HashSet<Integer>();
-        for(var surface:DesignGeometry.surfaces(design)){
-            if(surface.slope())continue;var face=DesignOrientation.direction(design.orientation(),surface.face());int axis=SlopeGeometry.axis(face);double boundary=face.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0;
-            var polygon=SlopeGeometry.polygon(design,surface).stream().map(v->DesignOrientation.rotate(design.orientation(),v)).toList();
-            if(polygon.stream().anyMatch(v->Math.abs(coordinate(v,axis)-boundary)>1e-8))continue;
-            var neighbor=neighbors.get(face.ordinal());if(neighbor==null)continue;double covered=0;
-            for(var other:DesignGeometry.surfaces(neighbor)){
-                if(other.slope()||DesignOrientation.direction(neighbor.orientation(),other.face())!=face.getOpposite())continue;
-                var otherPolygon=SlopeGeometry.polygon(neighbor,other).stream().map(v->DesignOrientation.rotate(neighbor.orientation(),v).add(face.getStepX(),face.getStepY(),face.getStepZ())).toList();
-                if(otherPolygon.stream().anyMatch(v->Math.abs(coordinate(v,axis)-boundary)>1e-8))continue;
-                covered+=SlopeGeometry.area(intersection(polygon,otherPolygon,axis));
-            }
-            if(covered>=SlopeGeometry.area(polygon)-1e-9)hidden.add(surface.key());
-        }return Set.copyOf(hidden);
+    private record Key(BoundaryGeometry.Face own,BoundaryGeometry.Coverage other,int direction,int orientation){}
+    private record WholeKey(BlockDesign.GeometryKey geometry,int orientation,List<BoundaryGeometry.Coverage> neighbors){}
+    private static final net.nicomar.paintableblocks.performance.WorkCache<WholeKey,Map<Integer,List<List<Vec3>>>> WHOLE=new net.nicomar.paintableblocks.performance.WorkCache<>("visibility",256,262144);
+    private static final class SurfaceMap extends AbstractMap<Integer,List<List<Vec3>>> {
+        private final Map<Integer,List<List<Vec3>>> data;private final int hash;
+        SurfaceMap(Map<Integer,List<List<Vec3>>> data){this.data=Map.copyOf(data);hash=this.data.hashCode();}
+        @Override public Set<Entry<Integer,List<List<Vec3>>>> entrySet(){return data.entrySet();}
+        @Override public List<List<Vec3>> get(Object key){return data.get(key);}
+        @Override public int hashCode(){return hash;}
     }
-    /** Override boundary polygons with their actual exterior difference, including partially covered contacts. */
+    private static final net.nicomar.paintableblocks.performance.WorkCache<Key,Map<Integer,List<List<Vec3>>>> CACHE=new net.nicomar.paintableblocks.performance.WorkCache<>("contacts",512,262144);
+    public static List<BlockDesign> neighbors(java.util.function.Function<BlockPos,BlockDesign> lookup,BlockPos pos){var out=new ArrayList<BlockDesign>();for(var direction:Direction.values())out.add(lookup.apply(pos.relative(direction)));return java.util.Collections.unmodifiableList(out);}
+    public static Set<Integer> hidden(BlockDesign design,List<BlockDesign> neighbors){var result=new HashSet<Integer>();for(var e:visible(design,neighbors).entrySet())if(e.getValue().isEmpty())result.add(e.getKey());return Set.copyOf(result);}
     public static Map<Integer,List<List<Vec3>>> visible(BlockDesign design,List<BlockDesign> neighbors){
-        var key=new Key(stamp(design),neighbors.stream().map(NeighborOcclusion::stamp).toList());
-        synchronized(CACHE){var cached=CACHE.get(key);if(cached!=null)return cached;}
-        var result=visibleUncached(design,neighbors);int count=vertices(result);
-        if(count<=65536)synchronized(CACHE){var raced=CACHE.get(key);if(raced!=null)return raced;while(!CACHE.isEmpty()&&(CACHE.size()>=64||cachedVertices+count>65536)){var iterator=CACHE.entrySet().iterator();cachedVertices-=vertices(iterator.next().getValue());iterator.remove();}CACHE.put(key,result);cachedVertices+=count;}
-        return result;
+        List<BoundaryGeometry.Coverage> stamps=new ArrayList<>();for(var direction:Direction.values()){var d=neighbors.get(direction.ordinal());stamps.add(d==null?BoundaryGeometry.EMPTY:BoundaryGeometry.faces(d).get(direction.getOpposite().ordinal()).stamp());}
+        return WHOLE.get(new WholeKey(design.geometryKey(),design.orientation(),List.copyOf(stamps)),()->visibleUncached(design,neighbors),map->{int count=map.size();for(var list:map.values())for(var p:list)count+=p.size();return count;});
     }
     private static Map<Integer,List<List<Vec3>>> visibleUncached(BlockDesign design,List<BlockDesign> neighbors){
-        Map<Integer,List<List<Vec3>>> result=new HashMap<>();
-        for(var surface:DesignGeometry.surfaces(design)){
-            if(surface.slope())continue;var face=DesignOrientation.direction(design.orientation(),surface.face());var neighbor=neighbors.get(face.ordinal());if(neighbor==null)continue;
-            int axis=SlopeGeometry.axis(face);double boundary=face.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0;
-            var original=SlopeGeometry.polygon(design,surface).stream().map(v->DesignOrientation.rotate(design.orientation(),v)).toList();
-            if(original.stream().anyMatch(v->Math.abs(coordinate(v,axis)-boundary)>1e-8))continue;
-            List<List<Vec3>> fragments=new ArrayList<>();fragments.add(original);
-            for(var other:DesignGeometry.surfaces(neighbor)){
-                if(other.slope()||DesignOrientation.direction(neighbor.orientation(),other.face())!=face.getOpposite())continue;
-                var mask=SlopeGeometry.polygon(neighbor,other).stream().map(v->DesignOrientation.rotate(neighbor.orientation(),v).add(face.getStepX(),face.getStepY(),face.getStepZ())).toList();
-                if(mask.stream().anyMatch(v->Math.abs(coordinate(v,axis)-boundary)>1e-8))continue;
+        Map<Integer,List<List<Vec3>>> result=new HashMap<>();var frontiers=BoundaryGeometry.faces(design);
+        for(var face:Direction.values()){
+            var neighbor=neighbors.get(face.ordinal());if(neighbor==null)continue;var own=frontiers.get(face.ordinal());if(own.patches().isEmpty())continue;
+            var other=BoundaryGeometry.faces(neighbor).get(face.getOpposite().ordinal());if(other.patches().isEmpty())continue;
+            if(other.full()){for(var patch:own.patches())result.put(patch.surface(),List.of());continue;}
+            var key=new Key(own,other.stamp(),face.ordinal(),design.orientation());
+            result.putAll(CACHE.get(key,()->contact(design,face,own,other),map->{int count=map.size();for(var list:map.values())for(var polygon:list)count+=polygon.size();return count;}));
+        }return new SurfaceMap(result);
+    }
+    private static Map<Integer,List<List<Vec3>>> contact(BlockDesign design,Direction face,BoundaryGeometry.Face own,BoundaryGeometry.Face other){
+        Map<Integer,List<List<Vec3>>> result=new HashMap<>();int axis=SlopeGeometry.axis(face),inverse=DesignOrientation.inverse(design.orientation());
+        for(var original:own.patches()){
+            List<List<Vec3>> fragments=new ArrayList<>();fragments.add(original.polygon());
+            for(var patch:other.patches()){
+                if(original.u1()<=patch.u0()+1e-10||patch.u1()<=original.u0()+1e-10||original.v1()<=patch.v0()+1e-10||patch.v1()<=original.v0()+1e-10)continue;
+                var mask=patch.polygon().stream().map(p->p.add(face.getStepX(),face.getStepY(),face.getStepZ())).toList();
                 List<List<Vec3>> next=new ArrayList<>();for(var fragment:fragments)next.addAll(subtract(fragment,mask,axis));fragments=next;if(fragments.isEmpty())break;
             }
-            double remaining=fragments.stream().mapToDouble(SlopeGeometry::area).sum();
-            if(remaining<SlopeGeometry.area(original)-1e-9){int inverse=DesignOrientation.inverse(design.orientation());result.put(surface.key(),fragments.stream().map(p->p.stream().map(v->DesignOrientation.rotate(inverse,v)).toList()).toList());}
-        }return Map.copyOf(result);
+            double area=0;for(var fragment:fragments)area+=SlopeGeometry.area(fragment);
+            if(area<SlopeGeometry.area(original.polygon())-1e-9)result.put(original.surface(),fragments.stream().map(p->p.stream().map(v->DesignOrientation.rotate(inverse,v)).toList()).toList());
+        }return new SurfaceMap(result);
     }
     private static List<List<Vec3>> subtract(List<Vec3> subject,List<Vec3> mask,int axis){
-        int bu=(axis+1)%3,bv=(axis+2)%3;
-        if(disjoint(subject,mask,bu)||disjoint(subject,mask,bv)||SlopeGeometry.area(intersection(subject,mask,axis))<1e-12)return List.of(subject);
-        int u=(axis+1)%3,v=(axis+2)%3;double signed=0;for(int i=0;i<mask.size();i++){var a=mask.get(i);var b=mask.get((i+1)%mask.size());signed+=coordinate(a,u)*coordinate(b,v)-coordinate(b,u)*coordinate(a,v);}double sign=signed>=0?1:-1;
+        int u=(axis+1)%3,v=(axis+2)%3;
+        if(disjoint(subject,mask,u)||disjoint(subject,mask,v)||SlopeGeometry.area(intersection(subject,mask,axis))<1e-12)return List.of(subject);
+        double signed=0;for(int i=0;i<mask.size();i++){var a=mask.get(i);var b=mask.get((i+1)%mask.size());signed+=coordinate(a,u)*coordinate(b,v)-coordinate(b,u)*coordinate(a,v);}double sign=signed>=0?1:-1;
         var inside=subject;List<List<Vec3>> result=new ArrayList<>();
-        for(int i=0;i<mask.size()&&!inside.isEmpty();i++){
-            var a=mask.get(i);var b=mask.get((i+1)%mask.size());var outside=cut(inside,a,b,u,v,-sign);if(SlopeGeometry.area(outside)>1e-12)result.add(outside);inside=cut(inside,a,b,u,v,sign);
-        }return result;
+        for(int i=0;i<mask.size()&&!inside.isEmpty();i++){var a=mask.get(i);var b=mask.get((i+1)%mask.size());var outside=cut(inside,a,b,u,v,-sign);if(SlopeGeometry.area(outside)>1e-12)result.add(outside);inside=cut(inside,a,b,u,v,sign);}return result;
     }
     private static boolean disjoint(List<Vec3> a,List<Vec3> b,int axis){
         double amin=Double.POSITIVE_INFINITY,amax=Double.NEGATIVE_INFINITY,bmin=Double.POSITIVE_INFINITY,bmax=Double.NEGATIVE_INFINITY;

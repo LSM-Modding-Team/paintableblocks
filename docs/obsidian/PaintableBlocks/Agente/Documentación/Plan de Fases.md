@@ -145,3 +145,7 @@ Esta entrega modifica únicamente documentación. Las filas nuevas siguen pendie
 Por elección del usuario se implementan pestañas, recorte volumétrico, datos/geometría, formador, pintura/conservación y recursos del formador. Estado: **código y recursos preparados**, revisión estática; compilación y Minecraft no ejecutados. Formato 2 compatible con datos 1, protocolo 5. Se resuelven nombre, receta y durabilidad del formador con autorización para decidir.
 
 Siguientes alternativas: revisión estática adicional, correcciones concretas o comprobaciones de marcha, guardado, red y rendimiento cuando se autorice ejecución. No se impone un orden global. [Evidencia y límites](../../../../technical/slopes-and-volumes.md).
+
+## Ejecución: optimizaciones de rendimiento
+
+El usuario eligió implementar todas las soluciones de la revisión. Se preparan geometría y cachés compartidas, simplificación de mallas/contornos, ray tracing por celdas, trabajo volumétrico reanudable por chunks, actualizaciones agrupadas, producción y sincronización incremental. Se añaden métricas bajo demanda y regresiones preparadas. Estado: **implementado en código, revisión estática; sin compilación, juego ni mediciones**. [Cobertura y siguientes escenarios de verificación](../../../../technical/performance.md).

@@ -68,3 +68,7 @@ Esta ampliación modifica la afirmación anterior de que solo se desgastan las r
 ## Implementación de las ampliaciones
 
 Formato 2 con migración desde 1, plano entero normalizado, cara inclinada independiente, selección por polígonos, colisión a 1/16 y protocolo 5 preparados. Ejecución volumétrica con presupuesto compartido y tres pestañas propias. La representación resta contactos completos y parciales entre piezas y mantiene cachés acotadas por geometría. Ver [informe](../../../../technical/slopes-and-volumes.md); sin ejecución Java/Minecraft.
+
+## Optimización de los sistemas
+
+Geometría validada y cachés compartidas independientes de pintura, recorte reanudable, fronteras e índices por celda/chunk y representación visual fusionada. Las celdas y reglas de selección permanecen intactas. Actualizaciones agrupadas, diferencias con recuperación completa y protocolo 6; persistencia 2 compatible con 1. Las máquinas reutilizan la simulación de salidas sin omitir la comprobación final. [Detalles de implementación, presupuestos y límites](../../../../technical/performance.md). Código preparado y revisión estática, sin ejecución de juego ni mediciones de rendimiento.

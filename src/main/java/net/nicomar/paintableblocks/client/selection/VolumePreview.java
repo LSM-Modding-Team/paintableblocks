@@ -25,17 +25,23 @@ public final class VolumePreview {
     private static ModNetworking.VolumeState state;
     private static long opened;
     private static Object item;private static int slot;
+    private record PreviewKey(VolumeRegion region,boolean former,boolean create,int direction,boolean upper,BlockDesign.GeometryKey geometry,int orientation){}
+    private record Preview(PreviewKey key,PreviewLines shape){}
+    private static final java.util.Map<net.minecraft.core.BlockPos,Preview> PREVIEWS=new java.util.HashMap<>();
+    private static long feedbackTick;
+    private static boolean previewPending;
+
     public static ModNetworking.VolumeState state(){return state;}
     private VolumePreview(){}
     public static void register(){NeoForge.EVENT_BUS.addListener(VolumePreview::key);NeoForge.EVENT_BUS.addListener(VolumePreview::tick);NeoForge.EVENT_BUS.addListener(VolumePreview::outline);}
     public static void payloads(RegisterClientPayloadHandlersEvent e){e.register(ModNetworking.VolumeState.TYPE,(v,ctx)->{
         var c=Minecraft.getInstance();if(c.player==null||c.level==null||!v.dimension().equals(c.level.dimension().identifier()))return;
         if(state!=null&&v.id()<state.id())return;
-        if(v.phase()==0){state=null;return;}state=v;item=c.player.getItemInHand(v.hand()).getItem();slot=c.player.getInventory().getSelectedSlot();
+        if(v.phase()==0){state=null;PREVIEWS.clear();return;}state=v;feedbackTick=0;item=c.player.getItemInHand(v.hand()).getItem();slot=c.player.getInventory().getSelectedSlot();
         if(v.former()&&v.phase()!=VolumeEditing.FIRST&&opened!=v.id()){opened=v.id();c.gui.setScreen(new SlopeFormerScreen());}
     });}
     public static void action(int action,int direction,boolean upper,boolean create,int width,int height,int depth,int resolution){if(state!=null)ClientPacketDistributor.sendToServer(new ModNetworking.VolumeAction(state.id(),action,direction,upper,create,width,height,depth,resolution));}
-    public static void cancel(){if(state!=null){action(2,0,false,false,1,1,1,1);state=null;}}
+    public static void cancel(){if(state!=null){action(2,0,false,false,1,1,1,1);state=null;PREVIEWS.clear();}}
     private static boolean control(){var c=Minecraft.getInstance();return InputConstants.isKeyDown(c.getWindow(),GLFW.GLFW_KEY_LEFT_CONTROL)||InputConstants.isKeyDown(c.getWindow(),GLFW.GLFW_KEY_RIGHT_CONTROL);}
     /** Called before the ordinary brush/editor input handler; consumes only volume tools. */
     public static boolean input(InputEvent.InteractionKeyMappingTriggered e){
@@ -52,13 +58,16 @@ public final class VolumePreview {
     }
     private static void key(InputEvent.Key e){if(e.getKey()==GLFW.GLFW_KEY_ESCAPE&&e.getAction()==GLFW.GLFW_PRESS)cancel();}
     private static void tick(ClientTickEvent.Post e){
-        var c=Minecraft.getInstance();if(state==null)return;if(c.player==null||c.level==null){state=null;return;}
+        var c=Minecraft.getInstance();if(state==null)return;if(c.player==null||c.level==null){state=null;PREVIEWS.clear();return;}
         if(!state.dimension().equals(c.level.dimension().identifier())||c.player.getItemInHand(state.hand()).getItem()!=item||state.hand()==InteractionHand.MAIN_HAND&&c.player.getInventory().getSelectedSlot()!=slot){cancel();return;}
-        if(c.gui.screen()==null){
+        prepare();
+        if(c.gui.screen()==null&&(feedbackTick==0||c.level.getGameTime()-feedbackTick>=20)){
+            feedbackTick=c.level.getGameTime();
             Component text=state.phase()==VolumeEditing.FIRST?Component.translatable("message.paintableblocks.volume_first"):
                     state.phase()==VolumeEditing.READY?Component.translatable("message.paintableblocks.volume_ready",state.affected(),state.ignored()):
                     Component.translatable("message.paintableblocks.volume_progress",state.reviewed(),region(state).size(),state.modified(),state.ignored());
-            c.gui.hud.setOverlayMessage(text.copy().append(" ").append(Component.translatable("message.paintableblocks.volume_warning_short")),false);
+            boolean simplified=PREVIEWS.values().stream().anyMatch(v->v.shape().simplified||v.shape().count()>8192/Math.max(1,PREVIEWS.size()));
+            c.gui.hud.setOverlayMessage(text.copy().append(" ").append(Component.translatable("message.paintableblocks.volume_warning_short")).append(simplified?Component.translatable("message.paintableblocks.preview_simplified"):Component.empty()).append(previewPending?Component.translatable("message.paintableblocks.preview_loading"):Component.empty()),false);
         }
     }
     public static VolumeRegion region(ModNetworking.VolumeState s){return new VolumeRegion(s.x0(),s.y0(),s.z0(),s.x1(),s.y1(),s.z1());}
@@ -67,13 +76,21 @@ public final class VolumePreview {
         VoxelShape box=Shapes.box(r.x0()/16.0-anchor.getX(),r.y0()/16.0-anchor.getY(),r.z0()/16.0-anchor.getZ(),r.x1()/16.0-anchor.getX(),r.y1()/16.0-anchor.getY(),r.z1()/16.0-anchor.getZ());
         int color=s.phase()==VolumeEditing.READY?0xff55ff88:0xffffcc55;
         e.addCustomRenderer((render,collector,poses,levelState)->{var camera=levelState.cameraRenderState.pos;poses.pushPose();poses.translate(anchor.getX()-camera.x,anchor.getY()-camera.y,anchor.getZ()-camera.z);collector.order(1).submitShapeOutline(poses,box,RenderTypes.lines(),color,2.5F,false);poses.popPose();return true;});
-        // At most 27 nearby pieces: distant selections never allocate a complete mesh.
-        var center=c.player.blockPosition();for(int z=-1;z<=1;z++)for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){
-            var pos=center.offset(x,y,z);if(pos.getX()<r.min().getX()||pos.getX()>r.max().getX()||pos.getY()<r.min().getY()||pos.getY()>r.max().getY()||pos.getZ()<r.min().getZ()||pos.getZ()>r.max().getZ()||!c.level.hasChunkAt(pos))continue;
-            if(!(c.level.getBlockEntity(pos) instanceof PaintableBlockEntity be)||!be.valid())continue;var d=be.design();
-            try{var plan=s.former()?new net.nicomar.paintableblocks.operation.DesignOperations.Plan(d,d.withSlope(r.plane(pos,d,s.direction(),s.upper())),java.util.List.of(),java.util.List.of(),0):r.hammer(pos,d);var shape=s.former()?new DesignOutlineShape(plan.after()):SelectionPreview.cells(plan);
-                e.addCustomRenderer((render,collector,poses,levelState)->{var camera=levelState.cameraRenderState.pos;poses.pushPose();poses.translate(pos.getX()-camera.x,pos.getY()-camera.y,pos.getZ()-camera.z);collector.order(1).submitShapeOutline(poses,shape,RenderTypes.lines(),color,1.5F,false);poses.popPose();return false;});
-            }catch(IllegalArgumentException ignored){}
+        for(var entry:PREVIEWS.entrySet()){
+            var pos=entry.getKey();var shape=entry.getValue().shape().limited(8192/Math.max(1,PREVIEWS.size()));
+            e.addCustomRenderer((render,collector,poses,levelState)->{var camera=levelState.cameraRenderState.pos;poses.pushPose();poses.translate(pos.getX()-camera.x,pos.getY()-camera.y,pos.getZ()-camera.z);collector.order(1).submitShapeOutline(poses,shape,RenderTypes.lines(),color,1.5F,false);poses.popPose();return false;});
         }
+    }
+    private static void prepare(){
+        var c=Minecraft.getInstance();var s=state;if(s==null)return;var r=region(s);var center=c.player.blockPosition();var wanted=new java.util.HashSet<net.minecraft.core.BlockPos>();
+        long end=System.nanoTime()+1_000_000;int remaining=2;
+        for(int z=-1;z<=1;z++)for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){
+            var pos=center.offset(x,y,z);if(pos.getX()<r.min().getX()||pos.getX()>r.max().getX()||pos.getY()<r.min().getY()||pos.getY()>r.max().getY()||pos.getZ()<r.min().getZ()||pos.getZ()>r.max().getZ()||!c.level.hasChunkAt(pos))continue;
+            BlockDesign d;if(s.create()){if(!c.level.getBlockState(pos).isAir())continue;d=BlockDesign.full(s.resolution());}else{if(!(c.level.getBlockEntity(pos) instanceof PaintableBlockEntity be)||!be.valid())continue;d=be.design();}
+            var key=new PreviewKey(r,s.former(),s.create(),s.direction(),s.upper(),d.geometryKey(),d.orientation());wanted.add(pos);var cached=PREVIEWS.get(pos);
+            if(cached!=null&&cached.key().equals(key))continue;PREVIEWS.remove(pos);
+            if(remaining<=0||System.nanoTime()>=end)continue;
+            try{var clean=d.withoutPaint();var shape=s.former()?new DesignOutlineShape(clean.withSlope(r.plane(pos,clean,s.direction(),s.upper()))):SelectionPreview.cells(r.hammer(pos,clean));PREVIEWS.put(pos,new Preview(key,PreviewLines.capture(shape)));remaining--;}catch(IllegalArgumentException ignored){}
+        }PREVIEWS.keySet().retainAll(wanted);boolean pending=PREVIEWS.size()<wanted.size();if(pending!=previewPending){previewPending=pending;feedbackTick=0;}
     }
 }

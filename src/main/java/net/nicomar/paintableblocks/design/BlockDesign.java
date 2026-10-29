@@ -26,7 +26,13 @@ public final class BlockDesign {
                 Codec.INT.fieldOf("orientation").forGetter(Data::orientation), SlopePlane.CODEC.optionalFieldOf("slope").forGetter(Data::slope)).apply(i, Data::new));
     }
     public static final Codec<BlockDesign> CODEC = Data.CODEC.flatXmap(BlockDesign::decode, d -> DataResult.success(d.data()));
-    public record GeometryKey(int resolution,List<Long> occupied,SlopePlane slope){public GeometryKey{occupied=List.copyOf(occupied);}}
+    public static final class GeometryKey {
+        private final int resolution,hash;private final List<Long> occupied;private final SlopePlane slope;
+        public GeometryKey(int resolution,List<Long> occupied,SlopePlane slope){this.resolution=resolution;this.occupied=List.copyOf(occupied);this.slope=slope;hash=java.util.Objects.hash(resolution,this.occupied,slope);}
+        public int resolution(){return resolution;}public List<Long> occupied(){return occupied;}public SlopePlane slope(){return slope;}
+        @Override public int hashCode(){return hash;}
+        @Override public boolean equals(Object o){return o instanceof GeometryKey k&&resolution==k.resolution&&java.util.Objects.equals(slope,k.slope)&&occupied.equals(k.occupied);}
+    }
     private final GeometryKey geometryKey;
     public GeometryKey geometryKey(){return geometryKey;}
     private final int resolution, orientation;
@@ -34,36 +40,40 @@ public final class BlockDesign {
     public SlopePlane slope(){return slope;}
     public static final int SLOPE_KEY=24576;
     private final BitSet occupied;
-    private final Map<Integer,Integer> paints;
+    private final java.util.NavigableMap<Integer,Integer> paints;
     private final int hash;
+    private final int paintHash;
+    private static final net.nicomar.paintableblocks.performance.WorkCache<BlockDesign,Data> SNAPSHOTS=new net.nicomar.paintableblocks.performance.WorkCache<>("persistent-snapshots",256,262144);
+    private static final java.util.concurrent.ConcurrentMap<Integer,BlockDesign> FULL=new java.util.concurrent.ConcurrentHashMap<>();
     private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation) {
         this(resolution,occupied,paints,orientation,null);
     }
-    private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation,SlopePlane slope) {
+    private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation,SlopePlane slope) {this(resolution,occupied,paints,orientation,slope,false);}
+    private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation,SlopePlane slope,boolean trusted) {
         this.slope=slope;
         this.resolution=PaintingBalance.requireResolution(resolution);
         this.orientation=DesignOrientation.require(orientation);
         this.occupied=(BitSet)occupied.clone();
         this.geometryKey=new GeometryKey(resolution,java.util.Arrays.stream(this.occupied.toLongArray()).boxed().toList(),slope);
         if(occupied.length()>resolution*resolution*resolution) throw new IllegalArgumentException("Occupation outside block");
-        if(slope!=null)for(int cell=this.occupied.nextSetBit(0);cell>=0;cell=this.occupied.nextSetBit(cell+1)){
-            double min=Double.POSITIVE_INFINITY;for(var corner:corners(cell))min=Math.min(min,slope.a()*corner.x+slope.b()*corner.y+slope.c()*corner.z-slope.offset());
+        if(!trusted&&slope!=null)for(int cell=this.occupied.nextSetBit(0);cell>=0;cell=this.occupied.nextSetBit(cell+1)){
+            double min=planeMinimum(cell,slope);
             if(min>=-1e-10)throw new IllegalArgumentException("Occupied cell has no volume inside slope");
         }
         TreeMap<Integer,Integer> sorted = new TreeMap<>();
         for(var e:paints.entrySet()) {
             int key=e.getKey(), paint=e.getValue();
-            if(key<0 || key>=SLOPE_KEY+resolution*resolution*resolution || !PaintCatalog.validId(paint) || !validSurfaceKey(key)) {
+            if(!trusted&&(key<0 || key>=SLOPE_KEY+resolution*resolution*resolution || !PaintCatalog.validId(paint) || !validSurfaceKey(key))) {
                 throw new IllegalArgumentException("Paint must identify a valid exposed face");
             }
             sorted.put(key,paint);
         }
-        this.paints=Collections.unmodifiableMap(sorted);
-        hash=java.util.Objects.hash(resolution,orientation,this.occupied,this.paints,slope);
+        this.paints=Collections.unmodifiableNavigableMap(sorted);paintHash=sorted.hashCode();
+        hash=designHash();
     }
+    public static BlockDesign restore(int n,long[] words,Map<Integer,Integer> paints,int orientation,SlopePlane slope){return new BlockDesign(n,BitSet.valueOf(words),paints,orientation,slope);}
     public static BlockDesign full(int n) {
-        PaintingBalance.requireResolution(n);BitSet bits=new BitSet(n*n*n);bits.set(0,n*n*n);
-        return new BlockDesign(n,bits,Map.of(),0);
+        PaintingBalance.requireResolution(n);return FULL.computeIfAbsent(n,k->{BitSet bits=new BitSet(k*k*k);bits.set(0,k*k*k);return new BlockDesign(k,bits,Map.of(),0);});
     }
     private static DataResult<BlockDesign> decode(Data data) {
         try {
@@ -76,7 +86,8 @@ public final class BlockDesign {
             return DataResult.success(new BlockDesign(n,BitSet.valueOf(words),paints,data.orientation(),data.version()==1?null:data.slope().orElse(null)));
         } catch(IllegalArgumentException e) { return DataResult.error(e::getMessage); }
     }
-    private Data data() {
+    private Data data(){return SNAPSHOTS.get(this,this::buildData,d->d.paints().size()+d.occupied().size()+1);}
+    private Data buildData() {
         long[] words=java.util.Arrays.copyOf(occupied.toLongArray(),(resolution*resolution*resolution+63)/64);
         return new Data(VERSION,resolution,java.util.Arrays.stream(words).boxed().toList(),
                 paints.entrySet().stream().map(e->new Face(e.getKey(),e.getValue())).toList(),orientation,java.util.Optional.ofNullable(slope));
@@ -101,23 +112,29 @@ public final class BlockDesign {
             key>=0&&key<resolution*resolution*resolution*6&&exposed(key/6,Direction.values()[key%6]);}
     public int paint(DesignGeometry.Surface s){return paints.getOrDefault(s.key(),0);}
     public int paint(int cell,Direction face){return paints.getOrDefault(cell*6+face.ordinal(),0);}
-    public BlockDesign withOrientation(int orientation){return new BlockDesign(resolution,occupied,paints,orientation,slope);}
-    public BlockDesign withoutPaint(){return painted()?new BlockDesign(resolution,occupied,Map.of(),orientation,slope):this;}
-    public BlockDesign paint(int cell,Direction face,int paint){
-        if(!exposed(cell,face))throw new IllegalArgumentException("Surface is hidden or absent");
-        TreeMap<Integer,Integer> next=new TreeMap<>(paints);
-        if(paint==0)next.remove(cell*6+face.ordinal());else next.put(cell*6+face.ordinal(),paint);
-        return new BlockDesign(resolution,occupied,next,orientation,slope);
+    public BlockDesign withOrientation(int orientation){return orientation==this.orientation?this:new BlockDesign(this,paints,orientation);}
+    public BlockDesign withoutPaint(){return painted()?new BlockDesign(this,Collections.emptyNavigableMap(),orientation):this;}
+    /** Trusted internal path: geometry and existing paints were validated already. */
+    private BlockDesign(BlockDesign geometry,java.util.NavigableMap<Integer,Integer> paints,int orientation){this(geometry,paints,orientation,paints==geometry.paints?geometry.paintHash:paints.hashCode());}
+    private BlockDesign(BlockDesign geometry,java.util.NavigableMap<Integer,Integer> paints,int orientation,int paintHash){
+        resolution=geometry.resolution;this.orientation=DesignOrientation.require(orientation);slope=geometry.slope;occupied=geometry.occupied;geometryKey=geometry.geometryKey;
+        this.paints=Collections.unmodifiableNavigableMap(paints);this.paintHash=paintHash;hash=designHash();
     }
+    public BlockDesign paint(int cell,Direction face,int paint){return paintFaces(Map.of(cell*6+face.ordinal(),paint));}
     public BlockDesign paintFaces(Map<Integer,Integer> changes){
-        TreeMap<Integer,Integer> next=new TreeMap<>(paints);
-        changes.forEach((key,id)->{if(id==0)next.remove(key);else next.put(key,id);});
-        return new BlockDesign(resolution,occupied,next,orientation,slope);
+        boolean changed=false;
+        for(var e:changes.entrySet()){
+            if(!validSurfaceKey(e.getKey())||e.getValue()!=0&&!PaintCatalog.validId(e.getValue()))throw new IllegalArgumentException("Invalid changed paint surface");
+            if(paints.getOrDefault(e.getKey(),0).intValue()!=e.getValue())changed=true;
+        }
+        if(!changed)return this;TreeMap<Integer,Integer> next=new TreeMap<>(paints);
+        for(var e:changes.entrySet())if(e.getValue()==0)next.remove(e.getKey());else next.put(e.getKey(),e.getValue());
+        return new BlockDesign(this,next,orientation);
     }
     public BlockDesign remove(BitSet cells){
-        BitSet next=(BitSet)occupied.clone();next.andNot(cells);
+        BitSet next=(BitSet)occupied.clone();next.andNot(cells);if(next.equals(occupied))return this;
         TreeMap<Integer,Integer> paint=new TreeMap<>(paints);paint.keySet().removeIf(k->!next.get(k>=SLOPE_KEY?k-SLOPE_KEY:k/6));
-        return new BlockDesign(resolution,next,paint,orientation,slope);
+        return new BlockDesign(resolution,next,paint,orientation,slope,true);
     }
     public BlockDesign converted(int n){
         if(!complete()||painted())throw new IllegalStateException("Conversion requires a complete unpainted block");
@@ -135,22 +152,25 @@ public final class BlockDesign {
         if(slope!=null)for(var e:paints.entrySet())if(e.getKey()>=SLOPE_KEY){int cell=e.getKey()-SLOPE_KEY;int[] p=DesignOrientation.cell(orientation,x(cell),y(cell),z(cell),resolution);paint.put(SLOPE_KEY+index(p[0],p[1],p[2]),e.getValue());}
         return new BlockDesign(resolution,bits,paint,0,slope==null?null:slope.rotated(orientation));
     }
-    public BlockDesign withSlope(SlopePlane plane){
-        if(slope!=null&&!slope.equals(plane))throw new IllegalArgumentException("A piece accepts only its existing slope plane");
-        if(slope!=null)return this;
-        BitSet bits=(BitSet)occupied.clone();boolean changed=false;
-        for(int cell=bits.nextSetBit(0);cell>=0;cell=bits.nextSetBit(cell+1)){
-            double min=Double.POSITIVE_INFINITY,max=Double.NEGATIVE_INFINITY;
-            for(Vec3Corner corner:corners(cell)){double v=plane.a()*corner.x+plane.b()*corner.y+plane.c()*corner.z-plane.offset();min=Math.min(min,v);max=Math.max(max,v);}
-            if(min>=-1e-10){bits.clear(cell);changed=true;}else if(max>1e-10)changed=true;
+    public ClipTask clipTask(SlopePlane plane){return new ClipTask(plane);}
+    public BlockDesign withSlope(SlopePlane plane){var task=clipTask(plane);while(!task.advance(4096)){}return task.result();}
+    /** Resumable pure operation: cells and paint validation are separately budgeted. */
+    public final class ClipTask {
+        private final SlopePlane plane;private final BitSet bits=(BitSet)occupied.clone();private int cell,hash;private boolean changed,geometryDone;private BlockDesign bare,result;private java.util.Iterator<Map.Entry<Integer,Integer>> paintIterator;private final TreeMap<Integer,Integer> kept=new TreeMap<>();
+        private ClipTask(SlopePlane plane){this.plane=plane;if(slope!=null){if(!slope.equals(plane))throw new IllegalArgumentException("A piece accepts only its existing slope plane");result=BlockDesign.this;}}
+        public boolean advance(int budget){
+            if(result!=null)return true;
+            while(budget-->0&&!geometryDone){if(cell==resolution*resolution*resolution){geometryDone=true;break;}int c=cell++;if(!bits.get(c))continue;double min=planeMinimum(c,plane),max=min+(Math.abs(plane.a())+Math.abs(plane.b())+Math.abs(plane.c()))/(double)resolution;if(min>=-1e-10){bits.clear(c);changed=true;}else if(max>1e-10)changed=true;}
+            if(!geometryDone)return false;
+            if(!changed){result=BlockDesign.this;return true;}
+            if(bare==null){bare=new BlockDesign(resolution,bits,Map.of(),orientation,plane,true);paintIterator=paints.entrySet().iterator();}
+            while(budget-->0&&paintIterator.hasNext()){var e=paintIterator.next();if(bare.validSurfaceKey(e.getKey())){kept.put(e.getKey(),e.getValue());hash+=e.getKey().hashCode()^e.getValue().hashCode();}}
+            if(paintIterator.hasNext())return false;result=new BlockDesign(bare,kept,orientation,hash);return true;
         }
-        if(!changed)return this;
-        BlockDesign bare=new BlockDesign(resolution,bits,Map.of(),orientation,plane);
-        TreeMap<Integer,Integer> kept=new TreeMap<>();for(var e:paints.entrySet())if(bare.validSurfaceKey(e.getKey()))kept.put(e.getKey(),e.getValue());
-        return new BlockDesign(resolution,bits,kept,orientation,plane);
+        public BlockDesign result(){if(result==null)throw new IllegalStateException("Unfinished clip task");return result;}
     }
-    private record Vec3Corner(double x,double y,double z){}
-    private List<Vec3Corner> corners(int cell){java.util.ArrayList<Vec3Corner> out=new java.util.ArrayList<>();for(int i=0;i<8;i++)out.add(new Vec3Corner((x(cell)+(i&1))/(double)resolution,(y(cell)+((i>>1)&1))/(double)resolution,(z(cell)+((i>>2)&1))/(double)resolution));return out;}
+    private int designHash(){int out=1;out=31*out+resolution;out=31*out+orientation;out=31*out+occupied.hashCode();out=31*out+paintHash;return 31*out+java.util.Objects.hashCode(slope);}
+    private double planeMinimum(int cell,SlopePlane p){return (p.a()*x(cell)+p.b()*y(cell)+p.c()*z(cell)+Math.min(0,p.a())+Math.min(0,p.b())+Math.min(0,p.c()))/(double)resolution-p.offset();}
     @Override public boolean equals(Object o){return o instanceof BlockDesign d && resolution==d.resolution && orientation==d.orientation && occupied.equals(d.occupied)&&paints.equals(d.paints)&&java.util.Objects.equals(slope,d.slope);}
     @Override public int hashCode(){return hash;}
 }
