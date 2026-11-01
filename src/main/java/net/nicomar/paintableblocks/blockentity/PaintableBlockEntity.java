@@ -42,8 +42,8 @@ public final class PaintableBlockEntity extends BlockEntity {
         var placing=net.nicomar.paintableblocks.design.PlacementDesign.current(pos,n);
         design=placing==null?BlockDesign.full(n):placing;
     }
-    @Override public void setLevel(net.minecraft.world.level.Level next){boolean restored=loadedFromStorage;loadedFromStorage=false;super.setLevel(next);if(!restored)net.nicomar.paintableblocks.interaction.VolumeEditing.changed(next,worldPosition);}
-    @Override public void setRemoved(){net.nicomar.paintableblocks.interaction.VolumeEditing.changed(level,worldPosition);super.setRemoved();}
+    @Override public void setLevel(net.minecraft.world.level.Level next){boolean restored=loadedFromStorage;loadedFromStorage=false;super.setLevel(next);net.nicomar.paintableblocks.performance.VisualInvalidation.around(next,worldPosition);if(!restored)net.nicomar.paintableblocks.interaction.VolumeEditing.changed(next,worldPosition);}
+    @Override public void setRemoved(){net.nicomar.paintableblocks.interaction.VolumeEditing.changed(level,worldPosition);net.nicomar.paintableblocks.performance.VisualInvalidation.around(level,worldPosition);super.setRemoved();}
     public boolean valid(){return valid;}
     public BlockDesign design(){return design;}
     public VoxelShape shape(){
@@ -79,12 +79,8 @@ public final class PaintableBlockEntity extends BlockEntity {
     private void refreshClientMesh(BlockDesign before){
         requestModelDataUpdate();
         if(level!=null&&level.isClientSide()){
-            net.nicomar.paintableblocks.performance.VisualInvalidation.add(level,worldPosition);
-            if(before==null||!before.equals(design))for(var direction:net.minecraft.core.Direction.values()){
-                if(before!=null&&before.paints().equals(design.paints())&&net.nicomar.paintableblocks.design.BoundaryGeometry.faces(before).get(direction.ordinal()).coverage().equals(net.nicomar.paintableblocks.design.BoundaryGeometry.faces(design).get(direction.ordinal()).coverage()))continue;
-                var p=worldPosition.relative(direction);if(level.hasChunkAt(p)){net.nicomar.paintableblocks.performance.VisualInvalidation.add(level,p);}
-            }
-
+            // Coplanar slopes can meet at an edge/corner, beyond the six axial neighbors.
+            if(before==null||!before.equals(design))net.nicomar.paintableblocks.performance.VisualInvalidation.around(level,worldPosition);
         }
     }
     private void refresh(){shape=null;outline=null;support=null;refreshClientMesh(null);}

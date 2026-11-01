@@ -15,6 +15,7 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.quad.BakedColors;
@@ -24,6 +25,7 @@ import net.nicomar.paintableblocks.design.DesignGeometry;
 import net.nicomar.paintableblocks.design.DesignOrientation;
 import net.nicomar.paintableblocks.design.SlopeGeometry;
 import net.nicomar.paintableblocks.design.SlopePlane;
+import net.nicomar.paintableblocks.design.GlassConnections;
 import net.nicomar.paintableblocks.paint.PaintCatalog;
 import org.joml.Vector3f;
 
@@ -43,16 +45,24 @@ public final class DesignMesh {
         @Override public DesignMesh compute(ModelBaker baker){return new DesignMesh(new Variant(baseModel).bake(baker));}
     }
     public Material.Baked particle(){return base.particleMaterial();}
-    private record MeshKey(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior){}
+    private record MeshKey(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior,Map<BlockPos,BlockDesign> surroundings){}
     public Mesh mesh(BlockDesign design){return mesh(design,Map.of());}
     public Mesh mesh(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior){
-        return meshes.get(new MeshKey(design,exterior),()->build(design,exterior),m->m.quads().getAll().size()+exterior.size()+design.paints().size()+64);
+        return mesh(design,exterior,Map.of());
     }
-    private Mesh build(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior){
+    public Mesh mesh(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior,Map<BlockPos,BlockDesign> surroundings){
+        return meshes.get(new MeshKey(design,exterior,surroundings),()->build(design,exterior,surroundings),m->{
+            int weight=m.quads().getAll().size()+exterior.size()+design.paints().size()+64;
+            for(var d:surroundings.values())weight+=d.paints().size()+d.geometryKey().occupied().size()+1;
+            return weight;
+        });
+    }
+    private Mesh build(BlockDesign design,Map<Integer,List<List<Vec3>>> exterior,Map<BlockPos,BlockDesign> surroundings){
         List<BakedQuad> quads=new ArrayList<>();
-        for(var patch:net.nicomar.paintableblocks.design.SurfaceGroups.merge(design,exterior)){
+        for(var patch:GlassConnections.fragments(design,exterior,surroundings)){
             var surface=patch.surface();int id=design.paint(surface);var source=samples.computeIfAbsent(id*6+surface.face().ordinal(),k->sample(id,surface.face()));int before=quads.size();
-            for(var quad:source)project(design,surface,quad,quads,patch.polygon());if(quads.size()==before)for(var quad:baseQuads(surface.face()))project(design,surface,quad,quads,patch.polygon());
+            for(var quad:source)project(design,surface,quad,quads,patch);
+            if(quads.size()==before)for(var quad:baseQuads(surface.face()))project(design,surface,quad,quads,patch);
         }
         QuadCollection.Builder builder=new QuadCollection.Builder();int flags=0;
         for(BakedQuad quad:quads){builder.addUnculledFace(quad);flags|=quad.materialInfo().flags();}
@@ -98,8 +108,8 @@ public final class DesignMesh {
     }
     private static int lerpColor(int a,int b,double t){int out=0;for(int s=0;s<32;s+=8)out|=(int)Math.round(((a>>>s)&255)+(((b>>>s)&255)-((a>>>s)&255))*t)<<s;return out;}
     private static double coordinate(Vec3 p,int axis){return axis==0?p.x:axis==1?p.y:p.z;}
-    private static void project(BlockDesign design,DesignGeometry.Surface surface,BakedQuad source,List<BakedQuad> output){project(design,surface,source,output,SlopeGeometry.polygon(design,surface));}
-    private static void project(BlockDesign design,DesignGeometry.Surface surface,BakedQuad source,List<BakedQuad> output,List<Vec3> polygon){
+    private static void project(BlockDesign design,DesignGeometry.Surface surface,BakedQuad source,List<BakedQuad> output,GlassConnections.Fragment fragment){
+        var polygon=fragment.polygon();
         Direction face=surface.face();int axis=face.getAxis()==Direction.Axis.X?0:face.getAxis()==Direction.Axis.Y?1:2;
         int u=axis==0?2:0,v=axis==1?2:1;
         List<Vertex> vertices=new ArrayList<>();
@@ -116,16 +126,29 @@ public final class DesignMesh {
         List<Vertex> unique=new ArrayList<>();for(Vertex vertex:vertices)if(unique.isEmpty()||unique.getLast().position.distanceToSqr(vertex.position)>1e-16)unique.add(vertex);
         if(unique.size()>1&&unique.getFirst().position.distanceToSqr(unique.getLast().position)<1e-16)unique.removeLast();vertices=unique;if(vertices.size()<3)return;
         var normal=SlopeGeometry.normal(design,surface);double constant=normal.dot(polygon.getFirst());
+        float minU=Float.POSITIVE_INFINITY,minV=minU,maxU=Float.NEGATIVE_INFINITY,maxV=maxU;
+        if(fragment.connected())for(int i=0;i<4;i++){long uv=source.packedUV(i);minU=Math.min(minU,UVPair.unpackU(uv));maxU=Math.max(maxU,UVPair.unpackU(uv));minV=Math.min(minV,UVPair.unpackV(uv));maxV=Math.max(maxV,UVPair.unpackV(uv));}
         List<Vertex> transformed=new ArrayList<>();
         for(Vertex vertex:vertices){Vec3 p=vertex.position;double[] xyzp={p.x,p.y,p.z};xyzp[axis]=(constant-coordinate(normal,u)*xyzp[u]-coordinate(normal,v)*xyzp[v])/coordinate(normal,axis);
-            transformed.add(new Vertex(DesignOrientation.rotate(design.orientation(),new Vec3(xyzp[0],xyzp[1],xyzp[2])),vertex.u,vertex.v,vertex.color));}
+            Vec3 local=new Vec3(xyzp[0],xyzp[1],xyzp[2]);float textureU=vertex.u,textureV=vertex.v;
+            if(fragment.connected()){
+                var border=fragment.border();
+                if(border==null){textureU=minU+(maxU-minU)/16+(vertex.u-minU)*14/16;textureV=minV+(maxV-minV)/16+(vertex.v-minV)*14/16;}
+                else{
+                    var delta=local.subtract(border.start());
+                    double along=Math.clamp(delta.dot(border.along())/border.length(),0,1),inward=Math.clamp(delta.dot(border.inward())/GlassConnections.BORDER_WIDTH,0,1);
+                    textureU=(float)(minU+(maxU-minU)*(1.0/16+along*14/16));
+                    textureV=(float)(minV+(maxV-minV)*(0.001+inward*0.998)/16);
+                }
+            }
+            transformed.add(new Vertex(DesignOrientation.rotate(design.orientation(),local),textureU,textureV,vertex.color));}
         Direction direction=DesignOrientation.direction(design.orientation(),face);
         if(transformed.size()==4){
             emit(transformed.get(0),transformed.get(1),transformed.get(2),transformed.get(3),direction,source.materialInfo(),output);
-            if(PaintCatalog.isGlass(design.paint(surface)))emit(transformed.get(3),transformed.get(2),transformed.get(1),transformed.get(0),direction.getOpposite(),source.materialInfo(),output);
+            if(fragment.doubleSided()&&PaintCatalog.isGlass(design.paint(surface)))emit(transformed.get(3),transformed.get(2),transformed.get(1),transformed.get(0),direction.getOpposite(),source.materialInfo(),output);
         } else for(int i=1;i+1<transformed.size();i++){
             emit(transformed.get(0),transformed.get(i),transformed.get(i+1),transformed.get(i+1),direction,source.materialInfo(),output);
-            if(PaintCatalog.isGlass(design.paint(surface)))emit(transformed.get(i+1),transformed.get(i),transformed.get(0),transformed.get(0),direction.getOpposite(),source.materialInfo(),output);
+            if(fragment.doubleSided()&&PaintCatalog.isGlass(design.paint(surface)))emit(transformed.get(i+1),transformed.get(i),transformed.get(0),transformed.get(0),direction.getOpposite(),source.materialInfo(),output);
         }
     }
     private static double side(Vec3 p,Vec3 a,Vec3 b,int u,int v){return (coordinate(b,u)-coordinate(a,u))*(coordinate(p,v)-coordinate(a,v))-(coordinate(b,v)-coordinate(a,v))*(coordinate(p,u)-coordinate(a,u));}

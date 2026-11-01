@@ -2,6 +2,8 @@
 
 Cada pintura representa una textura. Se utiliza un único tipo de ítem con una identidad de pintura guardada en sus datos. Su acabado es únicamente visual: no transmite las propiedades del bloque de origen.
 
+[[Pinturas de Cristal]] concreta la excepción de transparencia visual y paso/bloqueo de luz; conserva las propiedades físicas del bloque pintable.
+
 La unidad base corresponde a un cuadrado de un bloque de 16×16. Un ítem de pintura contiene **256 unidades**, suficientes para una cara completa de un bloque, independientemente de su subdivisión.
 
 Aplicar pintura sobre otra la sustituye directamente y consume las unidades correspondientes a la superficie pintada.

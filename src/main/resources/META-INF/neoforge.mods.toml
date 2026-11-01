@@ -9,7 +9,7 @@ displayName="${mod_name}"
 authors="nicomar"
 description='''
 Bloques pintables subdivididos, diseños persistentes y catálogo decorativo para Minecraft 26.2.
-Grupo 1 implementado en código; compilación y pruebas dentro de Minecraft pendientes.
+Herramientas, producción, pendientes y pinturas de cristal implementadas en código; verificación dentro de Minecraft pendiente.
 '''
 
 [[dependencies.${mod_id}]]

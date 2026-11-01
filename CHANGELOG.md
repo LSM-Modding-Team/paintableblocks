@@ -1,10 +1,22 @@
-# En desarrollo: pinturas de cristal (incompleto)
-
-Se incluye trabajo parcial del catálogo, recetas, traducciones y primeras adaptaciones de luz y renderizado. Los bordes conectables y la integración visual entre bloques siguen pendientes. No se ha compilado ni probado en Minecraft; la implementación puede contener errores y no debe considerarse terminada.
-
 # Registro de cambios
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
+
+## 2026-11-01 — Completar pinturas de cristal
+
+- Completada en código la ampliación iniciada en `de4f451`: 18 materiales, dos acabados por material, 373 identidades totales, extracción ×1, molino ×4, prensa ×16 y cambio reversible de acabado. La conversión conserva los componentes del ítem y consume una unidad de la pila por operación.
+- Bordes conectables sobre el perímetro real de polígonos coplanares iguales. Uniones parciales, resoluciones mezcladas, 24 orientaciones, huecos y pendientes, también entre vecinos diagonales. Se conservan marcos ante cambios de material, acabado, ángulo o contacto con bloques vanilla.
+- Ocultación de contactos sensible a pintura: una cara opaca sigue siendo visible detrás de cristal; los contactos entre cristales conectables iguales desaparecen. Los contactos entre cristales diferentes mantienen sus frentes opuestos sin duplicar reversos coplanares. El resto del cristal se representa por ambas caras, en mundo e inventario.
+- Decisión visual: borde de 1/16 de bloque, con UV del marco y del interior tomadas del sprite vanilla. El marco y el interior se reparten el área sin superponer capas; no se modifica ningún PNG ni `unpainted.png`.
+- Luz integrada con el estado existente: cristal normal/de color transmite solo con todas las superficies del diseño pintadas con cristal transmisivo; tintado oscuro, pintura opaca o superficie sin pintar bloquean. Cortar no pinta las superficies recién expuestas.
+- Claves de modelo/contacto incluyen las pinturas de cristal pertinentes. Cachés acotadas, vías rápidas para fronteras completas uniformes e invalidación agrupada por sección de los 26 vecinos al editar, cargar o retirar una pieza.
+- Protocolo **7**: actualizar cliente y servidor juntos. No se añaden migraciones ni compatibilidad con mundos obsoletos.
+- Contratos Java añadidos para luz, contactos, bordes, pendientes, áreas sin solapamiento, resoluciones/orientaciones, recetas y conservación de componentes. Corregido el contrato que todavía rechazaba el nuevo ID 338.
+- Solo lectura/edición de archivos y revisión del diff. Sin compilación, Java, Gradle, scripts de validación, pruebas, CI ni Minecraft ejecutados; la corrección de tipos, el acabado visual y el rendimiento en juego siguen sin verificar. Commit directo online en `26.2`, sin commit local.
+
+## 2026-11-01 — Inicio de pinturas de cristal (histórico)
+
+El commit `de4f451` incorporó catálogo, recetas, traducciones y primeras adaptaciones de luz/renderizado. Dejó los bordes conectables y la integración visual entre bloques incompletos; la entrada posterior describe su continuación.
 
 ## 2026-10-28 — Optimización de geometría, edición, producción y sincronización
 

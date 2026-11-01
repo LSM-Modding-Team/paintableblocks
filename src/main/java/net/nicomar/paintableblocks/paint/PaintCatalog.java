@@ -43,6 +43,7 @@ public final class PaintCatalog {
     /** Crystal identities are appended in pairs: vanilla, then connected. */
     public static boolean isGlass(int id) { return id >= 338 && id <= 373; }
     public static boolean isConnectedGlass(int id) { return isGlass(id) && (id - 338) % 2 == 1; }
+    public static boolean transmitsLight(int id) { return isGlass(id) && id < 372; }
     public static int alternateGlass(int id) {
         if (!isGlass(id)) throw new IllegalArgumentException("Not a glass paint");
         return isConnectedGlass(id) ? id - 1 : id + 1;

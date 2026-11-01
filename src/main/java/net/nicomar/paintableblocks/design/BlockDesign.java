@@ -105,7 +105,7 @@ public final class BlockDesign {
         if (!any) return null;
         for (var surface : DesignGeometry.surfaces(this)) {
             int id = paint(surface);
-            if (!PaintCatalog.isGlass(id) || id >= 372) return false;
+            if (!PaintCatalog.transmitsLight(id)) return false;
         }
         return true;
     }

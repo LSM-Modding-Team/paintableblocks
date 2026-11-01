@@ -13,7 +13,32 @@ import net.nicomar.paintableblocks.recipe.ProgressionRecipe;
 /** Invoke only after mod registries are available in an explicitly authorized test environment. */
 public final class ProductionContractChecks {
     private static void check(boolean condition,String message){if(!condition)throw new AssertionError(message);}
-    public static void runAfterRegistries(){counts();outputs();portable();upgrades();}
+    public static void runAfterRegistries(){counts();outputs();portable();upgrades();glass();}
+    private static void glass(){
+        var finish=new net.nicomar.paintableblocks.recipe.GlassFinishRecipe();
+        var extraction=new net.nicomar.paintableblocks.recipe.PaintExtractionRecipe();
+        for(int id=338;id<=372;id+=2){
+            final int paintId=id;
+            var entry=net.nicomar.paintableblocks.paint.PaintCatalog.byId(id);
+            var source=new ItemStack(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(entry.identifier()).asItem());
+            check(ProductionInputs.paint(source)==id,"Vanilla glass sources resolve to their vanilla finish, without duplicate registry keys");
+            for(var tier:List.of(PaintingBalance.Production.MILL,PaintingBalance.Production.PRESS)){
+                var output=PaintMachineOperations.outputs(List.of(ItemStack.EMPTY,ItemStack.EMPTY,ItemStack.EMPTY,ItemStack.EMPTY),source,tier);
+                check(output!=null&&output.stream().filter(s->s.is(ModContent.PAINT.get())&&Integer.valueOf(paintId).equals(s.get(ModContent.PAINT_ID.get()))).mapToInt(ItemStack::getCount).sum()==tier.itemsPerBlock,"Glass machines preserve identity and complete batch yield");
+            }
+            var scraper=new ItemStack(ModContent.SCRAPERS.get(PaintingBalance.Material.IRON).get());
+            var paint=extraction.assemble(CraftingInput.of(2,1,List.of(scraper,source)));
+            check(paint.getCount()==1&&Integer.valueOf(id).equals(paint.get(ModContent.PAINT_ID.get())),"Scraping glass produces one complete paint item");
+            var name=net.minecraft.network.chat.Component.literal("Preserve my glass paint");
+            paint.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,name);paint.setCount(8);
+            var converted=finish.assemble(CraftingInput.of(1,1,List.of(paint)));
+            check(converted.getCount()==1&&Integer.valueOf(id+1).equals(converted.get(ModContent.PAINT_ID.get()))&&name.equals(converted.get(net.minecraft.core.component.DataComponents.CUSTOM_NAME)),"Finish conversion preserves metadata and yields exactly one item");
+            var restored=finish.assemble(CraftingInput.of(1,1,List.of(converted)));
+            check(ItemStack.isSameItemSameComponents(restored,paint)&&paint.getCount()==8,"Reversing the finish preserves components and never mutates the source");
+            check(finish.assemble(CraftingInput.of(2,1,List.of(paint,source))).isEmpty(),"Additional ingredients cannot silently disappear");
+        }
+        check(finish.assemble(CraftingInput.of(1,1,List.of(new ItemStack(Items.GLASS)))).isEmpty(),"Raw glass is not a complete paint item");
+    }
     private static void counts(){
         for(var tier:PaintingBalance.Station.values())for(var material:PaintingBalance.Material.values())for(int n:PaintingBalance.RESOLUTIONS){
             int yield=tier.yield(material);var empty=List.of(0,0,0,0,0);var result=WorkstationOperations.produce(empty,tier,n,material);

@@ -16,7 +16,7 @@ public final class DesignContractChecks {
     private static void check(boolean result,String message){checks++;if(!result)throw new AssertionError(message);}
     private static void rejects(Runnable action){try{action.run();throw new AssertionError("Invalid design accepted");}catch(IllegalArgumentException|IllegalStateException expected){checks++;}}
     public static void main(String[] args){
-        rotations();geometry();persistence();SlopeVolumeContractChecks.run();PerformanceContractChecks.run();
+        rotations();geometry();persistence();SlopeVolumeContractChecks.run();PerformanceContractChecks.run();GlassContractChecks.run();
         System.out.println("Design contract checks: "+checks);
     }
     private static void rotations(){
@@ -77,7 +77,7 @@ public final class DesignContractChecks {
         invalid=encoded.deepCopy().getAsJsonObject();var faces=invalid.getAsJsonArray("paints");faces.add(faces.get(0).deepCopy());
         check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,invalid).error().isPresent(),"Duplicate face rejected");
         rejects(()->BlockDesign.full(4).paint(BlockDesign.full(4).index(1,1,1),Direction.NORTH,1));
-        rejects(()->BlockDesign.full(4).paint(0,Direction.NORTH,338));
+        rejects(()->BlockDesign.full(4).paint(0,Direction.NORTH,PaintingBalance.PAINTS+1));
         rejects(()->BlockDesign.full(3));
         rejects(()->original.converted(8));
         BitSet removed=new BitSet();removed.set(0);BlockDesign cut=original.remove(removed);
