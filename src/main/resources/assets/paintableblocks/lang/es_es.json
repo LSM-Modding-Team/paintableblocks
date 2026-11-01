@@ -462,6 +462,8 @@
   "paint.paintableblocks.370": "Cristal negro",
   "paint.paintableblocks.371": "Cristal negro conectable",
   "paint.paintableblocks.372": "Cristal tintado oscuro",
-  "paint.paintableblocks.373": "Cristal tintado oscuro conectable"
+  "paint.paintableblocks.373": "Cristal tintado oscuro conectable",
+  "button.paintableblocks.dimension_step": "Paso de dimensiones",
+  "button.paintableblocks.edit_grid": "Subdivisión editable"
 }
 

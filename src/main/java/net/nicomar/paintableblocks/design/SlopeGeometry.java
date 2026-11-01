@@ -17,6 +17,7 @@ public final class SlopeGeometry {
     public static List<Vec3> polygon(BlockDesign d,DesignGeometry.Surface s){return POLYGONS.get(new PolygonKey(d.geometryKey(),s.key()),()->List.copyOf(buildPolygon(d,s)),p->p.size()+1);}
     private static List<Vec3> buildPolygon(BlockDesign d,DesignGeometry.Surface s){
         int c=s.cell(),n=d.resolution();double[] lo={d.x(c)/(double)n,d.y(c)/(double)n,d.z(c)/(double)n},hi={lo[0]+1.0/n,lo[1]+1.0/n,lo[2]+1.0/n};
+        if(d.slope()!=null){var a=d.slope().point(lo[0],lo[1],lo[2]);var b=d.slope().point(hi[0],hi[1],hi[2]);lo=new double[]{a.x,a.y,a.z};hi=new double[]{b.x,b.y,b.z};}
         if(!s.slope()){
             int ax=axis(s.face()),u=(ax+1)%3,v=(ax+2)%3;List<Vec3> p=new ArrayList<>();
             for(int i:new int[]{0,1,3,2}){double[] q=lo.clone();q[ax]=s.face().getAxisDirection()==Direction.AxisDirection.POSITIVE?hi[ax]:lo[ax];q[u]=(i&1)==0?lo[u]:hi[u];q[v]=(i&2)==0?lo[v]:hi[v];p.add(new Vec3(q[0],q[1],q[2]));}
@@ -50,7 +51,7 @@ public final class SlopeGeometry {
     }
     public static Optional<DesignGeometry.Surface> target(BlockDesign d,Vec3 worldPoint){
         var point=DesignOrientation.rotate(DesignOrientation.inverse(d.orientation()),worldPoint);
-        int n=d.resolution();int x=(int)Math.floor(point.x*n),y=(int)Math.floor(point.y*n),z=(int)Math.floor(point.z*n);
+        int n=d.resolution();var grid=d.slope()==null?point:d.slope().grid(point);int x=(int)Math.floor(grid.x*n),y=(int)Math.floor(grid.y*n),z=(int)Math.floor(grid.z*n);
         for(int iz=Math.max(0,z-1);iz<=Math.min(n-1,z+1);iz++)for(int iy=Math.max(0,y-1);iy<=Math.min(n-1,y+1);iy++)for(int ix=Math.max(0,x-1);ix<=Math.min(n-1,x+1);ix++){
             int cell=d.index(ix,iy,iz);if(!d.occupied(cell))continue;
             var candidates=DesignGeometry.cellSurfaces(d,cell);
@@ -61,12 +62,12 @@ public final class SlopeGeometry {
         int inverse=DesignOrientation.inverse(d.orientation());Vec3 a=DesignOrientation.rotate(inverse,start.subtract(pos.getX(),pos.getY(),pos.getZ())),b=DesignOrientation.rotate(inverse,end.subtract(pos.getX(),pos.getY(),pos.getZ())),delta=b.subtract(a);double nearest=Double.POSITIVE_INFINITY;DesignGeometry.Surface picked=null;
         double enter=0,exit=1;
         for(int axis=0;axis<3;axis++){double origin=coord(a,axis),step=coord(delta,axis);if(Math.abs(step)<1e-14){if(origin<0||origin>1)return null;continue;}double t0=-origin/step,t1=(1-origin)/step;enter=Math.max(enter,Math.min(t0,t1));exit=Math.min(exit,Math.max(t0,t1));}
-        if(enter>exit)return null;int n=d.resolution();Vec3 initial=a.add(delta.scale(Math.min(exit,enter+1e-9)));int[] cell={(int)Math.floor(initial.x*n),(int)Math.floor(initial.y*n),(int)Math.floor(initial.z*n)};
+        if(enter>exit)return null;int n=d.resolution();Vec3 initial=a.add(delta.scale(Math.min(exit,enter+1e-9)));if(d.slope()!=null)initial=d.slope().grid(initial);int[] cell={(int)Math.floor(initial.x*n),(int)Math.floor(initial.y*n),(int)Math.floor(initial.z*n)};
         for(int i=0;i<3;i++)cell[i]=Math.clamp(cell[i],0,n-1);
         for(int iteration=0;iteration<3*n+4;iteration++){
             for(var s:DesignGeometry.cellSurfaces(d,d.index(cell[0],cell[1],cell[2]))){var polygon=polygon(d,s);if(polygon.size()<3)continue;var normal=normal(d,s);double den=normal.dot(delta);if(den>=-1e-12)continue;double t=normal.dot(polygon.getFirst().subtract(a))/den;if(t>=enter-1e-8&&t<=exit+1e-9&&t<nearest&&contains(polygon,a.add(delta.scale(t)),normal)){nearest=t;picked=s;}}
             double[] crossing=new double[3];double next=Double.POSITIVE_INFINITY;
-            for(int axis=0;axis<3;axis++){double step=coord(delta,axis);crossing[axis]=Math.abs(step)<1e-14?Double.POSITIVE_INFINITY:((cell[axis]+(step>0?1:0))/(double)n-coord(a,axis))/step;next=Math.min(next,crossing[axis]);}
+            for(int axis=0;axis<3;axis++){double step=coord(delta,axis);crossing[axis]=Math.abs(step)<1e-14?Double.POSITIVE_INFINITY:((d.slope()==null?(cell[axis]+(step>0?1:0))/(double)n:d.slope().coordinate(axis,(cell[axis]+(step>0?1:0))/(double)n))-coord(a,axis))/step;next=Math.min(next,crossing[axis]);}
             if(nearest<=next+1e-9||next>=exit-1e-9)break;
             for(int axis=0;axis<3;axis++)if(crossing[axis]<=next+1e-10)cell[axis]+=coord(delta,axis)>0?1:-1;
             if(cell[0]<0||cell[1]<0||cell[2]<0||cell[0]>=n||cell[1]>=n||cell[2]>=n)break;

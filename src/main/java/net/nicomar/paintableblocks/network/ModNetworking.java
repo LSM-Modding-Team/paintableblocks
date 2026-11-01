@@ -60,9 +60,10 @@ public final class ModNetworking {
         @Override public Type<ProductionAction> type(){return TYPE;}
     }
     /** No client-supplied geometry: only configuration of a server-owned selection. */
-    public record VolumeAction(long id,int action,int direction,boolean upper,boolean create,int width,int height,int depth,int resolution) implements CustomPacketPayload {
+    public record VolumeAction(long id,int action,int direction,boolean upper,boolean create,int width,int height,int depth,int resolution,int offsetX,int offsetY,int offsetZ) implements CustomPacketPayload {
+        public VolumeAction(long id,int action,int direction,boolean upper,boolean create,int width,int height,int depth,int resolution){this(id,action,direction,upper,create,width,height,depth,resolution,0,0,0);}
         public static final Type<VolumeAction> TYPE=new Type<>(Identifier.fromNamespaceAndPath("paintableblocks","volume_action"));
-        public static final StreamCodec<RegistryFriendlyByteBuf,VolumeAction> CODEC=StreamCodec.of((b,v)->{b.writeLong(v.id);b.writeVarInt(v.action);b.writeVarInt(v.direction);b.writeBoolean(v.upper);b.writeBoolean(v.create);b.writeVarInt(v.width);b.writeVarInt(v.height);b.writeVarInt(v.depth);b.writeVarInt(v.resolution);},b->new VolumeAction(b.readLong(),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readBoolean(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt()));
+        public static final StreamCodec<RegistryFriendlyByteBuf,VolumeAction> CODEC=StreamCodec.of((b,v)->{b.writeLong(v.id);b.writeVarInt(v.action);b.writeVarInt(v.direction);b.writeBoolean(v.upper);b.writeBoolean(v.create);b.writeVarInt(v.width);b.writeVarInt(v.height);b.writeVarInt(v.depth);b.writeVarInt(v.resolution);b.writeVarInt(v.offsetX);b.writeVarInt(v.offsetY);b.writeVarInt(v.offsetZ);},b->new VolumeAction(b.readLong(),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readBoolean(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt()));
         @Override public Type<VolumeAction> type(){return TYPE;}
     }
     public record VolumeState(long id,int phase,boolean former,InteractionHand hand,Identifier dimension,BlockPos first,BlockPos last,
@@ -94,7 +95,7 @@ public final class ModNetworking {
         @Override public Type<DesignSync> type(){return TYPE;}
     }
     public static void register(RegisterPayloadHandlersEvent event){
-        var registrar=event.registrar("7");
+        var registrar=event.registrar("8");
         registrar.playToServer(Use.TYPE,Use.CODEC,(v,ctx)->ServerInteractions.use(ctx.player(),v));
         registrar.playToClient(Selection.TYPE,Selection.CODEC);
         registrar.playToClient(VolumeState.TYPE,VolumeState.CODEC);

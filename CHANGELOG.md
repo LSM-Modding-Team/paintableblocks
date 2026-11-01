@@ -1,5 +1,14 @@
 # Registro de cambios
 
+## 2026-11-01 — Pendientes con dimensiones fraccionarias
+
+- Creación del formador con dimensiones de 1/16 a 16 bloques y origen desplazable de 0 a 15/16 por eje; paso elegible 1, 1/2, 1/4, 1/8 o 1/16, independiente de la subdivisión editable. Conserva la creación exclusiva de creativo y la transformación existente en supervivencia.
+- Cada fragmento guarda sus límites locales exactos: la cuadrícula editable se distribuye dentro de esos límites. Plano global continuo, caras, pintura, selección, colisión a 1/16, rotación, conservación, mallas y red utilizan esa geometría. Una operación desplazada de tamaño 16 puede tocar 17 posiciones por eje.
+- Cálculo local del plano con coordenadas fraccionarias y sin productos por coordenadas mundiales grandes. Interfaz con incremento/decremento y confirmación condicionada a la configuración revisada por el servidor.
+- Persistencia 3 y protocolo 8; se rechazan versiones de diseño obsoletas, sin migraciones. Límites del plano ampliados para pendientes fraccionarias.
+- Contratos de área continua, límites, subdivisión independiente, guardado y 24 rotaciones preparados. Solo lectura, edición y revisión del diff: sin compilación, Java, Gradle, scripts ni pruebas ejecutadas. Publicación directa online en `26.2`.
+
+
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.
 
 ## 2026-11-01 — Completar pinturas de cristal

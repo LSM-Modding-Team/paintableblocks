@@ -20,7 +20,7 @@ public class DesignOutlineShape extends VoxelShape {
     private static final net.nicomar.paintableblocks.performance.WorkCache<Key,BitSetDiscreteVoxelShape> GRIDS=new net.nicomar.paintableblocks.performance.WorkCache<>("outline-grids",256,1048576);
     private static BitSetDiscreteVoxelShape discrete(BlockDesign d){return GRIDS.get(new Key(d.geometryKey(),d.orientation()),()->buildDiscrete(d),g->d.resolution()*d.resolution()*d.resolution());}
     private static BitSetDiscreteVoxelShape buildDiscrete(BlockDesign d){int n=d.resolution();var bits=new BitSetDiscreteVoxelShape(n,n,n);for(int c=0;c<n*n*n;c++)if(d.occupied(c)){int[] p=DesignOrientation.cell(d.orientation(),d.x(c),d.y(c),d.z(c),n);bits.fill(p[0],p[1],p[2]);}return bits;}
-    @Override public DoubleList getCoords(Direction.Axis axis){return coordinates;}
+    @Override public DoubleList getCoords(Direction.Axis axis){if(design.slope()==null)return coordinates;var plane=design.slope().rotated(design.orientation());var values=new DoubleArrayList();int a=axis==Direction.Axis.X?0:axis==Direction.Axis.Y?1:2;for(int i=0;i<=design.resolution();i++)values.add(plane.coordinate(a,i/(double)design.resolution()));return values;}
     @Override public void forAllEdges(net.minecraft.world.phys.shapes.Shapes.DoubleLineConsumer consumer){
         for(var segment:EDGES.get(new Key(design.geometryKey(),design.orientation()),()->{
             java.util.Map<String,Segment> unique=new java.util.LinkedHashMap<>();

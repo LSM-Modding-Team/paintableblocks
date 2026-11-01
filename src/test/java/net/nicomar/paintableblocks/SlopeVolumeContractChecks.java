@@ -12,7 +12,29 @@ import net.nicomar.paintableblocks.operation.*;
 public final class SlopeVolumeContractChecks {
     private static void check(boolean value,String reason){if(!value)throw new AssertionError(reason);}
     private static void reject(Runnable action){try{action.run();throw new AssertionError("Expected rejection");}catch(IllegalArgumentException|IllegalStateException expected){}}
+    private static void fractional(){
+        var region=new VolumeRegion(-12,4,-8,28,16,12);
+        for(int n:List.of(1,2,4,8,16))for(int direction=0;direction<4;direction++)for(boolean upper:List.of(false,true)){
+            double area=0;
+            for(long i=0;i<region.size();i++){
+                var pos=region.position(i);var d=BlockDesign.full(n).withSlope(region.creationPlane(pos,BlockDesign.full(n),direction,upper));
+                check(d.resolution()==n,"Dimension precision never changes editing subdivision");
+                for(var surface:DesignGeometry.surfaces(d)){
+                    var polygon=SlopeGeometry.polygon(d,surface);
+                    for(var v:polygon)check(region.contains(v.add(pos.getX(),pos.getY(),pos.getZ())),"No surface exceeds fractional bounds");
+                    if(surface.slope())area+=SlopeGeometry.area(polygon);
+                }
+                var encoded=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,d).getOrThrow();
+                check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow().equals(d),"Fractional bounds persist");
+                if(d.slope()!=null)for(int rotation=0;rotation<24;rotation++)
+                    check(d.slope().rotated(rotation).rotated(DesignOrientation.inverse(rotation)).equals(d.slope()),"Bounds rotate without drift");
+            }
+            double length=direction%2==0?2.5:1.25,width=direction%2==0?1.25:2.5;
+            check(Math.abs(area-Math.hypot(length,.75)*width)<1e-7,"Fractional ramp has exact continuous area");
+        }
+    }
     public static void run(){
+        fractional();
         var basic=new SlopePlane(-1,1,0,0);
         var invalid=new com.google.gson.JsonObject();invalid.addProperty("a",0);invalid.addProperty("b",0);invalid.addProperty("c",0);invalid.addProperty("offset",0);
         check(SlopePlane.CODEC.parse(JsonOps.INSTANCE,invalid).error().isPresent(),"Invalid plane returns codec error instead of escaping quarantine");
@@ -37,7 +59,7 @@ public final class SlopeVolumeContractChecks {
             var hit=new DesignOutlineShape(d).clip(new Vec3(.25,2,.5),new Vec3(.25,-1,.5),BlockPos.ZERO);check(hit!=null&&Math.abs(hit.getLocation().y-.25)<1e-8,"Ray hits real incline rather than collision steps");
             var target=DesignGeometry.target(d,hit.getLocation(),hit.getDirection()).orElseThrow();check(target.slope(),"Ray selects inclined paint fragment");
         }
-        var original=BlockDesign.full(4).paint(0,Direction.DOWN,337);var old=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,original).getOrThrow().getAsJsonObject();old.addProperty("version",1);old.remove("slope");check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,old).getOrThrow().equals(original),"Version one migrates without paint loss");
+        var original=BlockDesign.full(4).paint(0,Direction.DOWN,337);var old=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,original).getOrThrow().getAsJsonObject();old.addProperty("version",1);old.remove("slope");check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,old).error().isPresent(),"Obsolete designs are rejected");
         var max=VolumeRegion.block(BlockPos.ZERO).union(VolumeRegion.block(new BlockPos(255,255,255)));check(max.valid(256)&&max.size()==16777216,"Inclusive 256 block boundary");check(!max.union(VolumeRegion.block(new BlockPos(256,0,0))).valid(256),"257 blocks rejected");
         var small=VolumeRegion.cell(BlockPos.ZERO,BlockDesign.full(16),0);check(small.hammer(BlockPos.ZERO,BlockDesign.full(16)).cells().size()==1,"Sixteenth selection only removes its one cell");check(small.hammer(BlockPos.ZERO,BlockDesign.full(2)).cells().isEmpty(),"Mixed grids use centers, not any overlap");
         for(int direction=0;direction<4;direction++)for(boolean upper:List.of(false,true)){

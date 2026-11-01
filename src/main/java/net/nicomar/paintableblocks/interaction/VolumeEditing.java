@@ -51,11 +51,11 @@ public final class VolumeEditing {
     }
     private static final class PlanWork {
         final Session session;final BlockPos pos;final BlockDesign before;final BlockDesign.ClipTask clip;final BitSet removed=new BitSet();int cell;
-        PlanWork(Session s,BlockPos pos,BlockDesign before){session=s;this.pos=pos;this.before=before;clip=s.former?before.clipTask(s.region.plane(pos,before,s.direction,s.upper)):null;}
+        PlanWork(Session s,BlockPos pos,BlockDesign before){session=s;this.pos=pos;this.before=before;clip=s.former?before.clipTask(s.create?s.region.creationPlane(pos,before,s.direction,s.upper):s.region.plane(pos,before,s.direction,s.upper)):null;}
         DesignOperations.Plan advance(){
             BlockDesign after;
             if(clip!=null){if(!clip.advance(128))return null;after=clip.result();}
-            else{int n=before.resolution(),end=Math.min(n*n*n,cell+128);for(;cell<end;cell++)if(n!=1&&before.occupied(cell)){var center=DesignOrientation.rotate(before.orientation(),new net.minecraft.world.phys.Vec3((before.x(cell)+.5)/n,(before.y(cell)+.5)/n,(before.z(cell)+.5)/n)).add(pos.getX(),pos.getY(),pos.getZ());if(session.region.contains(center))removed.set(cell);}if(cell<n*n*n)return null;after=before.remove(removed);}
+            else{int n=before.resolution(),end=Math.min(n*n*n,cell+128);for(;cell<end;cell++)if(n!=1&&before.occupied(cell)){var point=new net.minecraft.world.phys.Vec3((before.x(cell)+.5)/n,(before.y(cell)+.5)/n,(before.z(cell)+.5)/n);if(before.slope()!=null)point=before.slope().point(point.x,point.y,point.z);var center=DesignOrientation.rotate(before.orientation(),point).add(pos.getX(),pos.getY(),pos.getZ());if(session.region.contains(center))removed.set(cell);}if(cell<n*n*n)return null;after=before.remove(removed);}
             return new DesignOperations.Plan(session.create?before.remove(all(before.resolution())):before,after,removed.stream().boxed().toList(),List.of(),0);
         }
     }
@@ -112,9 +112,10 @@ public final class VolumeEditing {
         if(s.invalid||!held(p,s)){stop(p,"volume_invalid");return;}
         if(r.action()==1){if(s.phase==READY)start(p,s);return;}
         if(r.action()!=0||!s.former||s.phase==RUNNING||s.phase==FIRST||r.direction()<0||r.direction()>3||!net.nicomar.paintableblocks.balance.PaintingBalance.RESOLUTIONS.contains(r.resolution())||r.create()&&!p.isCreative())return;
-        if(r.width()<1||r.width()>16||r.height()<1||r.height()>16||r.depth()<1||r.depth()>16)return;
+        if(r.width()<1||r.width()>256||r.height()<1||r.height()>256||r.depth()<1||r.depth()>256)return;
+        if(r.offsetX()<0||r.offsetX()>15||r.offsetY()<0||r.offsetY()>15||r.offsetZ()<0||r.offsetZ()>15)return;
         s.direction=r.direction();s.upper=r.upper();s.create=r.create();s.resolution=r.resolution();
-        if(s.create){var min=s.createAnchor; s.region=new VolumeRegion(min.getX()*16,min.getY()*16,min.getZ()*16,(min.getX()+r.width())*16,(min.getY()+r.height())*16,(min.getZ()+r.depth())*16);}
+        if(s.create){var min=s.createAnchor;int x=min.getX()*16+r.offsetX(),y=min.getY()*16+r.offsetY(),z=min.getZ()*16+r.offsetZ();s.region=new VolumeRegion(x,y,z,x+r.width(),y+r.height(),z+r.depth());}
         else s.region=VolumeRegion.block(s.first).union(VolumeRegion.block(s.last));
         watch(p,s);scan(p,s);
     }
@@ -139,7 +140,7 @@ public final class VolumeEditing {
         }
         if(s.create){
             if(!p.level().getBlockState(pos).isAir()||!p.level().getFluidState(pos).isEmpty())throw new IllegalArgumentException("Creation requires empty positions");
-            var d=BlockDesign.full(s.resolution);var saved=s.plans.getIfPresent(key(s,pos,d));var after=saved==null?d.withSlope(s.region.plane(pos,d,s.direction,s.upper)):saved.after();
+            var d=BlockDesign.full(s.resolution);var saved=s.plans.getIfPresent(key(s,pos,d));var after=saved==null?d.withSlope(s.region.creationPlane(pos,d,s.direction,s.upper)):saved.after();
             if(after.empty())return null;
             var shape=DesignGeometry.shape(after).move(pos.getX(),pos.getY(),pos.getZ());if(!shape.isEmpty())for(var collision:p.level().getEntityCollisions(null,shape.bounds()))if(Shapes.joinIsNotEmpty(shape,collision,BooleanOp.AND))throw new IllegalArgumentException("Entity blocks creation");
             return new DesignOperations.Plan(d.remove(all(d.resolution())),after,List.of(),List.of(),0);
@@ -151,7 +152,7 @@ public final class VolumeEditing {
     }
     private static boolean checkEvents(ServerPlayer p,Session s,BlockPos pos,DesignOperations.Plan plan){
         if(s.create){
-            var intended=ModContent.block(s.resolution).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete());
+            var intended=ModContent.block(s.resolution).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(plan.after()));
             var snapshot=net.neoforged.neoforge.common.util.BlockSnapshot.create(p.level().dimension(),p.level(),pos);
             var event=new net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent(snapshot,p.level().getBlockState(pos.below()),p){
                 @Override public net.minecraft.world.level.block.state.BlockState getPlacedBlock(){return intended;}
@@ -189,7 +190,7 @@ public final class VolumeEditing {
                 s.writing=true;s.writingPos=pos;
                 try{
                     if(p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be)be.setDesign(plan.after());
-                    else{var state=ModContent.block(s.resolution).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete());try(var placing=PlacementDesign.enter(pos,plan.after())){if(!p.level().setBlock(pos,state,Block.UPDATE_ALL)){stop(p,"volume_conflict");return;}}}
+                    else{var state=ModContent.block(s.resolution).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(plan.after()));try(var placing=PlacementDesign.enter(pos,plan.after())){if(!p.level().setBlock(pos,state,Block.UPDATE_ALL)){stop(p,"volume_conflict");return;}}}
                     s.modified++;
                     if(s.former&&!p.isCreative()){var held=p.getItemInHand(s.hand);int damage=held.getDamageValue()+1;if(damage>=held.getMaxDamage()){held.shrink(1);s.tool.shrink(1);}else{held.setDamageValue(damage);s.tool.setDamageValue(damage);}}
                 }finally{s.writing=false;s.writingPos=null;}

@@ -8,13 +8,15 @@ Base del mod y grupos **1: bloques y diseños**, **2: herramientas y pinturas** 
 
 Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes completos en 80 ticks. Se incorporan recetas y mejoras con conservación de datos. Los recursos de 20 herramientas, cuatro cubos y cinco bloques de producción están implementados: modelos 3D, texturas originales de 16×16 y colisión coincidente. Se validan caras y UV para evitar superficies superpuestas. [Vista técnica y detalles](docs/technical/visual-assets.md).
 
-Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **7**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
+Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **8**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
 
 ## Ampliaciones acordadas
 
-Se han documentado el recorte volumétrico del martillo, las pendientes y su formador, la pintura de superficies inclinadas y tres pestañas del creativo. **Código y recursos preparados, sin compilación ni pruebas en Minecraft**. Formato de diseño 2 con lectura de datos 1; [detalles, controles y decisiones](docs/technical/slopes-and-volumes.md). Véase la [especificación](docs/obsidian/PaintableBlocks/PaintableBlocks.md).
+Se han documentado el recorte volumétrico del martillo, las pendientes y su formador, la pintura de superficies inclinadas y tres pestañas del creativo. **Código y recursos preparados, sin compilación ni pruebas en Minecraft**. Formato de diseño 3, sin migraciones de formatos antiguos; [detalles, controles y decisiones](docs/technical/slopes-and-volumes.md). Véase la [especificación](docs/obsidian/PaintableBlocks/PaintableBlocks.md).
 
 Las pinturas de cristal incorporan acabados vanilla y conectables, bordes por perímetro, contactos entre resoluciones/pendientes, luz y conversión reversible con conservación de datos. [Reglas y decisiones](docs/obsidian/PaintableBlocks/Pinturas/Pinturas%20de%20Cristal.md). Implementación revisada por lectura; sin compilación, scripts ni pruebas ejecutadas en esta entrega.
+
+El formador permite crear dimensiones fraccionarias y desplazar el origen hasta precisión de 1/16, independientemente de la subdivisión editable. La creación continúa siendo exclusiva de creativo; los extremos de cada pieza conservan sus límites al guardarse, girarse y colocarse.
 
 ## Rendimiento
 

@@ -10,6 +10,16 @@ Longitud, anchura y altura independientes de **1 a 16 bloques por operación**, 
 
 El límite corresponde a cada operación, no al tamaño total de una construcción conectada. Es posible ampliarla por etapas. Cada posición contiene su fragmento de pendiente: no existe un bloque gigante ni una estructura indivisible. Tras transformar, las piezas son independientes; romper una no recalcula las demás.
 
+## Dimensiones fraccionarias aceptadas
+
+La creación creativa admite dimensiones de 1/16 a 16 bloques por eje, con pasos elegibles hasta 1/16 y desplazamiento del inicio entre 0 y 15/16. Por ejemplo: 2,5 × 0,75 × 1,25 bloques. La precisión de ajuste es independiente de la subdivisión editable de cada fragmento.
+
+Cada pieza guarda un prisma local acotado y su plano. Sus celdas editables se distribuyen dentro de ese prisma; las piezas de los extremos no se redondean a bloques enteros. La geometría visible, las caras pintables, selección y conservación siguen esos límites. La colisión conserva la aproximación existente de 1/16. Una extensión desplazada de 16 bloques puede tocar 17 posiciones.
+
+Se mantienen el anclaje creativo junto a la cara inicial, la exigencia de aire sin fluidos y las comprobaciones de permisos/colisión. La transformación de construcciones existentes conserva sus reglas anteriores y no mueve ni estira material. Formato de diseño 3 y protocolo 8; sin migración de mundos obsoletos.
+
+Código preparado y contratos escritos; sin compilación ni ejecución de pruebas o Minecraft.
+
 ## Subdivisión y transformación
 
 Cinco variantes: 1×1, 2×2, 4×4, 8×8 y 16×16. El plano puede generar fragmentos de celda con caras triangulares o inclinadas. Se permiten subdivisiones mezcladas bajo el mismo plano global.

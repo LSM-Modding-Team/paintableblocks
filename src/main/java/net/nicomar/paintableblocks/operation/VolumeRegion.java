@@ -10,7 +10,13 @@ import net.nicomar.paintableblocks.design.*;
 public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
     public VolumeRegion {if(x1<=x0||y1<=y0||z1<=z0)throw new IllegalArgumentException("Empty volume");}
     public static VolumeRegion block(BlockPos p){return new VolumeRegion(p.getX()*16,p.getY()*16,p.getZ()*16,(p.getX()+1)*16,(p.getY()+1)*16,(p.getZ()+1)*16);}
-    public static VolumeRegion cell(BlockPos p,BlockDesign d,int cell){int[] c=DesignOrientation.cell(d.orientation(),d.x(cell),d.y(cell),d.z(cell),d.resolution());int size=16/d.resolution();return new VolumeRegion(p.getX()*16+c[0]*size,p.getY()*16+c[1]*size,p.getZ()*16+c[2]*size,p.getX()*16+(c[0]+1)*size,p.getY()*16+(c[1]+1)*size,p.getZ()*16+(c[2]+1)*size);}
+    public static VolumeRegion cell(BlockPos p,BlockDesign d,int cell){
+        Vec3 lo=new Vec3(d.x(cell)/(double)d.resolution(),d.y(cell)/(double)d.resolution(),d.z(cell)/(double)d.resolution());
+        Vec3 hi=lo.add(1.0/d.resolution(),1.0/d.resolution(),1.0/d.resolution());
+        if(d.slope()!=null){lo=d.slope().point(lo.x,lo.y,lo.z);hi=d.slope().point(hi.x,hi.y,hi.z);}
+        lo=DesignOrientation.rotate(d.orientation(),lo);hi=DesignOrientation.rotate(d.orientation(),hi);
+        return new VolumeRegion(p.getX()*16+(int)Math.floor(Math.min(lo.x,hi.x)*16),p.getY()*16+(int)Math.floor(Math.min(lo.y,hi.y)*16),p.getZ()*16+(int)Math.floor(Math.min(lo.z,hi.z)*16),p.getX()*16+(int)Math.ceil(Math.max(lo.x,hi.x)*16),p.getY()*16+(int)Math.ceil(Math.max(lo.y,hi.y)*16),p.getZ()*16+(int)Math.ceil(Math.max(lo.z,hi.z)*16));
+    }
     public VolumeRegion union(VolumeRegion b){return new VolumeRegion(Math.min(x0,b.x0),Math.min(y0,b.y0),Math.min(z0,b.z0),Math.max(x1,b.x1),Math.max(y1,b.y1),Math.max(z1,b.z1));}
     public BlockPos min(){return new BlockPos(Math.floorDiv(x0,16),Math.floorDiv(y0,16),Math.floorDiv(z0,16));}
     public BlockPos max(){return new BlockPos(Math.floorDiv(x1-1,16),Math.floorDiv(y1-1,16),Math.floorDiv(z1-1,16));}
@@ -23,13 +29,22 @@ public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
     public boolean contains(Vec3 p){return p.x*16>=x0-1e-8&&p.x*16<=x1+1e-8&&p.y*16>=y0-1e-8&&p.y*16<=y1+1e-8&&p.z*16>=z0-1e-8&&p.z*16<=z1+1e-8;}
     public DesignOperations.Plan hammer(BlockPos pos,BlockDesign d){
         BitSet selected=new BitSet();if(d.resolution()!=1)for(int c=0;c<d.resolution()*d.resolution()*d.resolution();c++)if(d.occupied(c)){
-            var center=DesignOrientation.rotate(d.orientation(),new Vec3((d.x(c)+.5)/d.resolution(),(d.y(c)+.5)/d.resolution(),(d.z(c)+.5)/d.resolution())).add(pos.getX(),pos.getY(),pos.getZ());if(contains(center))selected.set(c);
+            var point=new Vec3((d.x(c)+.5)/d.resolution(),(d.y(c)+.5)/d.resolution(),(d.z(c)+.5)/d.resolution());if(d.slope()!=null)point=d.slope().point(point.x,point.y,point.z);var center=DesignOrientation.rotate(d.orientation(),point).add(pos.getX(),pos.getY(),pos.getZ());if(contains(center))selected.set(c);
         }return new DesignOperations.Plan(d,d.remove(selected),selected.stream().boxed().toList(),java.util.List.of(),0);
     }
     public SlopePlane plane(BlockPos pos,BlockDesign d,int direction,boolean upper){
-        Direction facing=new Direction[]{Direction.EAST,Direction.SOUTH,Direction.WEST,Direction.NORTH}[direction];var lo=min();int length=facing.getAxis()==Direction.Axis.X?width():depth(),height=height();
-        int a=-height*facing.getStepX(),b=length,c=-height*facing.getStepZ();int origin=facing.getAxis()==Direction.Axis.X?(facing.getStepX()>0?lo.getX():max().getX()+1):(facing.getStepZ()>0?lo.getZ():max().getZ()+1);
-        int offset=length*lo.getY()+(a!=0?a:c)*origin;if(upper){a=-a;b=-b;c=-c;offset=-offset;}
-        return SlopePlane.local(a,b,c,offset,pos,d.orientation());
+        Direction facing=new Direction[]{Direction.EAST,Direction.SOUTH,Direction.WEST,Direction.NORTH}[direction];
+        int length=facing.getAxis()==Direction.Axis.X?x1-x0:z1-z0,height=y1-y0;
+        int a=-height*facing.getStepX(),b=length,c=-height*facing.getStepZ();
+        int origin=facing.getAxis()==Direction.Axis.X?(facing.getStepX()>0?x0:x1):(facing.getStepZ()>0?z0:z1);
+        // Work in local sixteenths before scaling to preserve fractional intercepts without world-coordinate overflow.
+        long local=(long)length*(y0-pos.getY()*16);
+        if(a!=0)local+=(long)a*(origin-pos.getX()*16);else local+=(long)c*(origin-pos.getZ()*16);
+        int sign=upper?-1:1;
+        return new SlopePlane(sign*a*16,sign*b*16,sign*c*16,Math.toIntExact(sign*local)).rotated(DesignOrientation.inverse(d.orientation()));
+    }
+    public SlopePlane creationPlane(BlockPos pos,BlockDesign d,int direction,boolean upper){
+        var p=plane(pos,d,direction,upper);
+        return new SlopePlane(p.a(),p.b(),p.c(),p.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)));
     }
 }

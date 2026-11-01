@@ -462,6 +462,8 @@
   "paint.paintableblocks.370": "Black stained glass",
   "paint.paintableblocks.371": "Black stained glass connected",
   "paint.paintableblocks.372": "Tinted glass",
-  "paint.paintableblocks.373": "Tinted glass connected"
+  "paint.paintableblocks.373": "Tinted glass connected",
+  "button.paintableblocks.dimension_step": "Dimension step",
+  "button.paintableblocks.edit_grid": "Editing subdivision"
 }
 
