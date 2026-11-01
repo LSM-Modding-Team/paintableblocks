@@ -22,7 +22,7 @@ public record SlopePlane(int a,int b,int c,int offset,java.util.List<Integer> bo
         bounds=java.util.List.copyOf(bounds);
         if(bounds.size()!=6)throw new IllegalArgumentException("Invalid bounds");
         for(int i=0;i<3;i++)if(bounds.get(i)<0||bounds.get(i+3)>16||bounds.get(i)>=bounds.get(i+3))throw new IllegalArgumentException("Empty bounds");
-        if(Math.abs((long)a)>8192||Math.abs((long)b)>8192||Math.abs((long)c)>8192||Math.abs((long)offset)>262144||((a!=0?1:0)+(b!=0?1:0)+(c!=0?1:0)!=2))throw new IllegalArgumentException("Invalid slope plane");
+        if(Math.abs((long)a)>8192||Math.abs((long)b)>8192||Math.abs((long)c)>8192||Math.abs((long)offset)>262144||((a!=0?1:0)+(b!=0?1:0)+(c!=0?1:0)<1||(a!=0?1:0)+(b!=0?1:0)+(c!=0?1:0)>2))throw new IllegalArgumentException("Invalid slope plane");
         int g=gcd(gcd(Math.abs(a),Math.abs(b)),gcd(Math.abs(c),Math.abs(offset)));a/=g;b/=g;c/=g;offset/=g;
     }
     private static int gcd(int a,int b){while(b!=0){int t=a%b;a=b;b=t;}return a;}

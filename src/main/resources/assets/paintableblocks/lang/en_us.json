@@ -464,6 +464,14 @@
   "paint.paintableblocks.372": "Tinted glass",
   "paint.paintableblocks.373": "Tinted glass connected",
   "button.paintableblocks.dimension_step": "Dimension step",
-  "button.paintableblocks.edit_grid": "Editing subdivision"
+  "button.paintableblocks.edit_grid": "Editing subdivision",
+  "button.paintableblocks.vertical_slope": "Vertical mode",
+  "button.paintableblocks.horizontal_slope": "Horizontal mode",
+  "button.paintableblocks.start_level": "Start level",
+  "button.paintableblocks.end_level": "End level",
+  "button.paintableblocks.profile_page": "Profile (switch page)",
+  "button.paintableblocks.dimensions_page": "Dimensions (switch page)",
+  "button.paintableblocks.positive_side": "Positive lateral side",
+  "button.paintableblocks.negative_side": "Negative lateral side"
 }
 

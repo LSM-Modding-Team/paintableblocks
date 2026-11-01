@@ -1,5 +1,15 @@
 # Registro de cambios
 
+## 2026-11-01 — Cotas independientes y perfiles verticales
+
+- Formador con cotas inicial/final en unidades de 1/16, relativas al origen del prisma. Una rampa 0,5 → 1 en un prisma Y=1 conserva una base sólida hasta Y=0; ΔY sigue desplazando toda la pieza y puede combinarse con las cotas.
+- Perfiles ascendentes, descendentes y planos (cotas iguales). Modo horizontal Y=f(X/Z) y vertical Z=f(X) o X=f(Z), extruido en altura, con cuatro sentidos y selección del lado sólido. Mismos parámetros en creación creativa y transformación de supervivencia, que solo retira material.
+- Cotas validadas por servidor, incluidas en claves de planificación/vista previa y sincronización. Dos páginas compactas del formador para perfil y dimensiones, traducciones español/inglés.
+- La geometría resultante utiliza el plano y límites persistentes existentes: selección, pintura, colisión, conservación, rotación y cristal comparten la misma forma; no se crean nuevos PNG ni bloques.
+- Protocolo 9; formato de diseño 3, sin migraciones. Contratos de base sólida, perfiles planos/descendentes, corte vertical, guardado y rotaciones preparados, sin ejecutar.
+- Solo lectura, edición y revisión del diff; sin compilar ni ejecutar Java, Gradle, scripts, pruebas o Minecraft. Publicación directa online en `26.2`, sin commits locales.
+
+
 ## 2026-11-01 — Pendientes con dimensiones fraccionarias
 
 - Creación del formador con dimensiones de 1/16 a 16 bloques y origen desplazable de 0 a 15/16 por eje; paso elegible 1, 1/2, 1/4, 1/8 o 1/16, independiente de la subdivisión editable. Conserva la creación exclusiva de creativo y la transformación existente en supervivencia.

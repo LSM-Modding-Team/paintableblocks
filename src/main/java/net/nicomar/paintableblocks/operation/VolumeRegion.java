@@ -43,6 +43,28 @@ public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
         int sign=upper?-1:1;
         return new SlopePlane(sign*a*16,sign*b*16,sign*c*16,Math.toIntExact(sign*local)).rotated(DesignOrientation.inverse(d.orientation()));
     }
+    /** Endpoint distances are local sixteenths along Y, or the transverse horizontal axis in vertical mode. */
+    public SlopePlane profilePlane(BlockPos pos,BlockDesign d,int direction,boolean upper,boolean vertical,int start,int end,boolean bounded){
+        if(direction<0||direction>3)throw new IllegalArgumentException("Invalid direction");
+        boolean runX=direction%2==0,positive=direction<2;
+        int runSpan=runX?x1-x0:z1-z0;
+        int dependentSpan=vertical?(runX?z1-z0:x1-x0):y1-y0;
+        if(end<0)end=dependentSpan;
+        if(start<0||end<0||start>dependentSpan||end>dependentSpan)throw new IllegalArgumentException("Endpoint outside prism");
+        int delta=end-start,runCoefficient=-delta*(positive?1:-1),dependentCoefficient=runSpan;
+        int a=runX?runCoefficient:vertical?dependentCoefficient:0;
+        int b=vertical?0:dependentCoefficient;
+        int c=runX?(vertical?dependentCoefficient:0):runCoefficient;
+        int runOrigin=runX?(positive?x0:x1):(positive?z0:z1);
+        int runPosition=(runX?pos.getX():pos.getZ())*16;
+        int dependentOrigin=vertical?(runX?z0:x0):y0;
+        int dependentPosition=(vertical?(runX?pos.getZ():pos.getX()):pos.getY())*16;
+        long constant=(long)dependentCoefficient*(dependentOrigin-dependentPosition+start)+(long)runCoefficient*(runOrigin-runPosition);
+        int sign=upper?-1:1;
+        var plane=new SlopePlane(sign*a*16,sign*b*16,sign*c*16,Math.toIntExact(sign*constant));
+        if(bounded)plane=new SlopePlane(plane.a(),plane.b(),plane.c(),plane.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)));
+        return plane.rotated(DesignOrientation.inverse(d.orientation()));
+    }
     public SlopePlane creationPlane(BlockPos pos,BlockDesign d,int direction,boolean upper){
         var p=plane(pos,d,direction,upper);
         return new SlopePlane(p.a(),p.b(),p.c(),p.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)));

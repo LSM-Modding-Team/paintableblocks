@@ -33,8 +33,34 @@ public final class SlopeVolumeContractChecks {
             check(Math.abs(area-Math.hypot(length,.75)*width)<1e-7,"Fractional ramp has exact continuous area");
         }
     }
+    private static void profiles(){
+        var region=VolumeRegion.block(BlockPos.ZERO);
+        for(int n:List.of(1,2,4,8,16))for(int direction=0;direction<4;direction++)for(boolean vertical:List.of(false,true))for(boolean upper:List.of(false,true)){
+            var full=BlockDesign.full(n);
+            for(int[] levels:List.of(new int[]{8,16},new int[]{16,8},new int[]{8,8},new int[]{0,16})){
+                var p=region.profilePlane(BlockPos.ZERO,full,direction,upper,vertical,levels[0],levels[1],true);
+                var d=full.withSlope(p);
+                var encoded=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,d).getOrThrow();
+                check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow().equals(d),"Profile survives persistence");
+                check(vertical?p.b()==0:p.b()!=0,"Vertical profile is extruded along Y");
+                for(int rotation=0;rotation<24;rotation++)check(p.rotated(rotation).rotated(DesignOrientation.inverse(rotation)).equals(p),"Profile supports all rotations");
+            }
+        }
+        var full=BlockDesign.full(4);
+        var ramp=full.withSlope(region.profilePlane(BlockPos.ZERO,full,0,false,false,8,16,true));
+        var hit=new DesignOutlineShape(ramp).clip(new Vec3(.25,2,.5),new Vec3(.25,-1,.5),BlockPos.ZERO);
+        check(hit!=null&&Math.abs(hit.getLocation().y-.625)<1e-8,"Raised ramp starts at half height without translating its base");
+        check(!DesignGeometry.shape(ramp).getFaceShape(Direction.DOWN).isEmpty(),"Raised ramp retains a solid bottom");
+        var wall=full.withSlope(region.profilePlane(BlockPos.ZERO,full,0,false,true,8,16,true));
+        var side=new DesignOutlineShape(wall).clip(new Vec3(.25,.75,2),new Vec3(.25,.75,-1),BlockPos.ZERO);
+        check(side!=null&&Math.abs(side.getLocation().z-.625)<1e-8,"Vertical profile creates a diagonal wall");
+        var slab=full.withSlope(region.profilePlane(BlockPos.ZERO,full,0,false,false,8,8,true));
+        var flat=new DesignOutlineShape(slab).clip(new Vec3(.5,2,.5),new Vec3(.5,-1,.5),BlockPos.ZERO);
+        check(flat!=null&&Math.abs(flat.getLocation().y-.5)<1e-8,"Equal endpoints create a flat cap");
+        reject(()->region.profilePlane(BlockPos.ZERO,full,0,false,false,17,16,true));
+    }
     public static void run(){
-        fractional();
+        fractional();profiles();
         var basic=new SlopePlane(-1,1,0,0);
         var invalid=new com.google.gson.JsonObject();invalid.addProperty("a",0);invalid.addProperty("b",0);invalid.addProperty("c",0);invalid.addProperty("offset",0);
         check(SlopePlane.CODEC.parse(JsonOps.INSTANCE,invalid).error().isPresent(),"Invalid plane returns codec error instead of escaping quarantine");

@@ -464,6 +464,14 @@
   "paint.paintableblocks.372": "Cristal tintado oscuro",
   "paint.paintableblocks.373": "Cristal tintado oscuro conectable",
   "button.paintableblocks.dimension_step": "Paso de dimensiones",
-  "button.paintableblocks.edit_grid": "Subdivisión editable"
+  "button.paintableblocks.edit_grid": "Subdivisión editable",
+  "button.paintableblocks.vertical_slope": "Modo vertical",
+  "button.paintableblocks.horizontal_slope": "Modo horizontal",
+  "button.paintableblocks.start_level": "Cota inicial",
+  "button.paintableblocks.end_level": "Cota final",
+  "button.paintableblocks.profile_page": "Perfil (cambiar página)",
+  "button.paintableblocks.dimensions_page": "Dimensiones (cambiar página)",
+  "button.paintableblocks.positive_side": "Lado lateral positivo",
+  "button.paintableblocks.negative_side": "Lado lateral negativo"
 }
 

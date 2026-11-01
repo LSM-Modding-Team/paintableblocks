@@ -20,6 +20,16 @@ Se mantienen el anclaje creativo junto a la cara inicial, la exigencia de aire s
 
 Código preparado y contratos escritos; sin compilación ni ejecución de pruebas o Minecraft.
 
+## Cotas inicial/final y modo vertical
+
+El perfil tiene dos cotas en pasos de hasta 1/16, medidas desde el origen del prisma, entre cero y su extensión dependiente. Son independientes del desplazamiento ΔY: con ΔY=0, Y=1 y cotas 0,5 → 1 se mantiene la base sólida desde el suelo; con ΔY=0,5 se desplaza todo el prisma.
+
+Se admiten cotas ascendentes, descendentes e iguales (perfil plano). El modo horizontal corta en Y según X/Z. El modo vertical corta en Z según X o en X según Z y se extruye a lo largo de Y, generando una cuña lateral. Los cuatro sentidos y la inversión seleccionan orientación y lado sólido. En vertical las cotas representan distancias laterales, no alturas.
+
+Ambos perfiles se ofrecen al transformar y al crear. La transformación solo intersecta el material existente: no rellena huecos; se mantiene la regla de un único plano por pieza. La creación continúa siendo exclusiva de creativo y conserva validaciones de espacio vacío, fluidos, permisos y colisiones.
+
+La interfaz separa perfil y dimensiones en dos páginas. El servidor valida las cotas contra el prisma real y sincroniza el perfil para vista previa y confirmación. Protocolo 9, persistencia 3 sin migraciones. No se ha compilado ni ejecutado el juego o los contratos añadidos.
+
 ## Subdivisión y transformación
 
 Cinco variantes: 1×1, 2×2, 4×4, 8×8 y 16×16. El plano puede generar fragmentos de celda con caras triangulares o inclinadas. Se permiten subdivisiones mezcladas bajo el mismo plano global.
