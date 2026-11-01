@@ -56,9 +56,9 @@ public final class PaintableBlockEntity extends BlockEntity {
         BlockDesign before=design;boolean wasValid=valid;long previousRevision=revision;
         accept(next);revision++;boolean geometryChanged=!wasValid||!before.sameGeometry(design);
         if(level!=null && design.empty()){level.removeBlock(worldPosition,false);return;}
-        boolean cut=!design.complete();boolean stateChanged=level!=null&&getBlockState().getValue(PaintableBlock.CUT)!=cut;
-        if(level!=null && getBlockState().getValue(PaintableBlock.CUT)!=cut) {
-            level.setBlock(worldPosition,getBlockState().setValue(PaintableBlock.CUT,cut),Block.UPDATE_ALL);
+        boolean cut=!design.complete(), light=PaintableBlock.lightPass(design);boolean stateChanged=level!=null&&(getBlockState().getValue(PaintableBlock.CUT)!=cut||getBlockState().getValue(PaintableBlock.LIGHT_PASS)!=light);
+        if(stateChanged) {
+            level.setBlock(worldPosition,getBlockState().setValue(PaintableBlock.CUT,cut).setValue(PaintableBlock.LIGHT_PASS,light),Block.UPDATE_ALL);
         }
         if(level!=null&&geometryChanged&&!stateChanged){
             // Same BlockState can have a different support/collision shape after any edit.
@@ -80,8 +80,8 @@ public final class PaintableBlockEntity extends BlockEntity {
         requestModelDataUpdate();
         if(level!=null&&level.isClientSide()){
             net.nicomar.paintableblocks.performance.VisualInvalidation.add(level,worldPosition);
-            if(before==null||!before.sameGeometry(design))for(var direction:net.minecraft.core.Direction.values()){
-                if(before!=null&&net.nicomar.paintableblocks.design.BoundaryGeometry.faces(before).get(direction.ordinal()).coverage().equals(net.nicomar.paintableblocks.design.BoundaryGeometry.faces(design).get(direction.ordinal()).coverage()))continue;
+            if(before==null||!before.equals(design))for(var direction:net.minecraft.core.Direction.values()){
+                if(before!=null&&before.paints().equals(design.paints())&&net.nicomar.paintableblocks.design.BoundaryGeometry.faces(before).get(direction.ordinal()).coverage().equals(net.nicomar.paintableblocks.design.BoundaryGeometry.faces(design).get(direction.ordinal()).coverage()))continue;
                 var p=worldPosition.relative(direction);if(level.hasChunkAt(p)){net.nicomar.paintableblocks.performance.VisualInvalidation.add(level,p);}
             }
 

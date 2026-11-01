@@ -21,7 +21,7 @@ public final class ProductionInputs {
         if(!plain(stack))return 0;var id=stack.is(Items.POWDER_SNOW_BUCKET)?net.minecraft.resources.Identifier.parse("minecraft:powder_snow"):BuiltInRegistries.ITEM.getKey(stack.getItem());
         return Paints.IDS.getOrDefault(id,0);
     }
-    private static final class Paints{static final java.util.Map<net.minecraft.resources.Identifier,Integer> IDS=PaintCatalog.entries().stream().filter(PaintCatalog.Entry::survivalAvailable).collect(java.util.stream.Collectors.toUnmodifiableMap(PaintCatalog.Entry::identifier,PaintCatalog.Entry::paintId));}
+    private static final class Paints{static final java.util.Map<net.minecraft.resources.Identifier,Integer> IDS=PaintCatalog.entries().stream().filter(PaintCatalog.Entry::survivalAvailable).filter(e -> !PaintCatalog.isConnectedGlass(e.paintId())).collect(java.util.stream.Collectors.toUnmodifiableMap(PaintCatalog.Entry::identifier,PaintCatalog.Entry::paintId));}
 
     public static int storable(ItemStack stack){
         if(!(stack.getItem() instanceof PaintableBlockItem))return -1;var design=stack.get(ModContent.DESIGN.get());

@@ -1,3 +1,7 @@
+# En desarrollo: pinturas de cristal (incompleto)
+
+Se incluye trabajo parcial del catálogo, recetas, traducciones y primeras adaptaciones de luz y renderizado. Los bordes conectables y la integración visual entre bloques siguen pendientes. No se ha compilado ni probado en Minecraft; la implementación puede contener errores y no debe considerarse terminada.
+
 # Registro de cambios
 
 Registra avances reales del repositorio y distingue código preparado, revisión estática y comportamiento comprobado dentro de Minecraft. Las entradas no implican una versión distribuida del mod.

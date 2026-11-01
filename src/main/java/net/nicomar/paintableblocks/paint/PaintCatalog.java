@@ -40,6 +40,13 @@ public final class PaintCatalog {
         if (!validId(id)) throw new IllegalArgumentException("Unknown paint: " + id);
         return entries().get(id - 1);
     }
+    /** Crystal identities are appended in pairs: vanilla, then connected. */
+    public static boolean isGlass(int id) { return id >= 338 && id <= 373; }
+    public static boolean isConnectedGlass(int id) { return isGlass(id) && (id - 338) % 2 == 1; }
+    public static int alternateGlass(int id) {
+        if (!isGlass(id)) throw new IllegalArgumentException("Not a glass paint");
+        return isConnectedGlass(id) ? id - 1 : id + 1;
+    }
     public static void validateRegistries() {
         for (Entry entry : entries()) {
             if (!BuiltInRegistries.BLOCK.containsKey(entry.identifier())) {
@@ -51,12 +58,19 @@ public final class PaintCatalog {
         var stream = PaintCatalog.class.getResourceAsStream("/assets/paintableblocks/catalog/paints.json");
         if (stream == null) throw new IllegalStateException("Missing approved paint catalog");
         try (var reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            Entry[] entries = new Gson().fromJson(reader, Entry[].class);
-            if (entries == null || entries.length != PaintingBalance.PAINTS) throw new IllegalStateException("Expected 337 paints");
+            Entry[] original = new Gson().fromJson(reader, Entry[].class);
+            if (original == null || original.length != 337) throw new IllegalStateException("Expected 337 original paints");
+            Entry[] entries = Arrays.copyOf(original, PaintingBalance.PAINTS);
+            String[] colors = {"glass", "white_stained_glass", "orange_stained_glass", "magenta_stained_glass", "light_blue_stained_glass", "yellow_stained_glass", "lime_stained_glass", "pink_stained_glass", "gray_stained_glass", "light_gray_stained_glass", "cyan_stained_glass", "purple_stained_glass", "blue_stained_glass", "brown_stained_glass", "green_stained_glass", "red_stained_glass", "black_stained_glass", "tinted_glass"};
+            for (int i = 0; i < colors.length; i++) {
+                int id = 338 + i * 2;
+                entries[id - 1] = new Entry(id, "minecraft:" + colors[i], colors[i], colors[i]);
+                entries[id] = new Entry(id + 1, "minecraft:" + colors[i], colors[i] + " conectable", colors[i] + " connected");
+            }
             var names = new java.util.HashSet<String>();
             for (int i = 0; i < entries.length; i++) {
                 Entry entry = entries[i];
-                if (entry.paintId() != i + 1 || !names.add(entry.blockId()) || entry.nameEs().isBlank() || entry.nameEn().isBlank()) {
+                if (entry.paintId() != i + 1 || (!names.add(entry.blockId()) && !isConnectedGlass(entry.paintId())) || entry.nameEs().isBlank() || entry.nameEn().isBlank()) {
                     throw new IllegalStateException("Invalid or duplicate catalog entry " + (i + 1));
                 }
                 entry.identifier();

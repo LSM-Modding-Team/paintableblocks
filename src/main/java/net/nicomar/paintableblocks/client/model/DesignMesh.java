@@ -120,8 +120,13 @@ public final class DesignMesh {
         for(Vertex vertex:vertices){Vec3 p=vertex.position;double[] xyzp={p.x,p.y,p.z};xyzp[axis]=(constant-coordinate(normal,u)*xyzp[u]-coordinate(normal,v)*xyzp[v])/coordinate(normal,axis);
             transformed.add(new Vertex(DesignOrientation.rotate(design.orientation(),new Vec3(xyzp[0],xyzp[1],xyzp[2])),vertex.u,vertex.v,vertex.color));}
         Direction direction=DesignOrientation.direction(design.orientation(),face);
-        if(transformed.size()==4)emit(transformed.get(0),transformed.get(1),transformed.get(2),transformed.get(3),direction,source.materialInfo(),output);
-        else for(int i=1;i+1<transformed.size();i++)emit(transformed.get(0),transformed.get(i),transformed.get(i+1),transformed.get(i+1),direction,source.materialInfo(),output);
+        if(transformed.size()==4){
+            emit(transformed.get(0),transformed.get(1),transformed.get(2),transformed.get(3),direction,source.materialInfo(),output);
+            if(PaintCatalog.isGlass(design.paint(surface)))emit(transformed.get(3),transformed.get(2),transformed.get(1),transformed.get(0),direction.getOpposite(),source.materialInfo(),output);
+        } else for(int i=1;i+1<transformed.size();i++){
+            emit(transformed.get(0),transformed.get(i),transformed.get(i+1),transformed.get(i+1),direction,source.materialInfo(),output);
+            if(PaintCatalog.isGlass(design.paint(surface)))emit(transformed.get(i+1),transformed.get(i),transformed.get(0),transformed.get(0),direction.getOpposite(),source.materialInfo(),output);
+        }
     }
     private static double side(Vec3 p,Vec3 a,Vec3 b,int u,int v){return (coordinate(b,u)-coordinate(a,u))*(coordinate(p,v)-coordinate(a,v))-(coordinate(b,v)-coordinate(a,v))*(coordinate(p,u)-coordinate(a,u));}
     private static void emit(Vertex a,Vertex b,Vertex c,Vertex d,Direction face,BakedQuad.MaterialInfo material,List<BakedQuad> output){

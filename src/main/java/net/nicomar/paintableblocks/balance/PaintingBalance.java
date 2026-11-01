@@ -5,7 +5,7 @@ import java.util.List;
 /** Shared gameplay units. No renderer, menu or recipe owns a second copy. */
 public final class PaintingBalance {
     public static final List<Integer> RESOLUTIONS = List.of(1, 2, 4, 8, 16);
-    public static final int PAINTS = 337;
+    public static final int PAINTS = 373;
     public static final int UNITS_PER_PAINT_ITEM = 256;
     public static final float HARDNESS = 1.5F;
     public static final float BLAST_RESISTANCE = 6.0F;

@@ -38,7 +38,7 @@ public final class PaintableBlockItem extends BlockItem {
     @Override protected BlockState getPlacementState(BlockPlaceContext context){
         BlockDesign design=preparedFor(context);
         BlockState state=super.getPlacementState(context);
-        return design==null||state==null?null:state.setValue(PaintableBlock.CUT,!design.complete());
+        return design==null||state==null?null:state.setValue(PaintableBlock.CUT,!design.complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(design));
     }
 
 }

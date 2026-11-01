@@ -25,10 +25,12 @@ import net.nicomar.paintableblocks.operation.CollectionPolicy;
 public final class PaintableBlock extends BaseEntityBlock {
     public static final net.minecraft.world.level.block.state.properties.BooleanProperty CUT =
             net.minecraft.world.level.block.state.properties.BooleanProperty.create("cut");
+    public static final net.minecraft.world.level.block.state.properties.BooleanProperty LIGHT_PASS =
+            net.minecraft.world.level.block.state.properties.BooleanProperty.create("light_pass");
     public static final MapCodec<PaintableBlock> CODEC=RecordCodecBuilder.mapCodec(i->i.group(
             Codec.INT.fieldOf("resolution").forGetter(PaintableBlock::resolution),propertiesCodec()).apply(i,PaintableBlock::new));
     private final int resolution;
-    public PaintableBlock(int resolution,Properties properties){super(properties);this.resolution=PaintingBalance.requireResolution(resolution);registerDefaultState(stateDefinition.any().setValue(CUT,false));}
+    public PaintableBlock(int resolution,Properties properties){super(properties);this.resolution=PaintingBalance.requireResolution(resolution);registerDefaultState(stateDefinition.any().setValue(CUT,false).setValue(LIGHT_PASS,false));}
     public int resolution(){return resolution;}
     @Override protected MapCodec<? extends BaseEntityBlock> codec(){return CODEC;}
     @Override public BlockEntity newBlockEntity(BlockPos pos,BlockState state){return new PaintableBlockEntity(pos,state);}
@@ -52,8 +54,9 @@ public final class PaintableBlock extends BaseEntityBlock {
         }
         return new ItemStack(asItem());
     }
-    @Override protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block,BlockState> builder){builder.add(CUT);}
-    @Override protected int getLightDampening(BlockState state){return state.getValue(CUT)?0:15;}
-    @Override protected boolean propagatesSkylightDown(BlockState state){return state.getValue(CUT);}
+    @Override protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block,BlockState> builder){builder.add(CUT,LIGHT_PASS);}
+    public static boolean lightPass(net.nicomar.paintableblocks.design.BlockDesign d){Boolean glass=d.glassLight();return glass==null?!d.complete():glass;}
+    @Override protected int getLightDampening(BlockState state){return state.getValue(LIGHT_PASS)?0:15;}
+    @Override protected boolean propagatesSkylightDown(BlockState state){return state.getValue(LIGHT_PASS);}
 
 }

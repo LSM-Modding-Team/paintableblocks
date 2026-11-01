@@ -99,6 +99,16 @@ public final class BlockDesign {
     public boolean complete(){return slope==null&&count()==resolution*resolution*resolution;}
     public boolean empty(){return occupied.isEmpty();}
     public boolean painted(){return !paints.isEmpty();}
+    /** Null means no glass is present, preserving the existing lighting rules. */
+    public Boolean glassLight() {
+        boolean any = paints.values().stream().anyMatch(PaintCatalog::isGlass);
+        if (!any) return null;
+        for (var surface : DesignGeometry.surfaces(this)) {
+            int id = paint(surface);
+            if (!PaintCatalog.isGlass(id) || id >= 372) return false;
+        }
+        return true;
+    }
     public Map<Integer,Integer> paints(){return paints;}
     public int index(int x,int y,int z){return x+resolution*(y+resolution*z);}
     public int x(int cell){return cell%resolution;}
