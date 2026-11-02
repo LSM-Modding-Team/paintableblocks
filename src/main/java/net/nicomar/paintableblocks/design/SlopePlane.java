@@ -12,7 +12,7 @@ public record SlopePlane(int a,int b,int c,int offset,java.util.List<Integer> bo
     private record Raw(int a,int b,int c,int offset,java.util.List<Integer> bounds){
         private static final Codec<Raw> CODEC=RecordCodecBuilder.create(i->i.group(
                 Codec.intRange(-8192,8192).fieldOf("a").forGetter(Raw::a),Codec.intRange(-8192,8192).fieldOf("b").forGetter(Raw::b),
-                Codec.intRange(-8192,8192).fieldOf("c").forGetter(Raw::c),Codec.intRange(-262144,262144).fieldOf("offset").forGetter(Raw::offset), Codec.intRange(0,16).listOf(6,6).fieldOf("bounds").forGetter(Raw::bounds)).apply(i,Raw::new));
+                Codec.intRange(-8192,8192).fieldOf("c").forGetter(Raw::c),Codec.intRange(-262144,262144).fieldOf("offset").forGetter(Raw::offset), Codec.intRange(0,16).listOf(6,6).optionalFieldOf("bounds",FULL).forGetter(Raw::bounds)).apply(i,Raw::new));
     }
     public static final Codec<SlopePlane> CODEC=Raw.CODEC.flatXmap(raw->{
         try{return com.mojang.serialization.DataResult.success(new SlopePlane(raw.a,raw.b,raw.c,raw.offset,raw.bounds));}

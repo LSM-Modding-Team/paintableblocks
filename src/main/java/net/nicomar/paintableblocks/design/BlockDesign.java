@@ -77,13 +77,13 @@ public final class BlockDesign {
     }
     private static DataResult<BlockDesign> decode(Data data) {
         try {
-            if(data.version()!=VERSION) throw new IllegalArgumentException("Unsupported design version");
+            if(data.version()<1||data.version()>VERSION) throw new IllegalArgumentException("Unsupported design version");
             int n=PaintingBalance.requireResolution(data.resolution());
             if(data.occupied().size()!=(n*n*n+63)/64 || data.paints().size()>7*n*n*n) throw new IllegalArgumentException("Invalid design size");
             long[] words=data.occupied().stream().mapToLong(Long::longValue).toArray();
             TreeMap<Integer,Integer> paints=new TreeMap<>();
             for(Face face:data.paints()) if(paints.put(face.key(),face.paint())!=null) throw new IllegalArgumentException("Duplicate face");
-            return DataResult.success(new BlockDesign(n,BitSet.valueOf(words),paints,data.orientation(),data.slope().orElse(null)));
+            return DataResult.success(new BlockDesign(n,BitSet.valueOf(words),paints,data.orientation(),data.version()==1?null:data.slope().orElse(null)));
         } catch(IllegalArgumentException e) { return DataResult.error(e::getMessage); }
     }
     private Data data(){return SNAPSHOTS.get(this,this::buildData,d->d.paints().size()+d.occupied().size()+1);}

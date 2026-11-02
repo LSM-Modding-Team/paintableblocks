@@ -59,7 +59,28 @@ public final class SlopeVolumeContractChecks {
         check(flat!=null&&Math.abs(flat.getLocation().y-.5)<1e-8,"Equal endpoints create a flat cap");
         reject(()->region.profilePlane(BlockPos.ZERO,full,0,false,false,17,16,true));
     }
+    private static void combinations(){
+        var region=VolumeRegion.block(BlockPos.ZERO);var full=BlockDesign.full(1);
+        var piece=full.withSlope(region.combinedPlane(BlockPos.ZERO,full,0,false,false,0,16,true,true,8,false));
+        var ramp=new DesignOutlineShape(piece).clip(new Vec3(.25,2,.5),new Vec3(.25,-1,.5),BlockPos.ZERO);
+        var plateau=new DesignOutlineShape(piece).clip(new Vec3(.75,2,.5),new Vec3(.75,-1,.5),BlockPos.ZERO);
+        check(ramp!=null&&Math.abs(ramp.getLocation().y-.5)<1e-8,"Half incline reaches the junction continuously");
+        check(plateau!=null&&Math.abs(plateau.getLocation().y-1)<1e-8,"Complete section and incline coexist inside one resolution-one piece");
+        for(int direction=0;direction<4;direction++)for(boolean vertical:List.of(false,true))for(boolean upper:List.of(false,true))for(boolean first:List.of(false,true))for(int length:new int[]{0,4,8,12,16}){
+            var p=region.combinedPlane(BlockPos.ZERO,full,direction,upper,vertical,0,0,true,true,length,first);
+            var d=full.withSlope(p);check(!d.empty(),"Combined profile retains material");
+            var encoded=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,d).getOrThrow();check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,encoded).getOrThrow().equals(d),"Combined geometry persists without a new format");
+            for(int rotation=0;rotation<24;rotation++)check(p.rotated(rotation).rotated(DesignOrientation.inverse(rotation)).equals(p),"Combined profile rotates with its complete section");
+            if(length==16)check(d.count()==1,"Entire complete section remains a full piece");
+        }
+        var legacy=BlockDesign.full(2).withSlope(new SlopePlane(-1,1,0,0));
+        var json=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,legacy).getOrThrow().getAsJsonObject();
+        json.addProperty("version",2);json.getAsJsonObject("slope").remove("bounds");
+        check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow().equals(legacy),"Version two slopes without bounds upgrade without shape loss");
+        reject(()->region.combinedPlane(BlockPos.ZERO,full,0,false,false,0,16,true,true,17,false));
+    }
     public static void run(){
+        combinations();
         fractional();profiles();
         var basic=new SlopePlane(-1,1,0,0);
         var invalid=new com.google.gson.JsonObject();invalid.addProperty("a",0);invalid.addProperty("b",0);invalid.addProperty("c",0);invalid.addProperty("offset",0);
@@ -85,7 +106,7 @@ public final class SlopeVolumeContractChecks {
             var hit=new DesignOutlineShape(d).clip(new Vec3(.25,2,.5),new Vec3(.25,-1,.5),BlockPos.ZERO);check(hit!=null&&Math.abs(hit.getLocation().y-.25)<1e-8,"Ray hits real incline rather than collision steps");
             var target=DesignGeometry.target(d,hit.getLocation(),hit.getDirection()).orElseThrow();check(target.slope(),"Ray selects inclined paint fragment");
         }
-        var original=BlockDesign.full(4).paint(0,Direction.DOWN,337);var old=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,original).getOrThrow().getAsJsonObject();old.addProperty("version",1);old.remove("slope");check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,old).error().isPresent(),"Obsolete designs are rejected");
+        var original=BlockDesign.full(4).paint(0,Direction.DOWN,337);var old=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,original).getOrThrow().getAsJsonObject();old.addProperty("version",1);old.remove("slope");check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,old).getOrThrow().equals(original),"Version one worlds retain their designs");
         var max=VolumeRegion.block(BlockPos.ZERO).union(VolumeRegion.block(new BlockPos(255,255,255)));check(max.valid(256)&&max.size()==16777216,"Inclusive 256 block boundary");check(!max.union(VolumeRegion.block(new BlockPos(256,0,0))).valid(256),"257 blocks rejected");
         var small=VolumeRegion.cell(BlockPos.ZERO,BlockDesign.full(16),0);check(small.hammer(BlockPos.ZERO,BlockDesign.full(16)).cells().size()==1,"Sixteenth selection only removes its one cell");check(small.hammer(BlockPos.ZERO,BlockDesign.full(2)).cells().isEmpty(),"Mixed grids use centers, not any overlap");
         for(int direction=0;direction<4;direction++)for(boolean upper:List.of(false,true)){

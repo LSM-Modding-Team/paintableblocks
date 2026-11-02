@@ -30,6 +30,22 @@ Ambos perfiles se ofrecen al transformar y al crear. La transformación solo int
 
 La interfaz separa perfil y dimensiones en dos páginas. El servidor valida las cotas contra el prisma real y sincroniza el perfil para vista previa y confirmación. Protocolo 9, persistencia 3 sin migraciones. No se ha compilado ni ejecutado el juego o los contratos añadidos.
 
+## Combinación con una zona completa
+
+Una misma pieza puede conservar una parte completa y otra inclinada. La página Combinación del formador permite activar esta función, ajustar la longitud completa en pasos de hasta 1/16 y elegir si ocupa el inicio o el final del sentido seleccionado. Por ejemplo: longitud total 1, longitud completa 0,5 produce media pieza completa y media inclinada.
+
+La pendiente llega hasta el borde completo en la unión, sin escalón ni cara interna. La cota libre se controla con Inicio cuando la parte completa está al final, o con Fin cuando está al inicio. La otra cota queda determinada por el borde del prisma; en el lado sólido invertido se refleja el perfil para mantener completa la zona elegida.
+
+Cero longitud completa deja toda la extensión inclinada; longitud completa igual al total deja el prisma completo. Se admiten los modos horizontal y vertical, desplazamientos fraccionarios y 24 rotaciones. La representación sigue siendo el prisma intersectado por un plano: el tramo que supera el borde queda completo. No hacen falta múltiples piezas ni un formato nuevo.
+
+La transformación solo retira material de diseños compatibles; no reconstruye recortes ni reemplaza otro plano ya existente. Crear sigue siendo exclusivo de creativo. Colisión, selección, pintura, cristal y conservación usan la geometría común.
+
+### Compatibilidad de mundos
+
+Se mantiene el formato de escritura 3 y se admiten diseños guardados en versiones 1, 2 y 3. Las pendientes anteriores sin límites explícitos conservan el prisma completo. No cambian identificadores ni pinturas. La compatibilidad es al actualizar; no implica poder abrir diseños nuevos con versiones antiguas del mod. Cliente y servidor requieren protocolo 10.
+
+Contratos preparados para lectura antigua y geometría combinada; sin compilación ni pruebas en ejecución.
+
 ## Subdivisión y transformación
 
 Cinco variantes: 1×1, 2×2, 4×4, 8×8 y 16×16. El plano puede generar fragmentos de celda con caras triangulares o inclinadas. Se permiten subdivisiones mezcladas bajo el mismo plano global.

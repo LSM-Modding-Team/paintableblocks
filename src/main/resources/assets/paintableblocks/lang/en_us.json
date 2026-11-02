@@ -472,6 +472,12 @@
   "button.paintableblocks.profile_page": "Profile (switch page)",
   "button.paintableblocks.dimensions_page": "Dimensions (switch page)",
   "button.paintableblocks.positive_side": "Positive lateral side",
-  "button.paintableblocks.negative_side": "Negative lateral side"
+  "button.paintableblocks.negative_side": "Negative lateral side",
+  "button.paintableblocks.combination_page": "Combination (switch page)",
+  "button.paintableblocks.combined_on": "Block + slope: on",
+  "button.paintableblocks.combined_off": "Block + slope: off",
+  "button.paintableblocks.full_length": "Full section length",
+  "button.paintableblocks.full_start": "Full section at start",
+  "button.paintableblocks.full_end": "Full section at end"
 }
 

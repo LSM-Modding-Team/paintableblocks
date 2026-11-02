@@ -65,6 +65,27 @@ public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
         if(bounded)plane=new SlopePlane(plane.a(),plane.b(),plane.c(),plane.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)));
         return plane.rotated(DesignOrientation.inverse(d.orientation()));
     }
+    /** Shorten the incline to leave a complete plateau, preserving the existing stored geometry. */
+    public SlopePlane combinedPlane(BlockPos pos,BlockDesign d,int direction,boolean upper,boolean vertical,int start,int end,boolean bounded,boolean combined,int fullLength,boolean fullAtStart){
+        if(!combined)return profilePlane(pos,d,direction,upper,vertical,start,end,bounded);
+        boolean runX=direction%2==0,positive=direction<2;
+        int run=runX?x1-x0:z1-z0,dependent=vertical?(runX?z1-z0:x1-x0):y1-y0;
+        if(fullLength<0||fullLength>run)throw new IllegalArgumentException("Invalid full section");
+        if(end<0)end=dependent;
+        if(start<0||start>dependent||end<0||end>dependent)throw new IllegalArgumentException("Invalid endpoint");
+        VolumeRegion ramp=this;int low=fullAtStart?dependent:start,high=fullAtStart?end:dependent;
+        if(fullLength==run){low=dependent;high=dependent;}
+        else if(fullLength>0){
+            boolean trimLow=fullAtStart==positive;
+            ramp=runX?new VolumeRegion(x0+(trimLow?fullLength:0),y0,z0,x1-(trimLow?0:fullLength),y1,z1):
+                new VolumeRegion(x0,y0,z0+(trimLow?fullLength:0),x1,y1,z1-(trimLow?0:fullLength));
+        }
+        if(upper){low=dependent-low;high=dependent-high;}
+        var plane=ramp.profilePlane(pos,d,direction,upper,vertical,low,high,false);
+        if(!bounded)return plane;
+        var world=plane.rotated(d.orientation());
+        return new SlopePlane(world.a(),world.b(),world.c(),world.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16))).rotated(DesignOrientation.inverse(d.orientation()));
+    }
     public SlopePlane creationPlane(BlockPos pos,BlockDesign d,int direction,boolean upper){
         var p=plane(pos,d,direction,upper);
         return new SlopePlane(p.a(),p.b(),p.c(),p.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)));

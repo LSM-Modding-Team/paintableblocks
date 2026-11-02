@@ -1,5 +1,15 @@
 # Registro de cambios
 
+## 2026-11-01 — Combinación de bloque completo y pendiente
+
+- Una sola pieza admite un tramo completo y otro inclinado, incluso en 1×1, sin entidades separadas. El plano alcanza el límite del prisma en la unión ajustable, conservando meseta y pendiente con la geometría persistente existente.
+- Tercera página del formador: activar combinación, longitud completa de cero a toda la extensión en pasos de hasta 1/16 y extremo inicial/final. Funciona en horizontal/vertical, cuatro sentidos y ambos lados sólidos; creación y transformación conservan sus permisos y costes.
+- La cota del extremo inclinado se mantiene configurable. La unión alcanza el borde completo; al cambiar de extremo se traslada la cota baja. La longitud completa igual a toda la extensión produce un bloque completo; cero deja una pendiente sin meseta.
+- Compatibilidad de actualización: escritura de diseño 3 y lectura de 1/2/3; pendientes antiguas sin límites reciben el prisma completo. Sin cambios de IDs, PNG ni datos de pinturas. No se garantiza bajar de versión.
+- Protocolo 10: actualizar ambos lados, conservando mundos existentes. Configuración validada por servidor e incluida en vista previa, confirmación, sincronización y cachés.
+- Contratos de combinación en una pieza, unión, extremos, orientación, guardado y lectura de formatos antiguos escritos, no ejecutados. Solo lectura, edición y revisión del diff; sin compilación, Java, Gradle, scripts, pruebas o Minecraft. Commit online en `26.2`, sin commit local.
+
+
 ## 2026-11-01 — Cotas independientes y perfiles verticales
 
 - Formador con cotas inicial/final en unidades de 1/16, relativas al origen del prisma. Una rampa 0,5 → 1 en un prisma Y=1 conserva una base sólida hasta Y=0; ΔY sigue desplazando toda la pieza y puede combinarse con las cotas.
