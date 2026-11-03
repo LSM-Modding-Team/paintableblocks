@@ -1,5 +1,16 @@
 # Registro de cambios
 
+## 2026-11-03 — Continuidad de planos y previsualización 3D
+
+- Corregida la normalización: también se divide offset por el máximo común divisor. Evita que el plano cambie de posición entre bloques, produciendo mesetas y saltos. Rechazados enteros mínimos que desbordan el cálculo del divisor.
+- Los diseños guardados se leen como la geometría que contienen; no se reinterpreta automáticamente un plano erróneo producido antes del arreglo. Se mantienen formato 4 y lectura 1–3. Las piezas ya generadas con el fallo necesitan regeneración manual si se desea corregir su forma.
+- Eliminado el aviso repetido del chat al cambiar parámetros del formador. Se conservan estados de interfaz y mensajes breves de validación.
+- Sustituida la sección de píxeles por una escena de bloques 3D que reúne geometría resultante, pinturas, recortes y contactos en un único modelo con profundidad compartida. Zoom con rueda y recorte al panel. Componentes temporales de escena nunca se entregan al inventario.
+- Preparación incremental de diseños, hasta dos posiciones y aproximadamente 1 ms entre operaciones por tick; caché de la escena actual por generación de recursos. Presupuesto de 32768 superficies lógicas con aviso de previsualización parcial: no limita la operación del servidor. Coordenadas centradas con doble precisión para evitar pérdida de detalle lejos del origen.
+- Protocolo 12 para el componente de escena y actualización conjunta de cliente/servidor. Contratos de normalización, offsets negativos, continuidad entre bloques y posiciones mundiales distantes preparados, sin ejecutar.
+- Solo lectura, edición y revisión del diff; sin compilación, Java, Gradle, scripts, pruebas o Minecraft ejecutados. Commit directamente online en `26.2`, sin commits locales.
+
+
 ## 2026-11-02 — Dos extremos completos e interfaz integrada
 
 - Corte delimitado por dos uniones, conservando material completo antes y después de la inclinación. Ambas longitudes son independientes; se rechazan solapamientos y el caso sin tramo central conserva todo el material. Las uniones pueden presentar paredes verticales, que se seleccionan y pintan.

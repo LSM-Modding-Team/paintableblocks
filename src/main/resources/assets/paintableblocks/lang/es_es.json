@@ -483,6 +483,7 @@
   "button.paintableblocks.one_end": "Completo en un extremo",
   "button.paintableblocks.other_length": "Longitud del otro extremo",
   "button.paintableblocks.section_preview": "Sección del perfil",
-  "button.paintableblocks.grid_requirement": "Ambos extremos: cuadrícula 16×16"
+  "button.paintableblocks.grid_requirement": "Ambos extremos: cuadrícula 16×16",
+  "button.paintableblocks.blocks_preview": "Previsualización 3D · rueda: zoom"
 }
 

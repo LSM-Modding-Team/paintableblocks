@@ -18,6 +18,8 @@ public final class SlopeFormerScreen extends Screen {
     private boolean upper,create,vertical,combined,fullAtStart,bothEnds;
     private final Map<Button,Integer> controls=new LinkedHashMap<>();
     private Button confirm;
+    private final SlopeScenePreview scene=new SlopeScenePreview();
+    private float zoom=1;
     public SlopeFormerScreen(){
         super(Component.translatable("item.paintableblocks.slope_former"));
         var s=VolumePreview.state();if(s!=null){var r=VolumePreview.region(s);direction=s.direction();resolution=s.resolution();upper=s.upper();create=s.create();vertical=s.vertical();combined=s.combined();fullAtStart=s.fullAtStart();bothEnds=s.bothEnds();fullLength=s.fullLength();otherLength=s.otherLength();start=s.start();
@@ -73,9 +75,10 @@ public final class SlopeFormerScreen extends Screen {
         controls.forEach((b,r)->{int y=40+r*22-scroll;b.setY(y);b.visible=y>=40&&y+20<=height-40;});
     }
     @Override public boolean mouseScrolled(double x,double y,double horizontal,double verticalScroll){
-        if(x<width/2){scroll-=(int)Math.round(verticalScroll*24);position();return true;}return super.mouseScrolled(x,y,horizontal,verticalScroll);
+        if(x<width/2){scroll-=(int)Math.round(verticalScroll*24);position();return true;}zoom=Math.clamp(zoom+(float)verticalScroll*.1F,.5F,2F);return true;
     }
     @Override public void tick(){
+        scene.tick();
         var s=VolumePreview.state();if(s==null){minecraft.gui.setScreen(null);return;}
         var r=VolumePreview.region(s);
         confirm.active=s.phase()==VolumeEditing.READY&&s.direction()==direction&&s.upper()==upper&&s.create()==create&&s.resolution()==resolution&&s.vertical()==vertical&&s.combined()==combined&&s.fullLength()==fullLength&&s.fullAtStart()==fullAtStart&&s.bothEnds()==bothEnds&&s.otherLength()==otherLength&&s.start()==start&&(s.end()<0?span():s.end())==end&&(!create||r.x1()-r.x0()==dimensions[0]&&r.y1()-r.y0()==dimensions[1]&&r.z1()-r.z0()==dimensions[2]&&Math.floorMod(r.x0(),16)==offsets[0]&&Math.floorMod(r.y0(),16)==offsets[1]&&Math.floorMod(r.z0(),16)==offsets[2]);
@@ -83,37 +86,21 @@ public final class SlopeFormerScreen extends Screen {
     private void preview(GuiGraphicsExtractor g){
         int left=width/2+6,right=width-8,top=52,bottom=height-90;
         g.fill(left,top,right,bottom,0xff101923);
-        var s=VolumePreview.state();if(s==null||minecraft.level==null||bottom<=top)return;
-        var r=VolumePreview.region(s);var full=BlockDesign.full(16);
-        Map<BlockPos,SlopePlane> planes=new HashMap<>();
-        int size=Math.min(64,Math.min(right-left,bottom-top));
-        if(size<1)return;
-        for(int y=0;y<size;y++)for(int x=0;x<size;x++){
-            double u=(x+.5)/size,v=1-(y+.5)/size;
-            double X=(r.x0()+u*(r.x1()-r.x0()))/16.0,Y=(r.y0()+v*(r.y1()-r.y0()))/16.0,Z=(r.z0()+.5*(r.z1()-r.z0()))/16.0;
-            if(s.direction()%2==1){Z=(r.z0()+u*(r.z1()-r.z0()))/16.0;X=(r.x0()+.5*(r.x1()-r.x0()))/16.0;}
-            if(s.vertical()){Y=(r.y0()+.5*(r.y1()-r.y0()))/16.0;if(s.direction()%2==0)Z=(r.z0()+v*(r.z1()-r.z0()))/16.0;else X=(r.x0()+v*(r.x1()-r.x0()))/16.0;}
-            var pos=new BlockPos((int)Math.floor(X),(int)Math.floor(Y),(int)Math.floor(Z));
-            try{
-                var p=planes.computeIfAbsent(pos,k->r.doublePlane(k,full,s.direction(),s.upper(),s.vertical(),s.start(),s.end(),s.create(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength()));
-                var local=new Vec3(X-pos.getX(),Y-pos.getY(),Z-pos.getZ());
-                boolean occupied=true;
-                if(!s.create()){
-                    if(!(minecraft.level.getBlockEntity(pos) instanceof net.nicomar.paintableblocks.blockentity.PaintableBlockEntity be)||!be.valid())occupied=false;
-                    else{
-                        var d=be.design();var designPoint=DesignOrientation.rotate(DesignOrientation.inverse(d.orientation()),local);var grid=d.slope()==null?designPoint:d.slope().grid(designPoint);
-                        occupied=grid.x>=0&&grid.y>=0&&grid.z>=0&&grid.x<1&&grid.y<1&&grid.z<1&&d.occupied((int)(grid.x*d.resolution()),(int)(grid.y*d.resolution()),(int)(grid.z*d.resolution()))&&(d.slope()==null||!d.slope().cuts(designPoint)||d.slope().value(designPoint)<=0);
-                        if(s.bothEnds()&&(d.resolution()!=16||d.slope()!=null&&!d.slope().bounds().equals(SlopePlane.FULL)))occupied=false;
-                    }
-                }
-                if(occupied&&(!p.cuts(local)||p.value(local)<=0))g.fill(left+x*(right-left)/size,top+y*(bottom-top)/size,left+(x+1)*(right-left)/size,top+(y+1)*(bottom-top)/size,0xff73c9b3);
-            }catch(IllegalArgumentException ignored){}
-        }
+        if(bottom<=top||scene.stack().isEmpty())return;
+        float pixels=Math.min(right-left,bottom-top)*.85F*zoom;
+        g.enableScissor(left,top,right,bottom);
+        g.pose().pushMatrix();
+        try{
+            g.pose().translate((left+right)/2F-pixels/2,(top+bottom)/2F-pixels/2);
+            g.pose().scale(pixels/16,pixels/16);
+            g.item(scene.stack(),0,0);
+        }finally{g.pose().popMatrix();g.disableScissor();}
     }
     @Override public void extractRenderState(GuiGraphicsExtractor g,int x,int y,float tick){
         g.fill(0,0,width,height,0xf01a2029);g.text(font,title,8,12,0xffffffff);
-        g.text(font,Component.translatable("button.paintableblocks.section_preview"),width/2+6,36,0xffffffff);preview(g);
+        g.text(font,Component.translatable("button.paintableblocks.blocks_preview"),width/2+6,36,0xffffffff);preview(g);
         var s=VolumePreview.state();if(s!=null){g.text(font,Component.translatable(s.phase()==VolumeEditing.READY?"message.paintableblocks.volume_ready":"message.paintableblocks.preview_loading",s.affected(),s.ignored()),width/2+6,height-76,0xffffffff);}
+        if(scene.pending()||scene.limited())g.text(font,Component.translatable(scene.limited()?"message.paintableblocks.preview_simplified":"message.paintableblocks.preview_loading"),width/2+6,height-88,0xffffcc66);
         if(bothEnds)g.text(font,Component.translatable("button.paintableblocks.grid_requirement"),width/2+6,height-58,0xffffcc66);
         if(row*22>height-80){int track=height-80;int thumb=Math.max(12,track*track/(row*22));int y0=40+scroll*(track-thumb)/Math.max(1,row*22-track);g.fill(width/2-7,y0,width/2-4,y0+thumb,0xff9aaabb);}
         super.extractRenderState(g,x,y,tick);

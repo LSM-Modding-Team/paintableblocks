@@ -56,6 +56,16 @@ Todos los controles están en una lista desplazable, sin páginas, junto a una p
 
 Persistencia 4 con lectura de 1–3, ventanas de corte antiguas ausentes equivalen al plano original. Protocolo 11. Compatibilidad al actualizar, no al volver a una versión anterior. Contratos escritos sin ejecutar: no se acredita funcionamiento en Minecraft.
 
+## Corrección de continuidad y escena 3D
+
+El plano se normaliza dividiendo todos sus coeficientes, incluido el término de posición. La misma pendiente global debe atravesar los límites de bloque sin mesetas ni saltos. El paso de ajuste no escalona la superficie visible.
+
+La previsualización integrada utiliza los modelos 3D de los diseños resultantes, con pinturas y recortes, contactos ocultos y profundidad compartida. La rueda sobre el panel ajusta el zoom; sobre los controles desplaza la lista. La preparación es incremental y puede mostrar un resultado parcial con aviso por carga, incompatibilidad o presupuesto visual. La operación autorizada no se recorta por ese presupuesto.
+
+No se envía al chat el aviso de preparación en cada cambio. Se mantienen estados de interfaz y feedback de validación. Protocolo 12; formatos persistentes 1–4 legibles. Se conserva la forma almacenada, sin reconstruir automáticamente piezas antiguas mal generadas.
+
+Código y contratos preparados; sin compilación ni pruebas o Minecraft ejecutados.
+
 ## Subdivisión y transformación
 
 Cinco variantes: 1×1, 2×2, 4×4, 8×8 y 16×16. El plano puede generar fragmentos de celda con caras triangulares o inclinadas. Se permiten subdivisiones mezcladas bajo el mismo plano global.

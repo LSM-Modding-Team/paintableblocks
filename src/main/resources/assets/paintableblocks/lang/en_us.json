@@ -483,6 +483,7 @@
   "button.paintableblocks.one_end": "Full section at one end",
   "button.paintableblocks.other_length": "Other end length",
   "button.paintableblocks.section_preview": "Profile cross-section",
-  "button.paintableblocks.grid_requirement": "Both ends: 16×16 grid"
+  "button.paintableblocks.grid_requirement": "Both ends: 16×16 grid",
+  "button.paintableblocks.blocks_preview": "3D preview · wheel: zoom"
 }
 

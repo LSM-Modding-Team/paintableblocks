@@ -20,10 +20,17 @@ import org.joml.Matrix4fc;
 /** Same projection factory as world blocks; the native wrapper supplies GUI/hand/ground transforms. */
 public final class DesignItemModel implements ItemModel {
     private final DesignMesh meshes;
+    private net.nicomar.paintableblocks.design.PreviewScene lastScene;
+    private net.minecraft.client.resources.model.geometry.QuadCollection lastSceneQuads;
     private final ModelRenderProperties properties;
     private final Matrix4fc transform;
     public DesignItemModel(DesignMesh meshes,ModelRenderProperties properties,Matrix4fc transform){this.meshes=meshes;this.properties=properties;this.transform=transform;}
     @Override public void update(ItemStackRenderState state,ItemStack stack,ItemModelResolver resolver,ItemDisplayContext display,ClientLevel level,ItemOwner owner,int seed){
+        var scene=stack.get(ModContent.PREVIEW_SCENE.get());
+        if(scene!=null){
+            if(scene!=lastScene){lastSceneQuads=PreviewSceneMesh.build(meshes,scene);lastScene=scene;}
+            new CuboidItemModelWrapper(List.of(),lastSceneQuads,properties,transform).update(state,stack,resolver,display,level,owner,seed);return;
+        }
         BlockDesign design=stack.get(ModContent.DESIGN.get());
         if(design==null||design.empty())return;
         new CuboidItemModelWrapper(List.of(),meshes.mesh(design).quads(),properties,transform).update(state,stack,resolver,display,level,owner,seed);

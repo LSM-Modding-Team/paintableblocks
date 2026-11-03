@@ -131,7 +131,7 @@ public final class VolumeEditing {
         watch(p,s);scan(p,s);
     }
     private static boolean chunks(ServerPlayer p,Session s){var lo=s.region.min();var hi=s.region.max();for(int z=lo.getZ()>>4;z<=hi.getZ()>>4;z++)for(int x=lo.getX()>>4;x<=hi.getX()>>4;x++)if(!p.level().hasChunkAt(new BlockPos(x*16,lo.getY(),z*16)))return false;return true;}
-    private static void scan(ServerPlayer p,Session s){if(!chunks(p,s)){stop(p,"volume_unloaded");return;}s.pendingPos=null;s.pendingWork=null;s.sentPhase=-1;s.phase=SCANNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;s.ignored=0;s.expected=0;reply(p,s);message(p,"volume_warning");p.sendSystemMessage(Component.translatable("message.paintableblocks.volume_warning"));}
+    private static void scan(ServerPlayer p,Session s){if(!chunks(p,s)){stop(p,"volume_unloaded");return;}s.pendingPos=null;s.pendingWork=null;s.sentPhase=-1;s.phase=SCANNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;s.ignored=0;s.expected=0;reply(p,s);message(p,"volume_warning");}
     private static void start(ServerPlayer p,Session s){if(s.invalid||!held(p,s)||!chunks(p,s)){stop(p,"volume_invalid");return;}
         var tool=p.getItemInHand(s.hand);if(s.former&&!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<s.expected){message(p,"volume_durability",s.expected);return;}
         s.pendingPos=null;s.pendingWork=null;s.phase=RUNNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;reply(p,s);

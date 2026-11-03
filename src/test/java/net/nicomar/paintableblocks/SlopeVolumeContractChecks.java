@@ -99,7 +99,24 @@ public final class SlopeVolumeContractChecks {
         check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,legacy).getOrThrow().equals(old),"Existing format three worlds retain their original slope");
         reject(()->r.doublePlane(BlockPos.ZERO,base,0,false,false,0,16,true,true,12,true,true,12));
     }
+    private static void normalization(){
+        check(new SlopePlane(6,9,0,12).equals(new SlopePlane(2,3,0,4)),"Normalizing a plane divides the offset too");
+        check(new SlopePlane(-24,12,0,-18).equals(new SlopePlane(-4,2,0,-3)),"Negative offsets retain their plane position");
+        reject(()->new SlopePlane(Integer.MIN_VALUE,1,0,0));
+        for(int origin:new int[]{-1000000,-17,0,101,1000000}){
+            var r=VolumeRegion.block(new BlockPos(origin,64,-3)).union(VolumeRegion.block(new BlockPos(origin+5,68,-3)));
+            for(int block=0;block<6;block++){
+                var pos=new BlockPos(origin+block,64,-3);var p=r.profilePlane(pos,BlockDesign.full(1),0,false,false,0,80,false);
+                double localX=.375,localY=5*(block+localX)/6;
+                check(Math.abs(p.value(new Vec3(localX,localY,.5)))<1e-8,"Every block uses the same continuous global plane");
+                var rotated=p.rotated(7).rotated(DesignOrientation.inverse(7));check(rotated.equals(p),"Plane position is stable across rotations");
+            }
+        }
+        var stored=BlockDesign.full(4).withSlope(new SlopePlane(-1,1,0,0));var json=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,stored).getOrThrow();
+        check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow().equals(stored),"Existing canonical saved geometry is unchanged");
+    }
     public static void run(){
+        normalization();
         bothEnds();
         combinations();
         fractional();profiles();
