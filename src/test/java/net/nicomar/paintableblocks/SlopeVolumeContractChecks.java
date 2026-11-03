@@ -79,7 +79,28 @@ public final class SlopeVolumeContractChecks {
         check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow().equals(legacy),"Version two slopes without bounds upgrade without shape loss");
         reject(()->region.combinedPlane(BlockPos.ZERO,full,0,false,false,0,16,true,true,17,false));
     }
+    private static void bothEnds(){
+        var r=VolumeRegion.block(BlockPos.ZERO);var base=BlockDesign.full(16);
+        var p=r.doublePlane(BlockPos.ZERO,base,0,false,false,0,16,true,true,4,true,true,4);
+        var d=r.doubleSeed(BlockPos.ZERO,base).withSlope(p);
+        for(double x:new double[]{.125,.875}){
+            var hit=new DesignOutlineShape(d).clip(new Vec3(x,2,.5),new Vec3(x,-1,.5),BlockPos.ZERO);
+            check(hit!=null&&Math.abs(hit.getLocation().y-1)<1e-8,"Both ends retain full height");
+        }
+        var middle=new DesignOutlineShape(d).clip(new Vec3(.5,2,.5),new Vec3(.5,-1,.5),BlockPos.ZERO);
+        check(middle!=null&&Math.abs(middle.getLocation().y-.5)<1e-8,"Incline stays inside its two joins");
+        var step=new DesignOutlineShape(d).clip(new Vec3(.5,.75,.5),new Vec3(0,.75,.5),BlockPos.ZERO);
+        check(step!=null&&Math.abs(step.getLocation().x-.25)<1e-8,"Join wall is exposed and selectable");
+        var json=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,d).getOrThrow();
+        check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow().equals(d),"Cut window persists with paints and occupancy");
+        for(int orientation=0;orientation<24;orientation++)check(p.rotated(orientation).rotated(DesignOrientation.inverse(orientation)).equals(p),"Both joins rotate without drift");
+        var old=BlockDesign.full(4).withSlope(new SlopePlane(-1,1,0,0));
+        var legacy=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,old).getOrThrow().getAsJsonObject();legacy.addProperty("version",3);legacy.getAsJsonObject("slope").remove("window");
+        check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,legacy).getOrThrow().equals(old),"Existing format three worlds retain their original slope");
+        reject(()->r.doublePlane(BlockPos.ZERO,base,0,false,false,0,16,true,true,12,true,true,12));
+    }
     public static void run(){
+        bothEnds();
         combinations();
         fractional();profiles();
         var basic=new SlopePlane(-1,1,0,0);

@@ -14,7 +14,7 @@ import net.nicomar.paintableblocks.paint.PaintCatalog;
 
 /** Immutable and canonical. Paint is stored only on exposed local faces; 0 means original texture. */
 public final class BlockDesign {
-    public static final int VERSION = 3;
+    public static final int VERSION = 4;
     private record Face(int key, int paint) {
         private static final Codec<Face> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.INT.fieldOf("key").forGetter(Face::key), Codec.INT.fieldOf("paint").forGetter(Face::paint)).apply(i, Face::new));
@@ -50,6 +50,7 @@ public final class BlockDesign {
     }
     private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation,SlopePlane slope) {this(resolution,occupied,paints,orientation,slope,false);}
     private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation,SlopePlane slope,boolean trusted) {
+        if(slope!=null&&slope.window().get(0)>=0&&(resolution!=16||!slope.bounds().equals(SlopePlane.FULL)))throw new IllegalArgumentException("Window cuts require a world-aligned 16 grid");
         this.slope=slope;
         this.resolution=PaintingBalance.requireResolution(resolution);
         this.orientation=DesignOrientation.require(orientation);
@@ -116,7 +117,7 @@ public final class BlockDesign {
     public int z(int cell){return cell/(resolution*resolution);}
     public boolean occupied(int cell){return cell>=0 && cell<resolution*resolution*resolution && occupied.get(cell);}
     public boolean occupied(int x,int y,int z){return x>=0 && y>=0 && z>=0 && x<resolution && y<resolution && z<resolution && occupied(index(x,y,z));}
-    public boolean exposed(int cell,Direction face){return occupied(cell)&&!occupied(x(cell)+face.getStepX(),y(cell)+face.getStepY(),z(cell)+face.getStepZ())
+    public boolean exposed(int cell,Direction face){return occupied(cell)&&(slope!=null&&slope.window().get(0)>=0||!occupied(x(cell)+face.getStepX(),y(cell)+face.getStepY(),z(cell)+face.getStepZ()))
             &&(slope==null||SlopeGeometry.area(SlopeGeometry.polygon(this,new DesignGeometry.Surface(cell,face)))>1e-12);}
     public boolean validSurfaceKey(int key){return key>=SLOPE_KEY?occupied(key-SLOPE_KEY)&&slope!=null&&SlopeGeometry.area(SlopeGeometry.polygon(this,new DesignGeometry.Surface(key-SLOPE_KEY,slope.dominant(),true)))>1e-12:
             key>=0&&key<resolution*resolution*resolution*6&&exposed(key/6,Direction.values()[key%6]);}
@@ -167,7 +168,7 @@ public final class BlockDesign {
     /** Resumable pure operation: cells and paint validation are separately budgeted. */
     public final class ClipTask {
         private final SlopePlane plane;private final BitSet bits=(BitSet)occupied.clone();private int cell,hash;private boolean changed,geometryDone;private BlockDesign bare,result;private java.util.Iterator<Map.Entry<Integer,Integer>> paintIterator;private final TreeMap<Integer,Integer> kept=new TreeMap<>();
-        private ClipTask(SlopePlane plane){this.plane=plane;if(slope!=null){if(slope.a()!=plane.a()||slope.b()!=plane.b()||slope.c()!=plane.c()||slope.offset()!=plane.offset())throw new IllegalArgumentException("A piece accepts only its existing slope plane");result=BlockDesign.this;}}
+        private ClipTask(SlopePlane plane){this.plane=plane;if(slope!=null){if(slope.a()!=plane.a()||slope.b()!=plane.b()||slope.c()!=plane.c()||slope.offset()!=plane.offset()||!slope.window().equals(plane.window()))throw new IllegalArgumentException("A piece accepts only its existing slope plane");result=BlockDesign.this;}}
         public boolean advance(int budget){
             if(result!=null)return true;
             while(budget-->0&&!geometryDone){if(cell==resolution*resolution*resolution){geometryDone=true;break;}int c=cell++;if(!bits.get(c))continue;double min=planeMinimum(c,plane),max=min+plane.span()/resolution;if(min>=-1e-10){bits.clear(c);changed=true;}else if(max>1e-10)changed=true;}
@@ -180,7 +181,7 @@ public final class BlockDesign {
         public BlockDesign result(){if(result==null)throw new IllegalStateException("Unfinished clip task");return result;}
     }
     private int designHash(){int out=1;out=31*out+resolution;out=31*out+orientation;out=31*out+occupied.hashCode();out=31*out+paintHash;return 31*out+java.util.Objects.hashCode(slope);}
-    private double planeMinimum(int cell,SlopePlane p){var lo=p.point(x(cell)/(double)resolution,y(cell)/(double)resolution,z(cell)/(double)resolution);return p.value(lo)+(Math.min(0,p.a())*(p.bounds().get(3)-p.bounds().get(0))+Math.min(0,p.b())*(p.bounds().get(4)-p.bounds().get(1))+Math.min(0,p.c())*(p.bounds().get(5)-p.bounds().get(2)))/(16.0*resolution);}
+    private double planeMinimum(int cell,SlopePlane p){if(!p.cuts(p.point((x(cell)+.5)/resolution,(y(cell)+.5)/resolution,(z(cell)+.5)/resolution)))return -1e12;var lo=p.point(x(cell)/(double)resolution,y(cell)/(double)resolution,z(cell)/(double)resolution);return p.value(lo)+(Math.min(0,p.a())*(p.bounds().get(3)-p.bounds().get(0))+Math.min(0,p.b())*(p.bounds().get(4)-p.bounds().get(1))+Math.min(0,p.c())*(p.bounds().get(5)-p.bounds().get(2)))/(16.0*resolution);}
     @Override public boolean equals(Object o){return o instanceof BlockDesign d && resolution==d.resolution && orientation==d.orientation && occupied.equals(d.occupied)&&paints.equals(d.paints)&&java.util.Objects.equals(slope,d.slope);}
     @Override public int hashCode(){return hash;}
 }

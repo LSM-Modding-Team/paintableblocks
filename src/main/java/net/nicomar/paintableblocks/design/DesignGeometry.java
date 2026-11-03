@@ -56,7 +56,7 @@ public final class DesignGeometry {
             for(int z=0;z<n;z++)for(int y=0;y<n;y++)for(int x=0;x<n;x++){
                 var p=DesignOrientation.rotate(inverse,new Vec3((x+.5)/n,(y+.5)/n,(z+.5)/n));
                 var g=d.slope().grid(p);
-                if(g.x>=0&&g.y>=0&&g.z>=0&&g.x<1&&g.y<1&&g.z<1&&d.occupied((int)(g.x*resolution),(int)(g.y*resolution),(int)(g.z*resolution))&&d.slope().value(p)<=1e-10)grid.fill(x,y,z);
+                if(g.x>=0&&g.y>=0&&g.z>=0&&g.x<1&&g.y<1&&g.z<1&&d.occupied((int)(g.x*resolution),(int)(g.y*resolution),(int)(g.z*resolution))&&(!d.slope().cuts(p)||d.slope().value(p)<=1e-10))grid.fill(x,y,z);
             }
         }return new GridShape(grid,n).optimize();
     },shape->d.slope()==null?d.resolution()*d.resolution()*d.resolution():4096);}

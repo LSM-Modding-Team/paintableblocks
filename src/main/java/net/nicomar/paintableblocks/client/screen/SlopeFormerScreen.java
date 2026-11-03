@@ -1,80 +1,121 @@
 package net.nicomar.paintableblocks.client.screen;
 
+import java.util.*;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import net.nicomar.paintableblocks.client.selection.VolumePreview;
 import net.nicomar.paintableblocks.interaction.VolumeEditing;
 import net.nicomar.paintableblocks.balance.PaintingBalance;
+import net.nicomar.paintableblocks.design.*;
 
-/** Dimensions and origin use sixteenths; editing subdivision remains independent. */
 public final class SlopeFormerScreen extends Screen {
-    private int direction,resolution=1,precision=16;
+    private int direction,resolution=1,precision=16,start,end=16,fullLength,otherLength,scroll,row;
     private final int[] dimensions={16,16,16},offsets={0,0,0};
-    private boolean upper,create,vertical,combined,fullAtStart;private int page,fullLength;private int start,end=16;
+    private boolean upper,create,vertical,combined,fullAtStart,bothEnds;
+    private final Map<Button,Integer> controls=new LinkedHashMap<>();
     private Button confirm;
     public SlopeFormerScreen(){
         super(Component.translatable("item.paintableblocks.slope_former"));
-        var s=VolumePreview.state();if(s!=null){var r=VolumePreview.region(s);direction=s.direction();resolution=s.resolution();upper=s.upper();create=s.create();vertical=s.vertical();combined=s.combined();fullLength=s.fullLength();fullAtStart=s.fullAtStart();start=s.start();end=s.end()<0?(vertical?(direction%2==0?r.z1()-r.z0():r.x1()-r.x0()):r.y1()-r.y0()):s.end();
-            dimensions[0]=Math.clamp(r.x1()-r.x0(),1,256);dimensions[1]=Math.clamp(r.y1()-r.y0(),1,256);dimensions[2]=Math.clamp(r.z1()-r.z0(),1,256);
+        var s=VolumePreview.state();if(s!=null){var r=VolumePreview.region(s);direction=s.direction();resolution=s.resolution();upper=s.upper();create=s.create();vertical=s.vertical();combined=s.combined();fullAtStart=s.fullAtStart();bothEnds=s.bothEnds();fullLength=s.fullLength();otherLength=s.otherLength();start=s.start();
+            dimensions[0]=r.x1()-r.x0();dimensions[1]=r.y1()-r.y0();dimensions[2]=r.z1()-r.z0();end=s.end()<0?span():s.end();
             offsets[0]=Math.floorMod(r.x0(),16);offsets[1]=Math.floorMod(r.y0(),16);offsets[2]=Math.floorMod(r.z0(),16);}
     }
     private int span(){return dimensions[vertical?(direction%2==0?2:0):1];}
     private int run(){return dimensions[direction%2==0?0:2];}
-    private void configure(){fullLength=Math.min(fullLength,run());start=Math.min(start,span());end=Math.min(end,span());VolumePreview.configure(direction,upper,create,dimensions[0],dimensions[1],dimensions[2],resolution,offsets[0],offsets[1],offsets[2],vertical,start,end,combined,fullLength,fullAtStart);}
-    private void button(String text,int x,int y,int w,Runnable action){addRenderableWidget(Button.builder(Component.literal(text),b->{action.run();configure();rebuildWidgets();}).bounds(width/2+x,height/2+y,w,18).build());}
-    private static String measure(int units){return Double.toString(units/16.0);}
-    private void adjust(int[] values,int axis,int delta,int min,int max){values[axis]=Math.clamp(values[axis]+delta*(16/precision),min,max);}
+    private String t(String key){return Component.translatable("button.paintableblocks."+key).getString();}
+    private String measure(int v){return Double.toString(v/16.0);}
+    private void configure(){
+        start=Math.min(start,span());end=Math.min(end,span());fullLength=Math.min(fullLength,run());otherLength=Math.min(otherLength,run()-fullLength);
+        if(bothEnds&&create)resolution=16;
+        VolumePreview.configure(direction,upper,create,dimensions[0],dimensions[1],dimensions[2],resolution,offsets[0],offsets[1],offsets[2],vertical,start,end,combined,fullLength,fullAtStart,bothEnds,otherLength);
+    }
+    private void control(String text,int x,int w,Runnable action){
+        var b=addRenderableWidget(Button.builder(Component.literal(text),v->{action.run();configure();rebuildWidgets();}).bounds(x,40+row*22-scroll,w,20).build());controls.put(b,row);
+    }
+    private void choice(String text,Runnable action){control(text,8,width/2-20,action);row++;}
+    private void number(String text,Runnable minus,Runnable plus){
+        int w=width/2-20;control("−",8,22,minus);control(text,32,w-48,()->{});control("+",8+w-22,22,plus);row++;
+    }
     @Override protected void init(){
-        button(Component.translatable(page==0?"button.paintableblocks.profile_page":page==1?"button.paintableblocks.combination_page":"button.paintableblocks.dimensions_page").getString(),-135,-91,270,()->page=(page+1)%3);
-        if(page==0){
-            button(Component.translatable("button.paintableblocks.dimension_step").getString()+": 1/"+precision,-135,-70,270,()->precision=PaintingBalance.RESOLUTIONS.get((PaintingBalance.RESOLUTIONS.indexOf(precision)+1)%5));
-            button(Component.translatable(vertical?"button.paintableblocks.vertical_slope":"button.paintableblocks.horizontal_slope").getString(),-135,-49,270,()->{vertical=!vertical;start=0;end=span();});
-            button(Component.translatable("button.paintableblocks.start_level").getString()+": "+measure(start),-112,-28,224,()->{});
-            button("−",-135,-28,22,()->start=Math.max(0,start-16/precision));button("+",113,-28,22,()->start=Math.min(span(),start+16/precision));
-            button(Component.translatable("button.paintableblocks.end_level").getString()+": "+measure(end),-112,-7,224,()->{});
-            button("−",-135,-7,22,()->end=Math.max(0,end-16/precision));button("+",113,-7,22,()->end=Math.min(span(),end+16/precision));
-            button(Component.translatable("button.paintableblocks.slope_direction").getString()+": "+new String[]{"+X","+Z","−X","−Z"}[direction],-135,14,270,()->direction=(direction+1)%4);
-            button(Component.translatable(vertical?(upper?"button.paintableblocks.positive_side":"button.paintableblocks.negative_side"):(upper?"button.paintableblocks.upper":"button.paintableblocks.lower")).getString(),-135,35,270,()->upper=!upper);
-        }else if(page==1){
-            button(Component.translatable(combined?"button.paintableblocks.combined_on":"button.paintableblocks.combined_off").getString(),-135,-70,270,()->{combined=!combined;if(combined&&fullLength==0)fullLength=run()/2;});
-            button(Component.translatable("button.paintableblocks.dimension_step").getString()+": 1/"+precision,-135,-49,270,()->precision=PaintingBalance.RESOLUTIONS.get((PaintingBalance.RESOLUTIONS.indexOf(precision)+1)%5));
-            button(Component.translatable("button.paintableblocks.full_length").getString()+": "+measure(fullLength),-112,-28,224,()->{});
-            button("−",-135,-28,22,()->fullLength=Math.max(0,fullLength-16/precision));button("+",113,-28,22,()->fullLength=Math.min(run(),fullLength+16/precision));
-            button(Component.translatable(fullAtStart?"button.paintableblocks.full_start":"button.paintableblocks.full_end").getString(),-135,-7,270,()->{fullAtStart=!fullAtStart;if(fullAtStart)end=start;else start=end;});
-        }else if(minecraft.player!=null&&minecraft.player.isCreative()){
-            button(Component.translatable(create?"button.paintableblocks.create":"button.paintableblocks.transform").getString(),-135,-70,270,()->create=!create);
-            if(create){
-                button(Component.translatable("button.paintableblocks.edit_grid").getString()+": "+resolution+"×"+resolution,-135,-49,270,()->resolution=PaintingBalance.RESOLUTIONS.get((PaintingBalance.RESOLUTIONS.indexOf(resolution)+1)%5));
-                button(Component.translatable("button.paintableblocks.dimension_step").getString()+": 1/"+precision,-135,-28,270,()->precision=PaintingBalance.RESOLUTIONS.get((PaintingBalance.RESOLUTIONS.indexOf(precision)+1)%5));
-                for(int axis=0;axis<3;axis++){
-                    final int a=axis;int y=-7+axis*21;
-                    button("−",-135,y,22,()->adjust(dimensions,a,-1,1,256));
-                    button(new String[]{"X: ","Y: ","Z: "}[a]+measure(dimensions[a]),-112,y,86,()->{});
-                    button("+",-25,y,22,()->adjust(dimensions,a,1,1,256));
-                    button("−",3,y,22,()->adjust(offsets,a,-1,0,15));
-                    button("Δ"+new String[]{"X: ","Y: ","Z: "}[a]+measure(offsets[a]),26,y,86,()->{});
-                    button("+",113,y,22,()->adjust(offsets,a,1,0,15));
-                }
+        controls.clear();row=0;
+        if(minecraft.player!=null&&minecraft.player.isCreative())choice(t(create?"create":"transform"),()->create=!create);
+        choice(t("dimension_step")+": 1/"+precision,()->precision=PaintingBalance.RESOLUTIONS.get((PaintingBalance.RESOLUTIONS.indexOf(precision)+1)%5));
+        choice(t(vertical?"vertical_slope":"horizontal_slope"),()->{vertical=!vertical;start=0;end=span();});
+        choice(t("slope_direction")+": "+new String[]{"+X","+Z","−X","−Z"}[direction],()->direction=(direction+1)%4);
+        choice(t(vertical?(upper?"positive_side":"negative_side"):(upper?"upper":"lower")),()->upper=!upper);
+        number(t("start_level")+": "+measure(start),()->start=Math.max(0,start-16/precision),()->start=Math.min(span(),start+16/precision));
+        number(t("end_level")+": "+measure(end),()->end=Math.max(0,end-16/precision),()->end=Math.min(span(),end+16/precision));
+        choice(t(combined?"combined_on":"combined_off"),()->{combined=!combined;if(!combined)bothEnds=false;});
+        if(combined){
+            choice(t(bothEnds?"both_ends":"one_end"),()->{bothEnds=!bothEnds;if(bothEnds){resolution=16;fullLength=Math.min(fullLength,run()/3);otherLength=Math.min(4,run()-fullLength);}});
+            choice(t(fullAtStart?"full_start":"full_end"),()->fullAtStart=!fullAtStart);
+            number(t("full_length")+": "+measure(fullLength),()->fullLength=Math.max(0,fullLength-16/precision),()->fullLength=Math.min(run()-(bothEnds?otherLength:0),fullLength+16/precision));
+            if(bothEnds)number(t("other_length")+": "+measure(otherLength),()->otherLength=Math.max(0,otherLength-16/precision),()->otherLength=Math.min(run()-fullLength,otherLength+16/precision));
+        }
+        if(create){
+            choice(t("edit_grid")+": "+resolution+"×"+resolution,()->{if(!bothEnds)resolution=PaintingBalance.RESOLUTIONS.get((PaintingBalance.RESOLUTIONS.indexOf(resolution)+1)%5);});
+            for(int i=0;i<3;i++){final int a=i;
+                number(new String[]{"X","Y","Z"}[i]+": "+measure(dimensions[i]),()->dimensions[a]=Math.max(1,dimensions[a]-16/precision),()->dimensions[a]=Math.min(256,dimensions[a]+16/precision));
+                number("Δ"+new String[]{"X","Y","Z"}[i]+": "+measure(offsets[i]),()->offsets[a]=Math.max(0,offsets[a]-16/precision),()->offsets[a]=Math.min(15,offsets[a]+16/precision));
             }
         }
-        confirm=addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.confirm"),b->{VolumePreview.action(1,direction,upper,create,1,1,1,resolution);minecraft.gui.setScreen(null);}).bounds(width/2-135,height/2+60,88,20).build());
-        button(Component.translatable("button.paintableblocks.preview").getString(),-44,60,88,this::configure);
-        addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.cancel"),b->onClose()).bounds(width/2+47,height/2+60,88,20).build());
+        confirm=addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.confirm"),b->{VolumePreview.action(1,direction,upper,create,1,1,1,resolution);minecraft.gui.setScreen(null);}).bounds(8,height-28,Math.max(80,width/3-12),20).build());
+        addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.preview"),b->configure()).bounds(width/3+4,height-28,Math.max(70,width/3-12),20).build());
+        addRenderableWidget(Button.builder(Component.translatable("button.paintableblocks.cancel"),b->onClose()).bounds(2*width/3,height-28,Math.max(70,width/3-8),20).build());
+        position();
+    }
+    private void position(){
+        scroll=Math.clamp(scroll,0,Math.max(0,row*22-(height-80)));
+        controls.forEach((b,r)->{int y=40+r*22-scroll;b.setY(y);b.visible=y>=40&&y+20<=height-40;});
+    }
+    @Override public boolean mouseScrolled(double x,double y,double horizontal,double verticalScroll){
+        if(x<width/2){scroll-=(int)Math.round(verticalScroll*24);position();return true;}return super.mouseScrolled(x,y,horizontal,verticalScroll);
     }
     @Override public void tick(){
         var s=VolumePreview.state();if(s==null){minecraft.gui.setScreen(null);return;}
         var r=VolumePreview.region(s);
-        confirm.active=s.phase()==VolumeEditing.READY&&s.direction()==direction&&s.upper()==upper&&s.create()==create&&s.resolution()==resolution&&s.vertical()==vertical&&s.combined()==combined&&s.fullLength()==fullLength&&s.fullAtStart()==fullAtStart&&s.start()==start&&(s.end()<0?span():s.end())==end&&(!create||
-            r.x1()-r.x0()==dimensions[0]&&r.y1()-r.y0()==dimensions[1]&&r.z1()-r.z0()==dimensions[2]&&Math.floorMod(r.x0(),16)==offsets[0]&&Math.floorMod(r.y0(),16)==offsets[1]&&Math.floorMod(r.z0(),16)==offsets[2]);
+        confirm.active=s.phase()==VolumeEditing.READY&&s.direction()==direction&&s.upper()==upper&&s.create()==create&&s.resolution()==resolution&&s.vertical()==vertical&&s.combined()==combined&&s.fullLength()==fullLength&&s.fullAtStart()==fullAtStart&&s.bothEnds()==bothEnds&&s.otherLength()==otherLength&&s.start()==start&&(s.end()<0?span():s.end())==end&&(!create||r.x1()-r.x0()==dimensions[0]&&r.y1()-r.y0()==dimensions[1]&&r.z1()-r.z0()==dimensions[2]&&Math.floorMod(r.x0(),16)==offsets[0]&&Math.floorMod(r.y0(),16)==offsets[1]&&Math.floorMod(r.z0(),16)==offsets[2]);
+    }
+    private void preview(GuiGraphicsExtractor g){
+        int left=width/2+6,right=width-8,top=52,bottom=height-90;
+        g.fill(left,top,right,bottom,0xff101923);
+        var s=VolumePreview.state();if(s==null||minecraft.level==null||bottom<=top)return;
+        var r=VolumePreview.region(s);var full=BlockDesign.full(16);
+        Map<BlockPos,SlopePlane> planes=new HashMap<>();
+        int size=Math.min(64,Math.min(right-left,bottom-top));
+        if(size<1)return;
+        for(int y=0;y<size;y++)for(int x=0;x<size;x++){
+            double u=(x+.5)/size,v=1-(y+.5)/size;
+            double X=(r.x0()+u*(r.x1()-r.x0()))/16.0,Y=(r.y0()+v*(r.y1()-r.y0()))/16.0,Z=(r.z0()+.5*(r.z1()-r.z0()))/16.0;
+            if(s.direction()%2==1){Z=(r.z0()+u*(r.z1()-r.z0()))/16.0;X=(r.x0()+.5*(r.x1()-r.x0()))/16.0;}
+            if(s.vertical()){Y=(r.y0()+.5*(r.y1()-r.y0()))/16.0;if(s.direction()%2==0)Z=(r.z0()+v*(r.z1()-r.z0()))/16.0;else X=(r.x0()+v*(r.x1()-r.x0()))/16.0;}
+            var pos=new BlockPos((int)Math.floor(X),(int)Math.floor(Y),(int)Math.floor(Z));
+            try{
+                var p=planes.computeIfAbsent(pos,k->r.doublePlane(k,full,s.direction(),s.upper(),s.vertical(),s.start(),s.end(),s.create(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength()));
+                var local=new Vec3(X-pos.getX(),Y-pos.getY(),Z-pos.getZ());
+                boolean occupied=true;
+                if(!s.create()){
+                    if(!(minecraft.level.getBlockEntity(pos) instanceof net.nicomar.paintableblocks.blockentity.PaintableBlockEntity be)||!be.valid())occupied=false;
+                    else{
+                        var d=be.design();var v=DesignOrientation.rotate(DesignOrientation.inverse(d.orientation()),local);var grid=d.slope()==null?v:d.slope().grid(v);
+                        occupied=grid.x>=0&&grid.y>=0&&grid.z>=0&&grid.x<1&&grid.y<1&&grid.z<1&&d.occupied((int)(grid.x*d.resolution()),(int)(grid.y*d.resolution()),(int)(grid.z*d.resolution()))&&(d.slope()==null||!d.slope().cuts(v)||d.slope().value(v)<=0);
+                        if(s.bothEnds()&&(d.resolution()!=16||d.slope()!=null&&!d.slope().bounds().equals(SlopePlane.FULL)))occupied=false;
+                    }
+                }
+                if(occupied&&(!p.cuts(local)||p.value(local)<=0))g.fill(left+x*(right-left)/size,top+y*(bottom-top)/size,left+(x+1)*(right-left)/size,top+(y+1)*(bottom-top)/size,0xff73c9b3);
+            }catch(IllegalArgumentException ignored){}
+        }
     }
     @Override public void extractRenderState(GuiGraphicsExtractor g,int x,int y,float tick){
-        g.fill(width/2-145,height/2-112,width/2+145,height/2+123,0xbb222222);g.text(font,title,width/2-135,height/2-104,0xffffffff);
-        var s=VolumePreview.state();if(s!=null){var r=VolumePreview.region(s);
-
-            g.text(font,Component.translatable("message.paintableblocks.volume_progress",s.reviewed(),r.size(),s.modified(),s.ignored()),width/2-135,height/2+86,0xffdddddd);
-            g.text(font,Component.translatable("message.paintableblocks.volume_planned",s.affected()),width/2-135,height/2+98,0xffdddddd);}
+        g.fill(0,0,width,height,0xf01a2029);g.text(font,title,8,12,0xffffffff);
+        g.text(font,Component.translatable("button.paintableblocks.section_preview"),width/2+6,36,0xffffffff);preview(g);
+        var s=VolumePreview.state();if(s!=null){g.text(font,Component.translatable(s.phase()==VolumeEditing.READY?"message.paintableblocks.volume_ready":"message.paintableblocks.preview_loading",s.affected(),s.ignored()),width/2+6,height-76,0xffffffff);}
+        if(bothEnds)g.text(font,Component.translatable("button.paintableblocks.grid_requirement"),width/2+6,height-58,0xffffcc66);
+        if(row*22>height-80){int track=height-80;int thumb=Math.max(12,track*track/(row*22));int y0=40+scroll*(track-thumb)/Math.max(1,row*22-track);g.fill(width/2-7,y0,width/2-4,y0+thumb,0xff9aaabb);}
         super.extractRenderState(g,x,y,tick);
     }
     @Override public boolean isPauseScreen(){return false;}

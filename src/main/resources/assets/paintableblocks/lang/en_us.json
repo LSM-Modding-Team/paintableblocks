@@ -478,6 +478,11 @@
   "button.paintableblocks.combined_off": "Block + slope: off",
   "button.paintableblocks.full_length": "Full section length",
   "button.paintableblocks.full_start": "Full section at start",
-  "button.paintableblocks.full_end": "Full section at end"
+  "button.paintableblocks.full_end": "Full section at end",
+  "button.paintableblocks.both_ends": "Full sections at both ends",
+  "button.paintableblocks.one_end": "Full section at one end",
+  "button.paintableblocks.other_length": "Other end length",
+  "button.paintableblocks.section_preview": "Profile cross-section",
+  "button.paintableblocks.grid_requirement": "Both ends: 16×16 grid"
 }
 

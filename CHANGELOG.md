@@ -1,5 +1,14 @@
 # Registro de cambios
 
+## 2026-11-02 — Dos extremos completos e interfaz integrada
+
+- Corte delimitado por dos uniones, conservando material completo antes y después de la inclinación. Ambas longitudes son independientes; se rechazan solapamientos y el caso sin tramo central conserva todo el material. Las uniones pueden presentar paredes verticales, que se seleccionan y pintan.
+- Decisión: cuadrícula mundial de 1/16 para este modo. La creación selecciona 16×16 automáticamente; transformación disponible para diseños 16×16 alineados, conservando recortes. No se estiran ni convierten silenciosamente diseños personalizados de otras resoluciones.
+- Forma visible, caras de unión, colisión, ray tracing, pintura, giro, guardado y red consideran la ventana de corte. Formato 4 con lectura de formatos 1–3; las ventanas ausentes conservan el plano anterior. Protocolo 11, actualizar cliente y servidor.
+- Una sola lista desplazable de controles, con acciones fijas, valores de ambos extremos y aviso de cuadrícula. Panel integrado de sección del perfil que incluye ocupación existente al transformar; el resultado se valida en servidor y la confirmación espera su configuración. No es una cámara 3D ni una vista de materiales.
+- Contratos de extremos completos, inclinación central, pared seleccionable, giro, guardado y lectura del formato 3 preparados. Revisión por lectura y diff únicamente: sin Java, Gradle, compilación, scripts, pruebas ni Minecraft ejecutados. Publicación directamente online en `26.2`.
+
+
 ## 2026-11-01 — Combinación de bloque completo y pendiente
 
 - Una sola pieza admite un tramo completo y otro inclinado, incluso en 1×1, sin entidades separadas. El plano alcanza el límite del prisma en la unión ajustable, conservando meseta y pendiente con la geometría persistente existente.

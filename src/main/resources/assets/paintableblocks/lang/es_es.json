@@ -478,6 +478,11 @@
   "button.paintableblocks.combined_off": "Bloque + pendiente: no",
   "button.paintableblocks.full_length": "Longitud completa",
   "button.paintableblocks.full_start": "Parte completa al inicio",
-  "button.paintableblocks.full_end": "Parte completa al final"
+  "button.paintableblocks.full_end": "Parte completa al final",
+  "button.paintableblocks.both_ends": "Completos en ambos extremos",
+  "button.paintableblocks.one_end": "Completo en un extremo",
+  "button.paintableblocks.other_length": "Longitud del otro extremo",
+  "button.paintableblocks.section_preview": "Sección del perfil",
+  "button.paintableblocks.grid_requirement": "Ambos extremos: cuadrícula 16×16"
 }
 

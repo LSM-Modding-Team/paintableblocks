@@ -46,6 +46,16 @@ Se mantiene el formato de escritura 3 y se admiten diseños guardados en version
 
 Contratos preparados para lectura antigua y geometría combinada; sin compilación ni pruebas en ejecución.
 
+## Ambos extremos completos y nueva interfaz
+
+El modo Ambos extremos conserva dos zonas completas y limita el corte a la región central. Las longitudes de ambos lados son independientes y admiten pasos hasta 1/16. Su suma no puede superar la longitud total; si la iguala no se recorta material. Se aplican cotas inicial/final al tramo central, por lo que pueden aparecer paredes en las uniones con las partes completas; también son superficies pintables y seleccionables.
+
+Se usa cuadrícula mundial 16×16 para alinear exactamente las uniones. La creación creativa la selecciona automáticamente. La transformación requiere piezas 16×16 alineadas, sin convertir ni estirar otros diseños personalizados; las piezas incompatibles se rechazan durante la preparación. Los modos anteriores conservan sus resoluciones.
+
+Todos los controles están en una lista desplazable, sin páginas, junto a una previsualización integrada de sección. La sección muestra geometría del perfil y ocupación preexistente, no una cámara ni texturas del mundo. La confirmación sigue condicionada a la revisión del servidor. Las acciones permanecen visibles abajo.
+
+Persistencia 4 con lectura de 1–3, ventanas de corte antiguas ausentes equivalen al plano original. Protocolo 11. Compatibilidad al actualizar, no al volver a una versión anterior. Contratos escritos sin ejecutar: no se acredita funcionamiento en Minecraft.
+
 ## Subdivisión y transformación
 
 Cinco variantes: 1×1, 2×2, 4×4, 8×8 y 16×16. El plano puede generar fragmentos de celda con caras triangulares o inclinadas. Se permiten subdivisiones mezcladas bajo el mismo plano global.

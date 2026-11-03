@@ -86,6 +86,23 @@ public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
         var world=plane.rotated(d.orientation());
         return new SlopePlane(world.a(),world.b(),world.c(),world.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16))).rotated(DesignOrientation.inverse(d.orientation()));
     }
+    public BlockDesign doubleSeed(BlockPos pos,BlockDesign d){
+        if(d.resolution()!=16||d.slope()!=null&&!d.slope().bounds().equals(SlopePlane.FULL))throw new IllegalArgumentException("Both ends require a world-aligned 16 grid");
+        var outside=new BitSet();for(int c=0;c<4096;c++){var v=DesignOrientation.rotate(d.orientation(),new Vec3((d.x(c)+.5)/16,(d.y(c)+.5)/16,(d.z(c)+.5)/16)).add(pos.getX(),pos.getY(),pos.getZ());if(!contains(v))outside.set(c);}
+        return d.remove(outside);
+    }
+    public SlopePlane doublePlane(BlockPos pos,BlockDesign d,int direction,boolean upper,boolean vertical,int start,int end,boolean bounded,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength){
+        if(!bothEnds)return combinedPlane(pos,d,direction,upper,vertical,start,end,bounded,combined,fullLength,fullAtStart);
+        boolean x=direction%2==0,positive=direction<2;int run=x?x1-x0:z1-z0;
+        int first=fullAtStart?fullLength:otherLength,last=fullAtStart?otherLength:fullLength;
+        if(first<0||last<0||first+last>run)throw new IllegalArgumentException("Overlapping complete ends");
+        if(first+last==run)return profilePlane(pos,d,direction,upper,vertical,upper?0:(vertical?(x?z1-z0:x1-x0):y1-y0),upper?0:(vertical?(x?z1-z0:x1-x0):y1-y0),false);
+        int lo=(x?x0:z0)+(positive?first:last),hi=(x?x1:z1)-(positive?last:first);
+        var middle=x?new VolumeRegion(lo,y0,z0,hi,y1,z1):new VolumeRegion(x0,y0,lo,x1,y1,hi);
+        var plane=middle.profilePlane(pos,d.withOrientation(0),direction,upper,vertical,start,end,false);
+        int origin=(x?pos.getX():pos.getZ())*16;
+        return new SlopePlane(plane.a(),plane.b(),plane.c(),plane.offset(),SlopePlane.FULL,java.util.List.of(x?0:2,Math.clamp(lo-origin,0,16),Math.clamp(hi-origin,0,16))).rotated(DesignOrientation.inverse(d.orientation()));
+    }
     public SlopePlane creationPlane(BlockPos pos,BlockDesign d,int direction,boolean upper){
         var p=plane(pos,d,direction,upper);
         return new SlopePlane(p.a(),p.b(),p.c(),p.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)));

@@ -18,13 +18,22 @@ public final class SlopeGeometry {
     private static List<Vec3> buildPolygon(BlockDesign d,DesignGeometry.Surface s){
         int c=s.cell(),n=d.resolution();double[] lo={d.x(c)/(double)n,d.y(c)/(double)n,d.z(c)/(double)n},hi={lo[0]+1.0/n,lo[1]+1.0/n,lo[2]+1.0/n};
         if(d.slope()!=null){var a=d.slope().point(lo[0],lo[1],lo[2]);var b=d.slope().point(hi[0],hi[1],hi[2]);lo=new double[]{a.x,a.y,a.z};hi=new double[]{b.x,b.y,b.z};}
+        boolean cutting=d.slope()==null||d.slope().cuts(new Vec3((lo[0]+hi[0])/2,(lo[1]+hi[1])/2,(lo[2]+hi[2])/2));
         if(!s.slope()){
             int ax=axis(s.face()),u=(ax+1)%3,v=(ax+2)%3;List<Vec3> p=new ArrayList<>();
             for(int i:new int[]{0,1,3,2}){double[] q=lo.clone();q[ax]=s.face().getAxisDirection()==Direction.AxisDirection.POSITIVE?hi[ax]:lo[ax];q[u]=(i&1)==0?lo[u]:hi[u];q[v]=(i&2)==0?lo[v]:hi[v];p.add(new Vec3(q[0],q[1],q[2]));}
             if(s.face().getAxisDirection()==Direction.AxisDirection.NEGATIVE)Collections.reverse(p);
-            return d.slope()==null?p:clip(p,d.slope());
+            if(d.slope()!=null&&d.slope().window().get(0)>=0){
+                int x=d.x(c)+s.face().getStepX(),y=d.y(c)+s.face().getStepY(),z=d.z(c)+s.face().getStepZ();
+                if(d.occupied(x,y,z)){
+                    var center=d.slope().point((x+.5)/n,(y+.5)/n,(z+.5)/n);
+                    if(cutting||!d.slope().cuts(center))return List.of();
+                    var plane=d.slope();return clip(p,new SlopePlane(-plane.a(),-plane.b(),-plane.c(),-plane.offset()));
+                }
+            }
+            return d.slope()==null||!cutting?p:clip(p,d.slope());
         }
-        if(d.slope()==null)return List.of();
+        if(d.slope()==null||!cutting)return List.of();
         var plane=d.slope();List<Vec3> vertices=new ArrayList<>();Vec3[] corners=new Vec3[8];double min=Double.POSITIVE_INFINITY,max=Double.NEGATIVE_INFINITY;
         for(int i=0;i<8;i++){corners[i]=new Vec3((i&1)==0?lo[0]:hi[0],(i&2)==0?lo[1]:hi[1],(i&4)==0?lo[2]:hi[2]);double value=plane.value(corners[i]);min=Math.min(min,value);max=Math.max(max,value);}
         if(min>=-1e-10||max<=1e-10)return List.of();

@@ -6,8 +6,8 @@ import net.nicomar.paintableblocks.design.*;
 
 /** Versioned compact wire format only. Persistent codec 2 and legacy codec 1 remain unchanged. */
 public final class DesignWireCodec {
-    public static void plane(FriendlyByteBuf b,SlopePlane plane){b.writeVarInt(plane.a());b.writeVarInt(plane.b());b.writeVarInt(plane.c());b.writeVarInt(plane.offset());for(int bound:plane.bounds())b.writeVarInt(bound);}
-    public static SlopePlane plane(FriendlyByteBuf b){return new SlopePlane(b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),java.util.List.of(b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt()));}
+    public static void plane(FriendlyByteBuf b,SlopePlane plane){b.writeVarInt(plane.a());b.writeVarInt(plane.b());b.writeVarInt(plane.c());b.writeVarInt(plane.offset());for(int bound:plane.bounds())b.writeVarInt(bound);for(int v:plane.window())b.writeVarInt(v);}
+    public static SlopePlane plane(FriendlyByteBuf b){return new SlopePlane(b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),java.util.List.of(b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt(),b.readVarInt()),java.util.List.of(b.readVarInt(),b.readVarInt(),b.readVarInt()));}
     public static void write(FriendlyByteBuf b,BlockDesign d){
         b.writeVarInt(1);b.writeVarInt(d.resolution());b.writeVarInt(d.orientation());var words=d.geometryKey().occupied();b.writeVarInt(words.size());for(long word:words)b.writeLong(word);
         b.writeBoolean(d.slope()!=null);if(d.slope()!=null)plane(b,d.slope());b.writeVarInt(d.paints().size());for(var e:d.paints().entrySet()){b.writeVarInt(e.getKey());b.writeVarInt(e.getValue());}
