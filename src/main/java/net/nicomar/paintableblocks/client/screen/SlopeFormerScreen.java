@@ -101,8 +101,8 @@ public final class SlopeFormerScreen extends Screen {
                 if(!s.create()){
                     if(!(minecraft.level.getBlockEntity(pos) instanceof net.nicomar.paintableblocks.blockentity.PaintableBlockEntity be)||!be.valid())occupied=false;
                     else{
-                        var d=be.design();var v=DesignOrientation.rotate(DesignOrientation.inverse(d.orientation()),local);var grid=d.slope()==null?v:d.slope().grid(v);
-                        occupied=grid.x>=0&&grid.y>=0&&grid.z>=0&&grid.x<1&&grid.y<1&&grid.z<1&&d.occupied((int)(grid.x*d.resolution()),(int)(grid.y*d.resolution()),(int)(grid.z*d.resolution()))&&(d.slope()==null||!d.slope().cuts(v)||d.slope().value(v)<=0);
+                        var d=be.design();var designPoint=DesignOrientation.rotate(DesignOrientation.inverse(d.orientation()),local);var grid=d.slope()==null?designPoint:d.slope().grid(designPoint);
+                        occupied=grid.x>=0&&grid.y>=0&&grid.z>=0&&grid.x<1&&grid.y<1&&grid.z<1&&d.occupied((int)(grid.x*d.resolution()),(int)(grid.y*d.resolution()),(int)(grid.z*d.resolution()))&&(d.slope()==null||!d.slope().cuts(designPoint)||d.slope().value(designPoint)<=0);
                         if(s.bothEnds()&&(d.resolution()!=16||d.slope()!=null&&!d.slope().bounds().equals(SlopePlane.FULL)))occupied=false;
                     }
                 }
