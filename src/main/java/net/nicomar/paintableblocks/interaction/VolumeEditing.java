@@ -44,10 +44,10 @@ public final class VolumeEditing {
     private static final class Session {
         long id=++nextId,cursor,modified,ignored,expected;
         final boolean former;final InteractionHand hand;final int slot;final ItemStack tool;final net.minecraft.resources.Identifier dimension;
-        final BlockPos first;final BlockPos createAnchor;BlockPos last;VolumeRegion firstCell,region;VolumeCursor traversal;BlockPos writingPos,pendingPos;PlanWork pendingWork;
+        final BlockPos first;final BlockPos createAnchor;BlockPos last;VolumeRegion firstCell,region,selection;net.minecraft.world.phys.Vec3 pointA,joinA;VolumeCursor traversal;BlockPos writingPos,pendingPos;PlanWork pendingWork;
         final net.nicomar.paintableblocks.performance.WorkCache<PlanKey,DesignOperations.Plan> plans=PLANS;
         final Set<ChunkKey> watches=new HashSet<>();long sentCursor=-1,sentModified=-1;int sentPhase=-1;int phase=FIRST,direction,resolution=1,start,end=-1;boolean vertical,combined,fullAtStart;int fullLength,otherLength;boolean bothEnds;boolean upper,create,invalid,writing;
-        Session(ServerPlayer p,ModNetworking.Use r,VolumeRegion cell,boolean former){this.former=former;hand=r.hand();slot=r.slot();tool=p.getItemInHand(hand).copy();dimension=r.dimension();first=r.pos();createAnchor=first.relative(r.face());last=first;firstCell=cell;region=cell;}
+        Session(ServerPlayer p,ModNetworking.Use r,VolumeRegion cell,boolean former){this.former=former;hand=r.hand();slot=r.slot();tool=p.getItemInHand(hand).copy();dimension=r.dimension();first=r.pos();createAnchor=first.relative(r.face());last=first;firstCell=cell;region=cell;selection=cell;}
     }
     private static final class PlanWork {
         final Session session;final BlockPos pos;final BlockDesign before;final BlockDesign.ClipTask clip;final BitSet removed=new BitSet();int cell;
@@ -94,19 +94,41 @@ public final class VolumeEditing {
         if(r.cancel()){if(s!=null)stop(p,"volume_stopped");return true;}
         if(s!=null&&(s.invalid||!held(p,s))){stop(p,"volume_invalid");return true;}
         if(s!=null&&(s.phase==SCANNING||s.phase==RUNNING))return true;
-        if(s!=null&&s.phase==READY){if(!r.control())start(p,s);return true;}
+        if(s!=null&&s.phase==READY&&!former){if(!r.control())start(p,s);return true;}
         if(!former&&!r.control())return true;
         if(p.isUsingItem()||p.containerMenu!=p.inventoryMenu||!r.dimension().equals(p.level().dimension().identifier())||!BuiltInRegistries.ITEM.getKey(item.getItem()).equals(r.item())||(r.hand()==InteractionHand.MAIN_HAND&&r.slot()!=p.getInventory().getSelectedSlot())||!ServerInteractions.allowed(p,r.pos()))return true;
         var hit=ServerInteractions.hit(p);if(hit==null||!hit.getBlockPos().equals(r.pos())||hit.getDirection()!=r.face()||!Double.isFinite(r.point().x)||!Double.isFinite(r.point().y)||!Double.isFinite(r.point().z)||hit.getLocation().distanceToSqr(r.point())>1.0/256)return true;
         var interaction=NeoForge.EVENT_BUS.post(new PlayerInteractEvent.RightClickBlock(p,r.hand(),r.pos(),hit));if(interaction.isCanceled()||interaction.getUseItem()==net.minecraft.util.TriState.FALSE||interaction.getUseBlock()==net.minecraft.util.TriState.FALSE)return true;
         if(!(p.level().getBlockEntity(r.pos()) instanceof PaintableBlockEntity be)||!be.valid()||!be.editIdentity().equals(r.block())||be.revision()!=r.revision())return true;
         if(!ServerInteractions.allowed(p,r.pos())||p.getItemInHand(r.hand()).getItem()!=item.getItem()||be.revision()!=r.revision())return true;
+        if(former&&s!=null&&(s.phase==CONFIG||s.phase==READY)){
+            if(r.control()){if(s.phase==READY)start(p,s);return true;}
+            var point=new net.minecraft.world.phys.Vec3(Math.rint(hit.getLocation().x*16)/16,Math.rint(hit.getLocation().y*16)/16,Math.rint(hit.getLocation().z*16)/16);
+            if(r.reverse()){
+                if(s.joinA==null){s.pointA=null;s.joinA=point;s.phase=CONFIG;reply(p,s);message(p,"world_join_second");return true;}
+                int span=s.direction%2==0?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();
+                int origin=s.direction%2==0?s.region.x0():s.region.z0();
+                double a=(s.direction%2==0?s.joinA.x:s.joinA.z)*16-origin,b=(s.direction%2==0?point.x:point.z)*16-origin;
+                int lo=Math.clamp((int)Math.min(a,b),0,span),hi=Math.clamp((int)Math.max(a,b),0,span);
+                s.fullAtStart=true;s.fullLength=s.direction<2?lo:span-hi;s.otherLength=s.direction<2?span-hi:lo;s.bothEnds=true;s.combined=true;s.joinA=null;
+            }else{
+                if(s.pointA==null){s.joinA=null;s.pointA=point;s.phase=CONFIG;reply(p,s);message(p,"world_profile_second");return true;}
+                var delta=point.subtract(s.pointA);boolean x=Math.abs(delta.x)>=Math.abs(delta.z);s.direction=x?(delta.x>=0?0:2):(delta.z>=0?1:3);
+                int origin=s.vertical?(x?s.region.z0():s.region.x0()):s.region.y0(),span=s.vertical?(x?s.region.z1()-s.region.z0():s.region.x1()-s.region.x0()):s.region.y1()-s.region.y0();
+                s.start=Math.clamp((int)Math.round((s.vertical?(x?s.pointA.z:s.pointA.x):s.pointA.y)*16)-origin,0,span);s.end=Math.clamp((int)Math.round((s.vertical?(x?point.z:point.x):point.y)*16)-origin,0,span);
+                int runOrigin=x?s.region.x0():s.region.z0(),runSize=x?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();
+                int a=Math.clamp((int)Math.round((x?s.pointA.x:s.pointA.z)*16)-runOrigin,0,runSize),b=Math.clamp((int)Math.round((x?point.x:point.z)*16)-runOrigin,0,runSize);
+                s.fullAtStart=true;s.fullLength=s.direction<2?a:runSize-a;s.otherLength=s.direction<2?runSize-b:b;s.combined=true;s.bothEnds=true;s.pointA=null;
+            }
+            int run=s.direction%2==0?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();s.fullLength=Math.min(s.fullLength,run);s.otherLength=Math.min(s.otherLength,run-s.fullLength);
+            scan(p,s);return true;
+        }
         var target=DesignGeometry.target(be.design(),hit.getLocation().subtract(r.pos().getX(),r.pos().getY(),r.pos().getZ()),hit.getDirection());if(target.isEmpty())return true;
-        var corner=former?VolumeRegion.block(r.pos()):VolumeRegion.cell(r.pos(),be.design(),target.get().cell());
+        var corner=former?VolumeRegion.aim(r.pos(),hit.getLocation(),hit.getDirection()):VolumeRegion.cell(r.pos(),be.design(),target.get().cell());
         if(s==null){s=new Session(p,r,corner,former);SESSIONS.put(p,s);watch(p,s);reply(p,s);message(p,"volume_first");return true;}
         if(s.hand!=r.hand()||s.former!=former)return true;
         var region=s.firstCell.union(corner);if(!region.valid(former?16:256)){message(p,"volume_limit",former?16:256);return true;}
-        s.region=region;watch(p,s);s.last=r.pos();if(former){s.phase=CONFIG;reply(p,s);}else scan(p,s);return true;
+        s.region=region;s.selection=region;watch(p,s);s.last=r.pos();scan(p,s);return true;
     }
     public static void action(Player player,ModNetworking.VolumeAction r){
         if(!(player instanceof ServerPlayer p))return;
@@ -119,24 +141,25 @@ public final class VolumeEditing {
         if(r.width()<1||r.width()>256||r.height()<1||r.height()>256||r.depth()<1||r.depth()>256)return;
         if(r.offsetX()<0||r.offsetX()>15||r.offsetY()<0||r.offsetY()>15||r.offsetZ()<0||r.offsetZ()>15)return;
         int dependent=r.vertical()?(r.direction()%2==0?r.depth():r.width()):r.height();
-        if(!r.create()){var selected=VolumeRegion.block(s.first).union(VolumeRegion.block(s.last));dependent=r.vertical()?(r.direction()%2==0?selected.z1()-selected.z0():selected.x1()-selected.x0()):selected.y1()-selected.y0();}
+        if(!r.create()){var selected=s.selection;dependent=r.vertical()?(r.direction()%2==0?selected.z1()-selected.z0():selected.x1()-selected.x0()):selected.y1()-selected.y0();}
         if(r.start()<0||r.start()>dependent||r.end()< -1||r.end()>dependent)return;
         int run=r.direction()%2==0?r.width():r.depth();
-        if(!r.create()){var selected=VolumeRegion.block(s.first).union(VolumeRegion.block(s.last));run=r.direction()%2==0?selected.x1()-selected.x0():selected.z1()-selected.z0();}
+        if(!r.create()){var selected=s.selection;run=r.direction()%2==0?selected.x1()-selected.x0():selected.z1()-selected.z0();}
         if(r.fullLength()<0||r.fullLength()>run)return;
         if(r.bothEnds()&&!r.combined())return;
         if(r.otherLength()<0||r.otherLength()>run||r.bothEnds()&&r.fullLength()+r.otherLength()>run)return;
+        s.pointA=null;s.joinA=null;
         s.bothEnds=r.bothEnds();s.otherLength=r.otherLength();
         s.combined=r.combined();s.fullLength=r.fullLength();s.fullAtStart=r.fullAtStart();
         s.vertical=r.vertical();s.start=r.start();s.end=r.end();
-        s.direction=r.direction();s.upper=r.upper();s.create=r.create();s.resolution=r.bothEnds()&&r.create()?16:r.resolution();
+        s.direction=r.direction();s.upper=r.upper();s.create=r.create();s.resolution=r.resolution();
         if(s.create){var min=s.createAnchor;int x=min.getX()*16+r.offsetX(),y=min.getY()*16+r.offsetY(),z=min.getZ()*16+r.offsetZ();s.region=new VolumeRegion(x,y,z,x+r.width(),y+r.height(),z+r.depth());}
-        else s.region=VolumeRegion.block(s.first).union(VolumeRegion.block(s.last));
+        else s.region=s.selection;
         watch(p,s);scan(p,s);
     }
     private static boolean chunks(ServerPlayer p,Session s){var lo=s.region.min();var hi=s.region.max();for(int z=lo.getZ()>>4;z<=hi.getZ()>>4;z++)for(int x=lo.getX()>>4;x<=hi.getX()>>4;x++)if(!p.level().hasChunkAt(new BlockPos(x*16,lo.getY(),z*16)))return false;return true;}
     private static void scan(ServerPlayer p,Session s){if(!chunks(p,s)){stop(p,"volume_unloaded");return;}s.pendingPos=null;s.pendingWork=null;s.sentPhase=-1;s.phase=SCANNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;s.ignored=0;s.expected=0;reply(p,s);message(p,"volume_warning");}
-    private static void start(ServerPlayer p,Session s){if(s.invalid||!held(p,s)||!chunks(p,s)){stop(p,"volume_invalid");return;}
+    private static void start(ServerPlayer p,Session s){if(s.pointA!=null||s.joinA!=null){message(p,"world_second_handle");return;}if(s.invalid||!held(p,s)||!chunks(p,s)){stop(p,"volume_invalid");return;}
         var tool=p.getItemInHand(s.hand);if(s.former&&!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<s.expected){message(p,"volume_durability",s.expected);return;}
         if(s.former&&s.expected>0)SlopeUndo.begin(p);
         s.pendingPos=null;s.pendingWork=null;s.phase=RUNNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;reply(p,s);

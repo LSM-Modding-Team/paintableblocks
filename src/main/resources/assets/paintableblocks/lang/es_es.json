@@ -509,6 +509,12 @@
   "message.paintableblocks.occupied_destination": "Destino ocupado o con fluido",
   "message.paintableblocks.entity_collision": "Hay una entidad en el volumen",
   "message.paintableblocks.unloaded_chunk": "Chunk sin cargar",
-  "tooltip.paintableblocks.undo": "Shift + usar al aire: deshacer la última operación (sin devolver desgaste)"
+  "tooltip.paintableblocks.undo": "Shift + usar al aire: deshacer la última operación (sin devolver desgaste)",
+  "message.paintableblocks.world_first": "Selecciona la segunda esquina (cuadrícula 1/16)",
+  "message.paintableblocks.world_ready": "%s piezas · clic: dos cotas · Shift+clic: dos uniones · Ctrl+clic/Enter: confirmar",
+  "message.paintableblocks.world_controls": "F6: vertical · F7: invertir · F8: crear · F9: subdivisión · flechas: cotas · Esc: cancelar",
+  "message.paintableblocks.world_join_second": "Marca la segunda unión con Shift + clic",
+  "message.paintableblocks.world_profile_second": "Marca el final de la inclinación con clic",
+  "message.paintableblocks.world_second_handle": "Completa el segundo marcador: clic para cotas o Shift+clic para uniones"
 }
 

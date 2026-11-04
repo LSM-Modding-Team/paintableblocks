@@ -126,7 +126,26 @@ public final class SlopeVolumeContractChecks {
         var wall=outline.clip(new Vec3(.5,.8,.5),new Vec3(0,.8,.5),BlockPos.ZERO);
         check(wall!=null&&Math.abs(wall.getLocation().x-.25)<1e-8,"Independent join has the vertical wall requested");
     }
+    private static void coarseWorldInteraction(){
+        var r=VolumeRegion.block(BlockPos.ZERO);
+        for(int n:List.of(1,2,4,8,16)){
+            var base=BlockDesign.full(n);var p=r.doublePlane(BlockPos.ZERO,base,0,false,false,0,16,true,true,4,true,true,4);
+            var d=r.doubleSeed(BlockPos.ZERO,base).withSlope(p);
+            check(d.resolution()==n,"World interaction never converts the logical grid");
+            var top=new DesignOutlineShape(d).clip(new Vec3(.125,2,.5),new Vec3(.125,-1,.5),BlockPos.ZERO);
+            var ramp=new DesignOutlineShape(d).clip(new Vec3(.5,2,.5),new Vec3(.5,-1,.5),BlockPos.ZERO);
+            var wall=new DesignOutlineShape(d).clip(new Vec3(.5,.75,.5),new Vec3(0,.75,.5),BlockPos.ZERO);
+            check(top!=null&&Math.abs(top.getLocation().y-1)<1e-8,"Coarse grid keeps full end");
+            check(ramp!=null&&Math.abs(ramp.getLocation().y-.5)<1e-8,"Coarse grid keeps exact incline");
+            check(wall!=null&&Math.abs(wall.getLocation().x-.25)<1e-8,"Join may cross a coarse cell");
+            var json=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,d).getOrThrow();check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow().equals(d),"Coarse fragments survive saving");
+        }
+        var point=new Vec3(-.125,.5,1);
+        var cell=VolumeRegion.aim(new BlockPos(-1,0,0),point,Direction.SOUTH);
+        check(cell.x1()-cell.x0()==1&&cell.y1()-cell.y0()==1&&cell.z1()-cell.z0()==1,"Interaction always selects a sixteenth even at negative coordinates");
+    }
     public static void run(){
+        coarseWorldInteraction();
         independentJoin();
         normalization();
         bothEnds();

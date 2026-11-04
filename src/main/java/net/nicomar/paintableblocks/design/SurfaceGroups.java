@@ -11,7 +11,7 @@ public final class SurfaceGroups {
     public static List<Patch> merge(BlockDesign d,Map<Integer,List<List<Vec3>>> exterior){
         Map<Key,List<Patch>> groups=new LinkedHashMap<>();
         for(var surface:DesignGeometry.surfaces(d)){
-            var fragments=exterior.get(surface.key());if(fragments==null)fragments=List.of(SlopeGeometry.polygon(d,surface));
+            var fragments=exterior.get(surface.key());if(fragments==null)fragments=SlopeGeometry.polygons(d,surface);
             for(var polygon:fragments){if(polygon.size()<3)continue;double plane=SlopeGeometry.normal(d,surface).dot(polygon.getFirst());var key=new Key(surface.face().ordinal(),surface.slope(),d.paint(surface),Double.doubleToLongBits(plane));groups.computeIfAbsent(key,k->new ArrayList<>()).add(new Patch(surface,polygon));}
         }
         List<Patch> out=new ArrayList<>();

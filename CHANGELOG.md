@@ -1,5 +1,16 @@
 # Registro de cambios
 
+## 2026-11-04 — Formador directo en el mundo y precisión independiente
+
+- Retirada la apertura automática de la pantalla del formador. Dos clics delimitan celdas mundiales de 1/16, otros dos fijan cotas/dirección, Shift + clic marca dos uniones y Ctrl + clic/Enter confirma. Esc/Retroceso cancela. F6 cambia plano horizontal/vertical, F7 lado sólido, F8 creación creativa, F9 subdivisión de creación y flechas ajustan cotas a 1/16. Se conserva Shift + usar al aire para deshacer.
+- Cuadrícula de apuntado y celda objetivo, marcadores coloreados, contornos de resultado verde/referencia roja e incompatibilidades rojas. Preparación de toda la selección por lotes, presupuestos de detalle y aviso de simplificación, sin cargar chunks.
+- Geometría por múltiples polígonos dentro de una celda lógica: desaparece la exigencia de 16×16 para las uniones. Se conserva resolución, ocupación y claves de pintura del bloque; superficies, coste de pintura, ray tracing, bordes, contactos y contornos consideran sus fragmentos. La colisión mantiene su precisión de 1/16.
+- Corregida la detección de cambios en celdas grandes atravesadas parcialmente por la ventana: conservar una parte completa ya no hace que se omita el recorte de la parte inclinada. Contactos agrupan todos los fragmentos de una cara, conservando las caras interiores no ocultas.
+- La selección fraccionaria se conserva al ajustar parámetros y no se sustituye por bloques enteros. No se confirma mientras falta el segundo marcador. Las protecciones, revisión de estado, límites y ejecución siguen en servidor.
+- Se mantiene formato de diseño 4 y lectura 1–3, sin cambio de IDs ni reinterpretación de diseños antiguos. Protocolo 14 por la nueva semántica de interacción y representación. La interfaz anterior se conserva como código auxiliar, sin ser el flujo principal.
+- Contratos de uniones a 1/16 con las cinco resoluciones, paredes internas, ray tracing y guardado preparados; revisión de lectura y diff solamente. Sin compilación ni ejecución de Java, Gradle, scripts, pruebas o Minecraft. Commit online en `26.2`, sin commits locales.
+
+
 ## 2026-11-03 — Perfiles libres, edición numérica, cámara y deshacer
 
 - Unión con escalón reutilizando la ventana de corte: la parte completa puede quedar al inicio y la pendiente ascender desde su propia cota, sin obligarla a bajar desde el borde. Se mantienen ambos extremos independientes y la alternativa de unión continua.

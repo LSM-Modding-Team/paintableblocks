@@ -84,6 +84,22 @@ El historial es temporal, acotado a una operación por jugador, 8192 posiciones 
 
 Persistencia de diseños 4 con lectura 1–3. Protocolo 13. Contratos preparados sin compilar ni ejecutar: pendientes pruebas reales de restauración, permisos, cámara e interfaces.
 
+## Interacción directa en el mundo
+
+El flujo principal no abre pantallas. Se apuntan dos esquinas en cuadrícula mundial de 1/16, independiente de la subdivisión lógica del bloque. Luego dos clics fijan las cotas y dirección de la inclinación; Shift + clic en dos puntos fija sus uniones. Ctrl + clic o Enter confirma únicamente después de revisión del servidor. Esc o Retroceso cancela. Mientras falta el segundo marcador no se puede confirmar.
+
+F6 alterna plano horizontal/vertical, F7 invierte el lado sólido, F8 alterna creación creativa/transformación y F9 cambia la subdivisión de las nuevas piezas. Las flechas ajustan cotas a 1/16. Los valores se limitan al volumen seleccionado. Crear conserva el anclaje adyacente a la cara inicial y la exigencia de aire sin fluido; transformar solo retira material.
+
+Se muestra cuadrícula, celda apuntada y marcadores en el mundo, resultado verde, referencia anterior roja e incompatibilidades rojas. La preparación cubre la selección progresivamente sin cargar chunks. Presupuestos de dibujo pueden simplificar el detalle con aviso, sin reducir la operación real.
+
+### Subdivisión conservada
+
+Un bloque 1×1, 2×2, 4×4 u 8×8 admite cortes y uniones a 1/16 sin conversión ni rechazo por resolución. Una cara lógica puede representar varios polígonos, incluidos los de las paredes de unión. La pintura conserva su identidad por cara lógica y su consumo suma las áreas de los fragmentos. No se añaden subceldas editables por usar el formador.
+
+La restricción de un plano existente distinto sigue siendo una incompatibilidad geométrica, no una exigencia de cuadrícula 16×16. Los recortes previos se conservan y no se rellenan al transformar.
+
+Formato 4 con lectura 1–3 y protocolo 14. Las notas anteriores que exigían cuadrícula 16×16 para las uniones quedan sustituidas por esta ampliación. Código y contratos preparados, sin compilación ni comprobación en juego.
+
 ## Subdivisión y transformación
 
 Cinco variantes: 1×1, 2×2, 4×4, 8×8 y 16×16. El plano puede generar fragmentos de celda con caras triangulares o inclinadas. Se permiten subdivisiones mezcladas bajo el mismo plano global.

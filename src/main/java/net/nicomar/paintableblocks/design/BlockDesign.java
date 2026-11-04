@@ -50,7 +50,6 @@ public final class BlockDesign {
     }
     private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation,SlopePlane slope) {this(resolution,occupied,paints,orientation,slope,false);}
     private BlockDesign(int resolution, BitSet occupied, Map<Integer,Integer> paints, int orientation,SlopePlane slope,boolean trusted) {
-        if(slope!=null&&slope.window().get(0)>=0&&(resolution!=16||!slope.bounds().equals(SlopePlane.FULL)))throw new IllegalArgumentException("Window cuts require a world-aligned 16 grid");
         this.slope=slope;
         this.resolution=PaintingBalance.requireResolution(resolution);
         this.orientation=DesignOrientation.require(orientation);
@@ -118,8 +117,8 @@ public final class BlockDesign {
     public boolean occupied(int cell){return cell>=0 && cell<resolution*resolution*resolution && occupied.get(cell);}
     public boolean occupied(int x,int y,int z){return x>=0 && y>=0 && z>=0 && x<resolution && y<resolution && z<resolution && occupied(index(x,y,z));}
     public boolean exposed(int cell,Direction face){return occupied(cell)&&(slope!=null&&slope.window().get(0)>=0||!occupied(x(cell)+face.getStepX(),y(cell)+face.getStepY(),z(cell)+face.getStepZ()))
-            &&(slope==null||SlopeGeometry.area(SlopeGeometry.polygon(this,new DesignGeometry.Surface(cell,face)))>1e-12);}
-    public boolean validSurfaceKey(int key){return key>=SLOPE_KEY?occupied(key-SLOPE_KEY)&&slope!=null&&SlopeGeometry.area(SlopeGeometry.polygon(this,new DesignGeometry.Surface(key-SLOPE_KEY,slope.dominant(),true)))>1e-12:
+            &&(slope==null||SlopeGeometry.surfaceArea(this,new DesignGeometry.Surface(cell,face))>1e-12);}
+    public boolean validSurfaceKey(int key){return key>=SLOPE_KEY?occupied(key-SLOPE_KEY)&&slope!=null&&SlopeGeometry.surfaceArea(this,new DesignGeometry.Surface(key-SLOPE_KEY,slope.dominant(),true))>1e-12:
             key>=0&&key<resolution*resolution*resolution*6&&exposed(key/6,Direction.values()[key%6]);}
     public int paint(DesignGeometry.Surface s){return paints.getOrDefault(s.key(),0);}
     public int paint(int cell,Direction face){return paints.getOrDefault(cell*6+face.ordinal(),0);}
@@ -171,7 +170,7 @@ public final class BlockDesign {
         private ClipTask(SlopePlane plane){this.plane=plane;if(slope!=null){if(slope.a()!=plane.a()||slope.b()!=plane.b()||slope.c()!=plane.c()||slope.offset()!=plane.offset()||!slope.window().equals(plane.window()))throw new IllegalArgumentException("A piece accepts only its existing slope plane");result=BlockDesign.this;}}
         public boolean advance(int budget){
             if(result!=null)return true;
-            while(budget-->0&&!geometryDone){if(cell==resolution*resolution*resolution){geometryDone=true;break;}int c=cell++;if(!bits.get(c))continue;double min=planeMinimum(c,plane),max=min+plane.span()/resolution;if(min>=-1e-10){bits.clear(c);changed=true;}else if(max>1e-10)changed=true;}
+            while(budget-->0&&!geometryDone){if(cell==resolution*resolution*resolution){geometryDone=true;break;}int c=cell++;if(!bits.get(c))continue;if(windowCuts(c,plane))changed=true;double min=planeMinimum(c,plane),max=min+plane.span()/resolution;if(min>=-1e-10){bits.clear(c);changed=true;}else if(max>1e-10)changed=true;}
             if(!geometryDone)return false;
             if(!changed&&plane.bounds().equals(SlopePlane.FULL)){result=BlockDesign.this;return true;}
             if(bare==null){bare=new BlockDesign(resolution,bits,Map.of(),orientation,plane,true);paintIterator=paints.entrySet().iterator();}
@@ -181,7 +180,15 @@ public final class BlockDesign {
         public BlockDesign result(){if(result==null)throw new IllegalStateException("Unfinished clip task");return result;}
     }
     private int designHash(){int out=1;out=31*out+resolution;out=31*out+orientation;out=31*out+occupied.hashCode();out=31*out+paintHash;return 31*out+java.util.Objects.hashCode(slope);}
-    private double planeMinimum(int cell,SlopePlane p){if(!p.cuts(p.point((x(cell)+.5)/resolution,(y(cell)+.5)/resolution,(z(cell)+.5)/resolution)))return -1e12;var lo=p.point(x(cell)/(double)resolution,y(cell)/(double)resolution,z(cell)/(double)resolution);return p.value(lo)+(Math.min(0,p.a())*(p.bounds().get(3)-p.bounds().get(0))+Math.min(0,p.b())*(p.bounds().get(4)-p.bounds().get(1))+Math.min(0,p.c())*(p.bounds().get(5)-p.bounds().get(2)))/(16.0*resolution);}
+    private boolean windowCuts(int cell,SlopePlane p){
+        int axis=p.window().get(0);if(axis<0)return false;
+        var a=p.point(x(cell)/(double)resolution,y(cell)/(double)resolution,z(cell)/(double)resolution);
+        var b=p.point((x(cell)+1)/(double)resolution,(y(cell)+1)/(double)resolution,(z(cell)+1)/(double)resolution);
+        double[] lo={a.x,a.y,a.z},hi={b.x,b.y,b.z};lo[axis]=Math.max(lo[axis],p.window().get(1)/16.0);hi[axis]=Math.min(hi[axis],p.window().get(2)/16.0);
+        if(hi[axis]<=lo[axis]+1e-10)return false;
+        double max=p.value(new net.minecraft.world.phys.Vec3(lo[0],lo[1],lo[2]))+Math.max(0,p.a())*(hi[0]-lo[0])+Math.max(0,p.b())*(hi[1]-lo[1])+Math.max(0,p.c())*(hi[2]-lo[2]);return max>1e-10;
+    }
+    private double planeMinimum(int cell,SlopePlane p){if(p.window().get(0)>=0){int axis=p.window().get(0);double low=p.coordinate(axis,(axis==0?x(cell):axis==1?y(cell):z(cell))/(double)resolution),high=p.coordinate(axis,((axis==0?x(cell):axis==1?y(cell):z(cell))+1)/(double)resolution);if(low<p.window().get(1)/16.0-1e-10||high>p.window().get(2)/16.0+1e-10)return -1e12;}if(!p.cuts(p.point((x(cell)+.5)/resolution,(y(cell)+.5)/resolution,(z(cell)+.5)/resolution)))return -1e12;var lo=p.point(x(cell)/(double)resolution,y(cell)/(double)resolution,z(cell)/(double)resolution);return p.value(lo)+(Math.min(0,p.a())*(p.bounds().get(3)-p.bounds().get(0))+Math.min(0,p.b())*(p.bounds().get(4)-p.bounds().get(1))+Math.min(0,p.c())*(p.bounds().get(5)-p.bounds().get(2)))/(16.0*resolution);}
     @Override public boolean equals(Object o){return o instanceof BlockDesign d && resolution==d.resolution && orientation==d.orientation && occupied.equals(d.occupied)&&paints.equals(d.paints)&&java.util.Objects.equals(slope,d.slope);}
     @Override public int hashCode(){return hash;}
 }

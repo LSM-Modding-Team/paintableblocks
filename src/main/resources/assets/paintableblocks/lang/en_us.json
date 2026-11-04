@@ -509,6 +509,12 @@
   "message.paintableblocks.occupied_destination": "Destination occupied or contains fluid",
   "message.paintableblocks.entity_collision": "An entity intersects the volume",
   "message.paintableblocks.unloaded_chunk": "Chunk is not loaded",
-  "tooltip.paintableblocks.undo": "Shift + use in air: undo last operation (durability is not refunded)"
+  "tooltip.paintableblocks.undo": "Shift + use in air: undo last operation (durability is not refunded)",
+  "message.paintableblocks.world_first": "Select the second corner (1/16 grid)",
+  "message.paintableblocks.world_ready": "%s pieces · click: two levels · Shift+click: two joins · Ctrl+click/Enter: confirm",
+  "message.paintableblocks.world_controls": "F6: vertical · F7: invert · F8: create · F9: subdivision · arrows: levels · Esc: cancel",
+  "message.paintableblocks.world_join_second": "Mark the second join with Shift + click",
+  "message.paintableblocks.world_profile_second": "Mark the end of the incline with a click",
+  "message.paintableblocks.world_second_handle": "Complete the second marker: click for levels or Shift+click for joins"
 }
 

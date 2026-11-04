@@ -9,6 +9,10 @@ import net.nicomar.paintableblocks.design.*;
 /** Integer sixteenth-block boundaries, inclusive cell centers; block extents count both endpoints. */
 public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
     public VolumeRegion {if(x1<=x0||y1<=y0||z1<=z0)throw new IllegalArgumentException("Empty volume");}
+    public static VolumeRegion aim(BlockPos pos,Vec3 point,Direction face){
+        int x=(int)Math.floor((point.x-face.getStepX()*1e-7)*16),y=(int)Math.floor((point.y-face.getStepY()*1e-7)*16),z=(int)Math.floor((point.z-face.getStepZ()*1e-7)*16);
+        return new VolumeRegion(x,y,z,x+1,y+1,z+1);
+    }
     public static VolumeRegion block(BlockPos p){return new VolumeRegion(p.getX()*16,p.getY()*16,p.getZ()*16,(p.getX()+1)*16,(p.getY()+1)*16,(p.getZ()+1)*16);}
     public static VolumeRegion cell(BlockPos p,BlockDesign d,int cell){
         Vec3 lo=new Vec3(d.x(cell)/(double)d.resolution(),d.y(cell)/(double)d.resolution(),d.z(cell)/(double)d.resolution());
@@ -87,9 +91,7 @@ public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
         return new SlopePlane(world.a(),world.b(),world.c(),world.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16))).rotated(DesignOrientation.inverse(d.orientation()));
     }
     public BlockDesign doubleSeed(BlockPos pos,BlockDesign d){
-        if(d.resolution()!=16||d.slope()!=null&&!d.slope().bounds().equals(SlopePlane.FULL))throw new IllegalArgumentException("Both ends require a world-aligned 16 grid");
-        var outside=new BitSet();for(int c=0;c<4096;c++){var v=DesignOrientation.rotate(d.orientation(),new Vec3((d.x(c)+.5)/16,(d.y(c)+.5)/16,(d.z(c)+.5)/16)).add(pos.getX(),pos.getY(),pos.getZ());if(!contains(v))outside.set(c);}
-        return d.remove(outside);
+        return d;
     }
     public SlopePlane doublePlane(BlockPos pos,BlockDesign d,int direction,boolean upper,boolean vertical,int start,int end,boolean bounded,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength){
         if(!bothEnds)return combinedPlane(pos,d,direction,upper,vertical,start,end,bounded,combined,fullLength,fullAtStart);
@@ -101,7 +103,8 @@ public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
         var middle=x?new VolumeRegion(lo,y0,z0,hi,y1,z1):new VolumeRegion(x0,y0,lo,x1,y1,hi);
         var plane=middle.profilePlane(pos,d.withOrientation(0),direction,upper,vertical,start,end,false);
         int origin=(x?pos.getX():pos.getZ())*16;
-        return new SlopePlane(plane.a(),plane.b(),plane.c(),plane.offset(),SlopePlane.FULL,java.util.List.of(x?0:2,Math.clamp(lo-origin,0,16),Math.clamp(hi-origin,0,16))).rotated(DesignOrientation.inverse(d.orientation()));
+        var bounds=bounded?java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)):d.slope()==null?SlopePlane.FULL:d.slope().rotated(d.orientation()).bounds();
+        return new SlopePlane(plane.a(),plane.b(),plane.c(),plane.offset(),bounds,java.util.List.of(x?0:2,Math.clamp(lo-origin,0,16),Math.clamp(hi-origin,0,16))).rotated(DesignOrientation.inverse(d.orientation()));
     }
     public SlopePlane creationPlane(BlockPos pos,BlockDesign d,int direction,boolean upper){
         var p=plane(pos,d,direction,upper);

@@ -26,7 +26,7 @@ public final class DesignGeometry {
         List<Surface> out=new ArrayList<>();int n=design.resolution();
         for(int c=0;c<n*n*n;c++)if(design.occupied(c)){
             for(Direction face:Direction.values())if(design.exposed(c,face))out.add(new Surface(c,face));
-            if(design.slope()!=null){var surface=new Surface(c,design.slope().dominant(),true);if(SlopeGeometry.area(SlopeGeometry.polygon(design,surface))>1e-12)out.add(surface);}
+            if(design.slope()!=null){var surface=new Surface(c,design.slope().dominant(),true);if(SlopeGeometry.surfaceArea(design,surface)>1e-12)out.add(surface);}
         }return List.copyOf(out);
     },List::size);}
     public static List<Surface> cellSurfaces(BlockDesign d,int cell){
@@ -66,7 +66,7 @@ public final class DesignGeometry {
         // Only full axis-aligned outer faces support attachments; never the stepped incline.
         VoxelShape out=Shapes.empty();
         for(Direction face:Direction.values()){
-            final Direction f=face;var polygons=surfaces(d).stream().filter(s->!s.slope()&&s.face()==f).map(s->SlopeGeometry.polygon(d,s)).filter(p->!p.isEmpty()&&p.stream().allMatch(v->Math.abs((f.getAxis()==Direction.Axis.X?v.x:f.getAxis()==Direction.Axis.Y?v.y:v.z)-(f.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0))<1e-9)).toList();
+            final Direction f=face;var polygons=surfaces(d).stream().filter(s->!s.slope()&&s.face()==f).flatMap(s->SlopeGeometry.polygons(d,s).stream()).filter(p->!p.isEmpty()&&p.stream().allMatch(v->Math.abs((f.getAxis()==Direction.Axis.X?v.x:f.getAxis()==Direction.Axis.Y?v.y:v.z)-(f.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0))<1e-9)).toList();
             double area=polygons.stream().mapToDouble(SlopeGeometry::area).sum();
             if(Math.abs(area-1)<1e-8){double[] min={0,0,0},max={1,1,1};int ax=SlopeGeometry.axis(f);if(f.getAxisDirection()==Direction.AxisDirection.POSITIVE)min[ax]=15.0/16;else max[ax]=1.0/16;out=Shapes.joinUnoptimized(out,Shapes.box(min[0],min[1],min[2],max[0],max[1],max[2]),BooleanOp.OR);}
         }return out.optimize();

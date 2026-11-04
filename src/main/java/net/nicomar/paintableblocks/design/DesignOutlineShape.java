@@ -30,7 +30,7 @@ public class DesignOutlineShape extends VoxelShape {
     }
     private static String point(Vec3 p){return Math.round(p.x*1e10)+","+Math.round(p.y*1e10)+","+Math.round(p.z*1e10);}
     static void emit(BlockDesign d,DesignGeometry.Surface s,net.minecraft.world.phys.shapes.Shapes.DoubleLineConsumer consumer){
-        var p=SlopeGeometry.polygon(d,s);for(int i=0;i<p.size();i++){var a=DesignOrientation.rotate(d.orientation(),p.get(i));var b=DesignOrientation.rotate(d.orientation(),p.get((i+1)%p.size()));consumer.consume(a.x,a.y,a.z,b.x,b.y,b.z);}
+        for(var p:SlopeGeometry.polygons(d,s))for(int i=0;i<p.size();i++){var a=DesignOrientation.rotate(d.orientation(),p.get(i));var b=DesignOrientation.rotate(d.orientation(),p.get((i+1)%p.size()));consumer.consume(a.x,a.y,a.z,b.x,b.y,b.z);}
     }
     @Override public BlockHitResult clip(Vec3 start,Vec3 end,BlockPos pos){return SlopeGeometry.ray(design,start,end,pos);}
 }

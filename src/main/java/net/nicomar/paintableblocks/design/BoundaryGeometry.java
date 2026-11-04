@@ -32,10 +32,10 @@ public final class BoundaryGeometry {
         List<List<Patch>> byDirection=new ArrayList<>();for(int i=0;i<6;i++)byDirection.add(new ArrayList<>());
         for(var s:DesignGeometry.surfaces(d))if(!s.slope()){
             var f=DesignOrientation.direction(d.orientation(),s.face());int axis=SlopeGeometry.axis(f),u=(axis+1)%3,v=(axis+2)%3;double plane=f.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0;
-            var p=SlopeGeometry.polygon(d,s).stream().map(x->DesignOrientation.rotate(d.orientation(),x)).toList();
+            for(var local:SlopeGeometry.polygons(d,s)){var p=local.stream().map(x->DesignOrientation.rotate(d.orientation(),x)).toList();
             double u0=Double.POSITIVE_INFINITY,v0=u0,u1=Double.NEGATIVE_INFINITY,v1=u1;boolean boundary=true;
             for(var x:p){if(Math.abs(coord(x,axis)-plane)>1e-8){boundary=false;break;}u0=Math.min(u0,coord(x,u));u1=Math.max(u1,coord(x,u));v0=Math.min(v0,coord(x,v));v1=Math.max(v1,coord(x,v));}
-            if(boundary)byDirection.get(f.ordinal()).add(new Patch(s.key(),p,u0,v0,u1,v1));
+            if(boundary)byDirection.get(f.ordinal()).add(new Patch(s.key(),p,u0,v0,u1,v1));}
         }
         List<Face> out=new ArrayList<>();for(var patches:byDirection){double area=0;for(var patch:patches)area+=SlopeGeometry.area(patch.polygon);out.add(new Face(List.copyOf(patches),patches.stream().map(Patch::polygon).toList(),Math.abs(area-1)<1e-8));}return List.copyOf(out);
     }

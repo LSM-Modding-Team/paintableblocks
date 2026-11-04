@@ -8,7 +8,7 @@ Base del mod y grupos **1: bloques y diseños**, **2: herramientas y pinturas** 
 
 Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes completos en 80 ticks. Se incorporan recetas y mejoras con conservación de datos. Los recursos de 20 herramientas, cuatro cubos y cinco bloques de producción están implementados: modelos 3D, texturas originales de 16×16 y colisión coincidente. Se validan caras y UV para evitar superficies superpuestas. [Vista técnica y detalles](docs/technical/visual-assets.md).
 
-Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **13**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
+Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **14**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
 
 ## Ampliaciones acordadas
 
@@ -27,6 +27,8 @@ El formador reúne sus controles en una lista desplazable, con una escena de blo
 Corregida la continuidad del plano entre bloques al normalizar sus coeficientes. La previsualización 3D muestra geometría y pinturas con zoom; se prepara por partes y avisa cuando su detalle es parcial. Las formas guardadas se conservan: los diseños defectuosos anteriores no se reconstruyen automáticamente.
 
 El editor ofrece unión continua o con escalón y cotas libres, movimiento y longitud del tramo inclinado, números decimales/fracciones al pulsar un valor, copia de ajustes durante la sesión, giro por arrastre, vistas predefinidas y comparación antes/después/material retirado. Los errores indican posición y marcan piezas en rojo. Shift + usar al aire con el formador deshace la última operación conservada; no devuelve desgaste y rechaza cambios posteriores o falta de permisos.
+
+El flujo principal del formador se realiza en el mundo: dos esquinas sobre cuadrícula 1/16, dos cotas por clic y dos uniones mediante Shift + clic. Ctrl + clic o Enter confirma; Esc cancela. F6 cambia el plano, F7 el lado sólido, F8 el modo creativo y F9 la subdivisión de las piezas creadas. La subdivisión de bloques existentes se conserva, incluidas 1×1 y 2×2, sin exigir conversión a 16×16. La pantalla anterior deja de abrirse automáticamente.
 
 ## Rendimiento
 

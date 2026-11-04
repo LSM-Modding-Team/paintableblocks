@@ -43,6 +43,7 @@ public final class NeighborOcclusion {
         return WHOLE.get(new WholeKey(design.geometryKey(),design.orientation(),glass,keys),()->visibleUncached(design,neighbors,keys,glass),map->{int count=map.size()+glass.size();for(var face:keys)count+=face.size()*6;for(var list:map.values())for(var p:list)count+=p.size();return count;});
     }
     private static Map<Integer,List<List<Vec3>>> visibleUncached(BlockDesign design,List<BlockDesign> neighbors,List<List<PaintedPatch>> keys,Map<Integer,Integer> glass){
+        if(design.slope()!=null&&design.slope().window().get(0)>=0)return multiVisible(design,neighbors);
         Map<Integer,List<List<Vec3>>> result=new HashMap<>();var frontiers=BoundaryGeometry.faces(design);
         for(var face:Direction.values()){
             var neighbor=neighbors.get(face.ordinal());if(neighbor==null)continue;var own=frontiers.get(face.ordinal());if(own.patches().isEmpty())continue;
@@ -57,6 +58,28 @@ public final class NeighborOcclusion {
             var key=new Key(own,glass,painted,face.ordinal(),design.orientation());
             result.putAll(CACHE.get(key,()->contact(design,face,own,painted),map->{int count=map.size()+glass.size()+painted.size()*6;for(var list:map.values())for(var polygon:list)count+=polygon.size();return count;}));
         }return new SurfaceMap(result);
+    }
+    private static Map<Integer,List<List<Vec3>>> multiVisible(BlockDesign design,List<BlockDesign> neighbors){
+        Map<Integer,List<List<Vec3>>> out=new HashMap<>();int inverse=DesignOrientation.inverse(design.orientation());
+        for(var s:DesignGeometry.surfaces(design)){
+            var fragments=new ArrayList<List<Vec3>>();boolean changed=false;
+            for(var local:SlopeGeometry.polygons(design,s)){
+                var face=DesignOrientation.direction(design.orientation(),s.face());int axis=SlopeGeometry.axis(face);double edge=face.getAxisDirection()==Direction.AxisDirection.POSITIVE?1:0;
+                var world=local.stream().map(p->DesignOrientation.rotate(design.orientation(),p)).toList();
+                var neighbor=neighbors.get(face.ordinal());var remaining=new ArrayList<List<Vec3>>();remaining.add(world);
+                if(!s.slope()&&neighbor!=null&&world.stream().allMatch(p->Math.abs(coordinate(p,axis)-edge)<1e-8)){
+                    for(var patch:BoundaryGeometry.faces(neighbor).get(face.getOpposite().ordinal()).patches()){
+                        if(!occludes(design.paint(s),neighbor.paints().getOrDefault(patch.surface(),0)))continue;
+                        var mask=patch.polygon().stream().map(p->p.add(face.getStepX(),face.getStepY(),face.getStepZ())).toList();var next=new ArrayList<List<Vec3>>();
+                        for(var part:remaining)next.addAll(subtract(part,mask,axis));remaining=next;
+                    }
+                }
+                double area=remaining.stream().mapToDouble(SlopeGeometry::area).sum();if(area<SlopeGeometry.area(world)-1e-9)changed=true;
+                for(var p:remaining)fragments.add(p.stream().map(v->DesignOrientation.rotate(inverse,v)).toList());
+            }
+            if(changed)out.put(s.key(),List.copyOf(fragments));
+        }
+        return new SurfaceMap(out);
     }
     private static Map<Integer,List<List<Vec3>>> contact(BlockDesign design,Direction face,BoundaryGeometry.Face own,List<PaintedPatch> other){
         Map<Integer,List<List<Vec3>>> result=new HashMap<>();int axis=SlopeGeometry.axis(face),inverse=DesignOrientation.inverse(design.orientation());

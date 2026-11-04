@@ -100,7 +100,7 @@ public final class ModNetworking {
         @Override public Type<DesignSync> type(){return TYPE;}
     }
     public static void register(RegisterPayloadHandlersEvent event){
-        var registrar=event.registrar("13");
+        var registrar=event.registrar("14");
         registrar.playToServer(Use.TYPE,Use.CODEC,(v,ctx)->ServerInteractions.use(ctx.player(),v));
         registrar.playToClient(Selection.TYPE,Selection.CODEC);
         registrar.playToClient(VolumeState.TYPE,VolumeState.CODEC);
