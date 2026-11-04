@@ -82,7 +82,9 @@ public final class VolumeEditing {
     public static boolean allowed(ServerPlayer p,BlockPos pos,InteractionHand hand){return p.isAlive()&&!p.isSpectator()&&p.mayBuild()&&p.level().hasChunkAt(pos)&&!p.level().isOutsideBuildHeight(pos)&&p.level().getWorldBorder().isWithinBounds(pos)&&p.mayInteract(p.level(),pos)&&p.level().mayInteract(p,pos)&&p.mayUseItemAt(pos,Direction.UP,p.getItemInHand(hand));}
     private static void message(ServerPlayer p,String key,Object... args){p.sendOverlayMessage(Component.translatable("message.paintableblocks."+key,args));}
     private static void reply(ServerPlayer p,Session s){if(s.sentPhase==s.phase&&s.sentCursor==s.cursor&&s.sentModified==s.modified)return;s.sentPhase=s.phase;s.sentCursor=s.cursor;s.sentModified=s.modified;var r=s.region;PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeState(s.id,s.phase,s.former,s.hand,s.dimension,s.first,s.last,r.x0(),r.y0(),r.z0(),r.x1(),r.y1(),r.z1(),s.direction,s.upper,s.create,s.resolution,s.cursor,s.modified,s.ignored,s.expected,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength));}
+    private static String classify(IllegalArgumentException e){String m=String.valueOf(e.getMessage());if(m.contains("16")||m.contains("aligned"))return "grid_mismatch";if(m.contains("slope plane"))return "plane_conflict";if(m.contains("empty positions"))return "occupied_destination";if(m.contains("Entity"))return "entity_collision";return "volume_conflict";}
     private static void reject(ServerPlayer p,Session s,String reason){
+        PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeNotice(reason,s.pendingPos==null?s.first:s.pendingPos));
         if(s.former&&s.phase!=RUNNING){s.phase=CONFIG;s.cursor=0;s.expected=0;reply(p,s);message(p,reason,s.modified);}else stop(p,reason);
     }
     private static void stop(ServerPlayer p,String reason){var s=SESSIONS.remove(p);if(s==null)return;unwatch(p,s);s.phase=0;reply(p,s);message(p,reason,s.modified);}
@@ -107,7 +109,9 @@ public final class VolumeEditing {
         s.region=region;watch(p,s);s.last=r.pos();if(former){s.phase=CONFIG;reply(p,s);}else scan(p,s);return true;
     }
     public static void action(Player player,ModNetworking.VolumeAction r){
-        if(!(player instanceof ServerPlayer p))return;var s=SESSIONS.get(p);if(s==null||s.id!=r.id())return;
+        if(!(player instanceof ServerPlayer p))return;
+        if(r.action()==3){var running=SESSIONS.get(p);if(running!=null&&running.phase==RUNNING)return;boolean ok=SlopeUndo.undo(p);PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeNotice(ok?"undo_done":"undo_conflict",p.blockPosition()));return;}
+        var s=SESSIONS.get(p);if(s==null||s.id!=r.id())return;
         if(r.action()==2){stop(p,"volume_stopped");return;}
         if(s.invalid||!held(p,s)){stop(p,"volume_invalid");return;}
         if(r.action()==1){if(s.phase==READY)start(p,s);return;}
@@ -134,6 +138,7 @@ public final class VolumeEditing {
     private static void scan(ServerPlayer p,Session s){if(!chunks(p,s)){stop(p,"volume_unloaded");return;}s.pendingPos=null;s.pendingWork=null;s.sentPhase=-1;s.phase=SCANNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;s.ignored=0;s.expected=0;reply(p,s);message(p,"volume_warning");}
     private static void start(ServerPlayer p,Session s){if(s.invalid||!held(p,s)||!chunks(p,s)){stop(p,"volume_invalid");return;}
         var tool=p.getItemInHand(s.hand);if(s.former&&!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<s.expected){message(p,"volume_durability",s.expected);return;}
+        if(s.former&&s.expected>0)SlopeUndo.begin(p);
         s.pendingPos=null;s.pendingWork=null;s.phase=RUNNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;reply(p,s);
     }
     private static DesignOperations.Plan plan(ServerPlayer p,Session s,BlockPos pos){
@@ -185,14 +190,14 @@ public final class VolumeEditing {
         if((entity instanceof PaintableBlockEntity be&&be.valid())||s.create){
             var key=key(s,pos,source);if(s.plans.getIfPresent(key)==null){
                 try{if(s.pendingWork==null)s.pendingWork=new PlanWork(s,pos,source);var built=s.pendingWork.advance();if(built==null)return;s.plans.get(key,()->built,v->v.cells().size()+v.before().paints().size()+v.after().paints().size()+64);s.pendingWork=null;}
-                catch(IllegalArgumentException conflict){s.pendingPos=null;s.pendingWork=null;reject(p,s,"volume_conflict");return;}
+                catch(IllegalArgumentException conflict){s.pendingWork=null;reject(p,s,classify(conflict));return;}
             }
         }
         s.pendingPos=null;
         DesignOperations.Plan plan;
-        try{plan=plan(p,s,pos);}catch(IllegalArgumentException bad){reject(p,s,"volume_conflict");return;}
+        try{plan=plan(p,s,pos);}catch(IllegalArgumentException bad){s.pendingPos=pos;reject(p,s,classify(bad));return;}
         if(plan!=null&&plan.changes()){
-            if(!allowed(p,pos,s.hand)||!events(p,s,pos,plan)||s.invalid||!held(p,s)){stop(p,"volume_denied");return;}
+            if(!allowed(p,pos,s.hand)||!events(p,s,pos,plan)||s.invalid||!held(p,s)){PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeNotice("volume_denied",pos));stop(p,"volume_denied");return;}
             // Listeners may mutate state. Recompute after events before committing.
             DesignOperations.Plan fresh;try{fresh=plan(p,s,pos);}catch(IllegalArgumentException bad){stop(p,"volume_invalid");return;}
             if(fresh==null||!fresh.equals(plan)){stop(p,"volume_invalid");return;}
@@ -200,8 +205,10 @@ public final class VolumeEditing {
             else{
                 s.writing=true;s.writingPos=pos;
                 try{
+                    var beforeState=p.level().getBlockState(pos);var beforeEntity=p.level().getBlockEntity(pos);var beforeTag=beforeEntity==null?null:beforeEntity.saveWithoutMetadata(p.level().registryAccess());
                     if(p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be)be.setDesign(plan.after());
                     else{var state=ModContent.block(s.resolution).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(plan.after()));try(var placing=PlacementDesign.enter(pos,plan.after())){if(!p.level().setBlock(pos,state,Block.UPDATE_ALL)){stop(p,"volume_conflict");return;}}}
+                    if(s.former)SlopeUndo.record(p,pos,beforeState,beforeTag,plan.before());
                     s.modified++;
                     if(s.former&&!p.isCreative()){var held=p.getItemInHand(s.hand);int damage=held.getDamageValue()+1;if(damage>=held.getMaxDamage()){held.shrink(1);s.tool.shrink(1);}else{held.setDamageValue(damage);s.tool.setDamageValue(damage);}}
                 }finally{s.writing=false;s.writingPos=null;}

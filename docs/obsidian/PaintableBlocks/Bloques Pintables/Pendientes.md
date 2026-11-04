@@ -66,6 +66,24 @@ No se envía al chat el aviso de preparación en cada cambio. Se mantienen estad
 
 Código y contratos preparados; sin compilación ni pruebas o Minecraft ejecutados.
 
+## Editor ampliado y perfiles independientes
+
+La opción Unión con escalón usa cotas libres en la inclinación central. Una parte completa al inicio puede unirse por pared vertical a una pendiente ascendente baja, como en el dibujo aceptado. Unión continua conserva el comportamiento que llega al borde del tramo completo. La modalidad libre admite uno o ambos extremos completos en cuadrícula 16×16.
+
+Los extremos se controlan independientemente; mover la inclinación reparte ambas longitudes completas sin cambiar su suma ni las cotas. Cambiar la longitud inclinada conserva las cotas. Pulsar un número abre entrada decimal o fraccionaria, por ejemplo 0,5, 2.75 o 1/8: solo valores exactos de la cuadrícula 1/16 e intervalos válidos.
+
+La cámara se gira arrastrando dentro del panel; la rueda ajusta zoom. Hay vistas frontal, lateral, superior e isométrica, medidas de tramos/cotas y modos Antes, Después y Material retirado. Este último representa volumen retirado muestreado a 1/16 en rojo. Copiar/Pegar reutiliza ajustes durante la sesión del cliente, sin cambiar la selección de transformación.
+
+Los diagnósticos muestran coordenadas y distinguen tipos de impedimento; las piezas afectadas se resaltan rojas. Los conflictos individuales no ocultan todas las piezas posteriores de la previsualización. La confirmación siempre depende de la validación del servidor.
+
+### Deshacer
+
+El editor y Shift + usar al aire permiten deshacer la última operación registrada del formador, incluidas las partes ya realizadas de una operación interrumpida. Se restaura el estado y datos previos de las piezas sin drops ni devolución de desgaste. Se exige sostener el formador, estar en la misma dimensión, chunks cargados, permisos/protecciones válidos y ausencia de entidades en el volumen que se restaura. Si algún bloque cambió después, se rechaza el deshacer completo.
+
+El historial es temporal, acotado a una operación por jugador, 8192 posiciones y 8 388 608 caracteres serializados. Superar el presupuesto descarta el historial, no recorta la construcción. No hay rehacer y se pierde al reiniciar. No se revierte el inventario del jugador.
+
+Persistencia de diseños 4 con lectura 1–3. Protocolo 13. Contratos preparados sin compilar ni ejecutar: pendientes pruebas reales de restauración, permisos, cámara e interfaces.
+
 ## Subdivisión y transformación
 
 Cinco variantes: 1×1, 2×2, 4×4, 8×8 y 16×16. El plano puede generar fragmentos de celda con caras triangulares o inclinadas. Se permiten subdivisiones mezcladas bajo el mismo plano global.

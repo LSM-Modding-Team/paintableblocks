@@ -13,7 +13,7 @@ def main():
   for imported in re.findall(r'import\s+(net\.minecraft\.[\w.]+);',text):assert imported.replace('.','/')+'.class' in native,(source,imported)
   if 'client' not in source.relative_to(JAVA).parts:assert not re.search(r'import\s+net\.minecraft\.client\.',text)
  assert 'VERSION = 4' in (JAVA/'design/BlockDesign.java').read_text()
- network=(JAVA/'network/ModNetworking.java').read_text();assert 'event.registrar("12")' in network
+ network=(JAVA/'network/ModNetworking.java').read_text();assert 'event.registrar("13")' in network
  for payload in ['Use','Selection','VolumeAction','VolumeState','BucketAction','ProductionAction','DesignRequest','DesignSync']:
   assert 'record '+payload+'(' in network
  for payload in ['VolumeAction','VolumeState','DesignRequest','DesignSync']:

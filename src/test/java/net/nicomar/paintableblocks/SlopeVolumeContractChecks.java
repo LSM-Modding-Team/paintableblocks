@@ -115,7 +115,19 @@ public final class SlopeVolumeContractChecks {
         var stored=BlockDesign.full(4).withSlope(new SlopePlane(-1,1,0,0));var json=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,stored).getOrThrow();
         check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow().equals(stored),"Existing canonical saved geometry is unchanged");
     }
+    private static void independentJoin(){
+        var region=VolumeRegion.block(BlockPos.ZERO);var base=BlockDesign.full(16);
+        var plane=region.doublePlane(BlockPos.ZERO,base,0,false,false,0,16,true,true,4,true,true,0);
+        var d=region.doubleSeed(BlockPos.ZERO,base).withSlope(plane);var outline=new DesignOutlineShape(d);
+        var cap=outline.clip(new Vec3(.125,2,.5),new Vec3(.125,-1,.5),BlockPos.ZERO);
+        var ramp=outline.clip(new Vec3(.5,2,.5),new Vec3(.5,-1,.5),BlockPos.ZERO);
+        check(cap!=null&&Math.abs(cap.getLocation().y-1)<1e-8,"Full initial zone stays complete");
+        check(ramp!=null&&Math.abs(ramp.getLocation().y-1.0/3)<1e-8,"Independent ramp ascends after the full initial zone instead of being forced down");
+        var wall=outline.clip(new Vec3(.5,.8,.5),new Vec3(0,.8,.5),BlockPos.ZERO);
+        check(wall!=null&&Math.abs(wall.getLocation().x-.25)<1e-8,"Independent join has the vertical wall requested");
+    }
     public static void run(){
+        independentJoin();
         normalization();
         bothEnds();
         combinations();

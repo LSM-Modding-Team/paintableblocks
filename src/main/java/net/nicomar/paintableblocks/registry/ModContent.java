@@ -36,7 +36,7 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 
 public final class ModContent {
     public static final DeferredHolder<DataComponentType<?>,DataComponentType<net.nicomar.paintableblocks.design.PreviewScene>> PREVIEW_SCENE =
-            ModRegistries.DATA_COMPONENTS.registerComponentType("preview_scene",b->b.persistent(net.nicomar.paintableblocks.design.PreviewScene.CODEC));
+            ModRegistries.DATA_COMPONENTS.registerComponentType("preview_scene",b->b.persistent(net.nicomar.paintableblocks.design.PreviewScene.CODEC).networkSynchronized(StreamCodec.unit(new net.nicomar.paintableblocks.design.PreviewScene(List.of()))));
     public static final DeferredHolder<DataComponentType<?>,DataComponentType<BlockDesign>> DESIGN =
             ModRegistries.DATA_COMPONENTS.registerComponentType("block_design", b -> b.persistent(BlockDesign.CODEC));
     public static final DeferredHolder<DataComponentType<?>,DataComponentType<Integer>> PAINT_ID =

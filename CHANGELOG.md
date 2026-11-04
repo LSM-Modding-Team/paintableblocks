@@ -1,5 +1,17 @@
 # Registro de cambios
 
+## 2026-11-03 — Perfiles libres, edición numérica, cámara y deshacer
+
+- Unión con escalón reutilizando la ventana de corte: la parte completa puede quedar al inicio y la pendiente ascender desde su propia cota, sin obligarla a bajar desde el borde. Se mantienen ambos extremos independientes y la alternativa de unión continua.
+- Movimiento del tramo inclinado conservando su longitud/cotas y ajuste de longitud conservando las cotas. Valores editables mediante diálogo con decimales, coma o fracciones; se rechazan cantidades no representables exactamente a 1/16, fuera de intervalo o divisiones por cero.
+- Cámara 3D por arrastre y vistas frontal, lateral, superior e isométrica; controles de cámara no reinician la preparación del servidor. Comparación antes/después y material retirado rojo muestreado a 1/16; medidas de tramos/cotas visibles junto a la escena.
+- Copia y pegado de ajustes en memoria durante la sesión del cliente; al transformar se conserva la selección de destino. La unión libre mantiene el requisito 16×16 ya establecido.
+- Diagnósticos con coordenadas, distinción de cuadrícula, plano, destino ocupado, entidades o permisos y piezas rojas en escena. Una pieza incompatible no impide preparar las siguientes. No se añaden mensajes de chat.
+- Deshacer la última operación del formador desde el editor o Shift + usar al aire. Historial en memoria por jugador y dimensión, máximo 8192 posiciones y presupuesto de 8 388 608 caracteres serializados; si se agota se descarta el historial completo, sin impedir la operación. Comprueba estados/datos posteriores, permisos, protecciones y entidades; no carga chunks, genera drops, concede objetos ni devuelve durabilidad. No hay rehacer ni persistencia del historial tras reiniciar.
+- Restauración mediante ValueInput de 26.2 y actualización nativa de datos. El formato de diseño 4 y la lectura 1–3 permanecen; protocolo 13 por avisos y parámetros locales de escena. No se reinterpretan mundos anteriores.
+- Contratos de perfil libre con pared de unión y números exactos escritos, sin ejecutar. Lectura de APIs y revisión del diff únicamente: sin Java, Gradle, compilación, scripts, pruebas ni Minecraft. Publicación online en `26.2`, sin commits locales.
+
+
 ## 2026-11-03 — Continuidad de planos y previsualización 3D
 
 - Corregida la normalización: también se divide offset por el máximo común divisor. Evita que el plano cambie de posición entre bloques, produciendo mesetas y saltos. Rechazados enteros mínimos que desbordan el cálculo del divisor.

@@ -31,17 +31,19 @@ public final class VolumePreview {
     private static long feedbackTick;
     private static boolean previewPending;
 
+    private static ModNetworking.VolumeNotice notice;
+    public static ModNetworking.VolumeNotice notice(){return notice;}
     public static ModNetworking.VolumeState state(){return state;}
     private VolumePreview(){}
     public static void register(){NeoForge.EVENT_BUS.addListener(VolumePreview::key);NeoForge.EVENT_BUS.addListener(VolumePreview::tick);NeoForge.EVENT_BUS.addListener(VolumePreview::outline);}
-    public static void payloads(RegisterClientPayloadHandlersEvent e){e.register(ModNetworking.VolumeState.TYPE,(v,ctx)->{
+    public static void payloads(RegisterClientPayloadHandlersEvent e){e.register(ModNetworking.VolumeNotice.TYPE,(v,ctx)->{notice=v;if(v.reason().startsWith("undo_")){var client=Minecraft.getInstance();client.gui.hud.setOverlayMessage(Component.translatable("message.paintableblocks."+v.reason()),false);}});e.register(ModNetworking.VolumeState.TYPE,(v,ctx)->{
         var c=Minecraft.getInstance();if(c.player==null||c.level==null||!v.dimension().equals(c.level.dimension().identifier()))return;
         if(state!=null&&v.id()<state.id())return;
-        if(v.phase()==0){state=null;PREVIEWS.clear();return;}state=v;feedbackTick=0;item=c.player.getItemInHand(v.hand()).getItem();slot=c.player.getInventory().getSelectedSlot();
+        if(v.phase()==0){state=null;PREVIEWS.clear();return;}if(state==null||state.id()!=v.id())notice=null;state=v;feedbackTick=0;item=c.player.getItemInHand(v.hand()).getItem();slot=c.player.getInventory().getSelectedSlot();
         if(v.former()&&v.phase()!=VolumeEditing.FIRST&&opened!=v.id()){opened=v.id();c.gui.setScreen(new SlopeFormerScreen());}
     });}
     public static void action(int action,int direction,boolean upper,boolean create,int width,int height,int depth,int resolution){if(state!=null)ClientPacketDistributor.sendToServer(new ModNetworking.VolumeAction(state.id(),action,direction,upper,create,width,height,depth,resolution));}
-    public static void configure(int direction,boolean upper,boolean create,int width,int height,int depth,int resolution,int x,int y,int z,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength){if(state!=null)ClientPacketDistributor.sendToServer(new ModNetworking.VolumeAction(state.id(),0,direction,upper,create,width,height,depth,resolution,x,y,z,vertical,start,end,combined,fullLength,fullAtStart,bothEnds,otherLength));}
+    public static void configure(int direction,boolean upper,boolean create,int width,int height,int depth,int resolution,int x,int y,int z,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength){notice=null;if(state!=null)ClientPacketDistributor.sendToServer(new ModNetworking.VolumeAction(state.id(),0,direction,upper,create,width,height,depth,resolution,x,y,z,vertical,start,end,combined,fullLength,fullAtStart,bothEnds,otherLength));}
     public static void cancel(){if(state!=null){action(2,0,false,false,1,1,1,1);state=null;PREVIEWS.clear();}}
     private static boolean control(){var c=Minecraft.getInstance();return InputConstants.isKeyDown(c.getWindow(),GLFW.GLFW_KEY_LEFT_CONTROL)||InputConstants.isKeyDown(c.getWindow(),GLFW.GLFW_KEY_RIGHT_CONTROL);}
     /** Called before the ordinary brush/editor input handler; consumes only volume tools. */
@@ -51,13 +53,14 @@ public final class VolumePreview {
         if(e.getHand()==InteractionHand.OFF_HAND&&(net.nicomar.paintableblocks.interaction.ServerInteractions.tool(c.player.getMainHandItem())||c.player.getMainHandItem().getItem() instanceof SlopeFormerItem||c.player.getMainHandItem().getItem() instanceof HammerItem&&(control()||state!=null))){e.setCanceled(true);e.setSwingHand(false);return true;}
         if(!former&&!(hammer&&(control()||state!=null)))return false;
         e.setCanceled(true);e.setSwingHand(false);SelectionPreview.discardBrushSelection();
+        if(former&&c.player.isShiftKeyDown()&&(c.hitResult==null||c.hitResult.getType()!=HitResult.Type.BLOCK)){ClientPacketDistributor.sendToServer(new ModNetworking.VolumeAction(0,3,0,false,false,1,1,1,1));return true;}
         if(state!=null&&state.phase()==VolumeEditing.READY){action(1,state.direction(),state.upper(),state.create(),1,1,1,state.resolution());return true;}
         if(state!=null&&(state.phase()==VolumeEditing.RUNNING||state.phase()==VolumeEditing.SCANNING))return true;
         if(c.hitResult instanceof BlockHitResult hit&&hit.getType()==HitResult.Type.BLOCK&&c.level.getBlockEntity(hit.getBlockPos()) instanceof PaintableBlockEntity)
             ClientPacketDistributor.sendToServer(ModNetworking.Use.capture(c.player,e.getHand(),hit,SelectionPreview.requestId(),0,control(),false,false));
         return true;
     }
-    private static void key(InputEvent.Key e){if(e.getKey()==GLFW.GLFW_KEY_ESCAPE&&e.getAction()==GLFW.GLFW_PRESS)cancel();}
+    private static void key(InputEvent.Key e){if(Minecraft.getInstance().gui.screen()==null&&e.getKey()==GLFW.GLFW_KEY_ESCAPE&&e.getAction()==GLFW.GLFW_PRESS)cancel();}
     private static void tick(ClientTickEvent.Post e){
         var c=Minecraft.getInstance();if(state==null)return;if(c.player==null||c.level==null){state=null;PREVIEWS.clear();return;}
         if(!state.dimension().equals(c.level.dimension().identifier())||c.player.getItemInHand(state.hand()).getItem()!=item||state.hand()==InteractionHand.MAIN_HAND&&c.player.getInventory().getSelectedSlot()!=slot){cancel();return;}
