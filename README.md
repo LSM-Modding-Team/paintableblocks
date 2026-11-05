@@ -8,7 +8,7 @@ Base del mod y grupos **1: bloques y diseños**, **2: herramientas y pinturas** 
 
 Las estaciones fabrican, almacenan y convierten; molino/prensa procesan lotes completos en 80 ticks. Se incorporan recetas y mejoras con conservación de datos. Los recursos de 20 herramientas, cuatro cubos y cinco bloques de producción están implementados: modelos 3D, texturas originales de 16×16 y colisión coincidente. Se validan caras y UV para evitar superficies superpuestas. [Vista técnica y detalles](docs/technical/visual-assets.md).
 
-Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **16**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
+Detalle: [Grupo 1](docs/technical/group1.md), [Grupo 2](docs/technical/group2.md), [correcciones de interacción](docs/technical/interaction-fixes.md) y [Grupo 3](docs/technical/group3.md). El protocolo es **17**: cliente y servidor deben actualizarse juntos. Implementado no significa probado en juego.
 
 ## Ampliaciones acordadas
 
@@ -55,3 +55,5 @@ Se mantiene la configuración existente de ModDevGradle 2.0.148 y el wrapper Gra
 El código tiene revisión estática y un arnés de contratos Java preparado, todavía sin ejecutar. No se ha ejecutado Gradle, compilado ni iniciado Minecraft; no se acredita carga o funcionamiento en juego. Construcción y ejecución requieren petición expresa del usuario, también desde el IDE o scripts.
 
 Los commits se crean directamente en el repositorio online, siempre en la rama `26.2`, sin commits locales. Véase [la licencia MIT](LICENSE).
+
+El pincel permite áreas coplanares entre bloques con Ctrl + clic y clic de confirmación; el cristal usa dos clics directamente. La selección respeta las subdivisiones, previsualiza el consumo y conserva huecos. Jade opcional 26.2.10+neoforge muestra el material de la cara apuntada. Dependencia de compilación en Modrinth; no se ha resuelto ni compilado durante esta implementación.

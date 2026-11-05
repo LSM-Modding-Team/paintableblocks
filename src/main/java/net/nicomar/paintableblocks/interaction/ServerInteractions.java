@@ -125,13 +125,11 @@ public final class ServerInteractions {
         if(held.getItem() instanceof BrushItem brush){
             var content=brush.content(held);int id=content.paint();
             if(!PaintCatalog.validId(id)||!p.isCreative()&&!PaintCatalog.byId(id).survivalAvailable())return;
-            if(r.control()){
+            if(r.control()||pending==null&&PaintCatalog.isGlass(id)){
                 PENDING.put(p,new Pending(r.request(),pos.immutable(),r.dimension(),be.editIdentity(),be.revision(),surface.get(),r.hand(),r.slot(),r.item(),id));return;
             }
-            if(pending!=null&&!pending.pos.equals(pos))return;
-            List<DesignGeometry.Surface> faces;
-            try{faces=pending==null?List.of(surface.get()):DesignOperations.area(before,pending.first,surface.get());}catch(IllegalArgumentException invalid){return;}
-            plan=DesignOperations.paint(before,faces,id);
+            if(pending!=null){paintArea(p,r,pending,surface.get(),id);return;}
+            plan=DesignOperations.paint(before,List.of(surface.get()),id);
             if(!p.isCreative()&&content.units()<plan.units()){p.sendOverlayMessage(Component.translatable("message.paintableblocks.insufficient_paint",plan.units(),content.units()));return;}
         }else if(held.getItem() instanceof EditingToolItem tool)plan=DesignOperations.tool(before,surface.get(),tool.action(),hit.getDirection(),r.reverse());
         else return;
@@ -147,6 +145,22 @@ public final class ServerInteractions {
         var current=p.getItemInHand(r.hand());
         if(current.getItem() instanceof BrushItem brush){var content=brush.content(current);if(!brush.valid(current)||!p.isCreative()&&(!PaintCatalog.byId(r.paint()).survivalAvailable()||content.units()<plan.units()))return;if(!p.isCreative())current.set(ModContent.BRUSH_PAINT.get(),content.withUnits(content.units()-plan.units()));}
         be.setDesign(plan.after());if(pending!=null)PENDING.remove(p);
+    }
+    private static void paintArea(ServerPlayer p,ModNetworking.Use r,Pending pending,DesignGeometry.Surface end,int paint){
+        Map<BlockPos,DesignOperations.Plan> plans;
+        try{plans=net.nicomar.paintableblocks.operation.WorldPaintArea.plans(pos->{
+            if(!allowed(p,pos)||!p.mayUseItemAt(pos,r.face(),p.getItemInHand(r.hand())))throw new IllegalArgumentException("Area is unavailable");
+            return p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be&&be.valid()?be.design():null;
+        },pending.pos,pending.first,r.pos(),end,paint);}catch(IllegalArgumentException invalid){p.sendOverlayMessage(Component.translatable("message.paintableblocks.invalid_area"));return;}
+        long units=plans.values().stream().mapToLong(DesignOperations.Plan::units).sum();var held=p.getItemInHand(r.hand());if(!(held.getItem() instanceof BrushItem brush)||!brush.valid(held))return;
+        if(!p.isCreative()&&units>brush.content(held).units()){p.sendOverlayMessage(Component.translatable("message.paintableblocks.insufficient_paint",units,brush.content(held).units()));return;}
+        for(var e:plans.entrySet())if(e.getValue().changes()&&NeoForge.EVENT_BUS.post(new PaintableBlockEditEvent(p.level(),e.getKey(),p.level().getBlockState(e.getKey()),p,r.hand(),e.getValue())).isCanceled())return;
+        if(!pendingValid(p,pending)||!matchesRequest(p,r)||p.isUsingItem()||p.containerMenu!=p.inventoryMenu)return;
+        for(var e:plans.entrySet())if(!allowed(p,e.getKey())||!p.mayUseItemAt(e.getKey(),r.face(),p.getItemInHand(r.hand()))||!(p.level().getBlockEntity(e.getKey()) instanceof PaintableBlockEntity be)||!be.valid()||!be.design().equals(e.getValue().before()))return;
+        held=p.getItemInHand(r.hand());if(!(held.getItem() instanceof BrushItem current)||!current.valid(held)||current.content(held).paint()!=paint||!p.isCreative()&&current.content(held).units()<units)return;
+        if(!p.isCreative())held.set(ModContent.BRUSH_PAINT.get(),current.content(held).withUnits(current.content(held).units()-(int)units));
+        for(var e:plans.entrySet())if(e.getValue().changes()&&p.level().getBlockEntity(e.getKey()) instanceof PaintableBlockEntity be)be.setDesign(e.getValue().after());
+        PENDING.remove(p);
     }
     public static int selected(Player p,PaintBucketBlockEntity be){
         var choice=CHOICES.get(p);if(choice!=null&&choice.dimension.equals(p.level().dimension().identifier())&&choice.pos.equals(be.getBlockPos())&&be.storage().units(choice.paint)>0)return choice.paint;

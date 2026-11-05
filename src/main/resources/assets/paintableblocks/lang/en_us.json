@@ -355,7 +355,7 @@
   "button.paintableblocks.withdraw_stack": "Withdraw up to 64",
   "message.paintableblocks.insufficient_paint": "Need %s units; have %s",
   "message.paintableblocks.paint_cost": "Cost: %s units · Stored: %s · Ctrl + click: select area",
-  "message.paintableblocks.area_cost": "Area: %s units · Stored: %s · Click: confirm · Ctrl + click: cancel",
+  "message.paintableblocks.area_cost": "World area: %s units / %s available · click: apply · Ctrl+click: cancel",
   "message.paintableblocks.no_transfer": "No transfer: check selected paint, units and capacity",
   "tooltip.paintableblocks.brush": "%s / %s real units",
   "tooltip.paintableblocks.scraper": "%s / %s uses",
@@ -382,7 +382,7 @@
   "item.paintableblocks.netherite_brush": "Netherite brush",
   "item.paintableblocks.netherite_scraper": "Netherite scraper",
   "block.paintableblocks.netherite_paint_bucket": "Netherite paint bucket",
-  "message.paintableblocks.invalid_area": "Invalid area: choose another corner on the same block and plane",
+  "message.paintableblocks.invalid_area": "Invalid area: use coplanar faces within reach, at most 256 positions / 32768 faces",
   "block.paintableblocks.workbench": "Block workbench",
   "block.paintableblocks.cutter": "Block cutter",
   "block.paintableblocks.assembler": "Block assembler",
@@ -518,6 +518,7 @@
   "message.paintableblocks.world_second_handle": "Complete the second marker: click for levels or Shift+click for joins",
   "message.paintableblocks.world_invalid_points": "Mark two points inside the selection with horizontal separation; points are never clamped",
   "message.paintableblocks.world_lateral_first": "Mark the first lateral boundary; material outside the band stays complete",
-  "message.paintableblocks.world_lateral_second": "Mark the second lateral boundary at a different position (1/16)"
+  "message.paintableblocks.world_lateral_second": "Mark the second lateral boundary at a different position (1/16)",
+  "tooltip.paintableblocks.brush_area": "Ctrl+click: start world area; click: confirm. Glass: two clicks."
 }
 

@@ -24,3 +24,11 @@ La actualización de luz, conexiones, renderizado por ambas caras y modelos de o
 ## Verificación pendiente de ejecución autorizada
 
 Se prepararon contratos de geometría/luz y de extracción, producción y conservación en recetas. No se ejecutaron Java, Gradle, scripts de validación ni Minecraft. Quedan por comprobar tipos/APIs, mezcla y orden de transparencias, muestreo de UV con paquetes de recursos, actualización de iluminación, límites de chunk y rendimiento/multijugador.
+
+## Selección de cristal por dos puntos
+
+El pincel con pintura de cristal fija el inicio con clic derecho y aplica con otro clic, también entre bloques. La previsualización comparte la selección coplanar de [[Herramientas/Pinceles|Pinceles]], adaptada a la subdivisión de cada pieza. Ctrl + clic cancela. Material completo, pendientes y caras de unión conservan su geometría y las mismas identidades de pintura.
+
+Se reutilizan las conexiones geométricas existentes: el acabado conectable une bordes compatibles del mismo material y acabado entre piezas, respetando huecos y cambios de plano; vanilla conserva su aspecto original. La selección no cambia acabados ni transforma cristales ya guardados. La revisión estática no garantiza ausencia de errores visuales en el juego.
+
+Jade 26.2 muestra el material de la superficie exacta apuntada (nombre/icono), mediante su API de sustitución de accessor. Sin pintura mantiene el bloque pintable. No se modifica estado, colisión, drops ni datos del mundo; no se solicitan datos del bloque imitado al servidor. Integración opcional, compilada contra Jade 26.2.10+neoforge.

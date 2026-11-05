@@ -1,5 +1,14 @@
 # Registro de cambios
 
+## 2026-11-05 — Pintura entre bloques y presentación en Jade
+
+- Selector rectangular coplanar compartido entre cliente y servidor, con celdas lógicas completas y subdivisiones mezcladas. Ctrl + clic inicia área del pincel y clic confirma; cristal inicia con clic normal. Ctrl + clic cancela. No se rellenan huecos ni se convierten diseños.
+- Previsualización de todas las caras y coste total; máximo 256 posiciones y 32768 caras examinadas, sin cargar chunks. Validación del lote, permisos, eventos, cambios y consumo antes de aplicar. Se conservan renderizado y contactos de cristal conectable existentes, sin convertir el acabado vanilla.
+- Integración opcional con la API de Jade 26.2: material, nombre e icono de la cara apuntada; sin pintura conserva bloque pintable. Accessor visual sin datos del bloque imitado ni cambios en el mundo. CompileOnly Jade 26.2.10+neoforge desde Modrinth, sin resolver dependencias durante el trabajo.
+- Formato persistente 5 y lectura 1–4 sin cambios. Protocolo 17. Contratos de área entre resoluciones, huecos, coste y planos escritos e integrados, sin ejecutar.
+- Solo lectura, edición y revisión estática/diff. Sin Java, Gradle, scripts, compilación, pruebas o Minecraft. Publicación online en `26.2`, sin commits locales.
+
+
 ## 2026-11-04 — Pendiente en una franja lateral
 
 - F10 selecciona dos límites transversales a 1/16 sin modificar extremos/cotas; F11 cancela o recupera ancho completo. Fuera de la franja se conserva material y pintura, admitiendo bloque completo a uno o ambos lados.

@@ -36,6 +36,14 @@ neoForge {
     }
 }
 
+repositories {
+    maven { url = 'https://api.modrinth.com/maven'; content { includeGroup 'maven.modrinth' } }
+}
+
+dependencies {
+    compileOnly 'maven.modrinth:jade:26.2.10+neoforge'
+}
+
 def metadata = [
     mod_id: mod_id,
     mod_name: mod_name,

@@ -38,6 +38,7 @@ public final class SelectionPreview {
     private static boolean overlayOwned;
     private static Key cachedKey;
     private static DesignOperations.Plan cachedPlan;
+    private static java.util.Map<BlockPos,DesignOperations.Plan> areaPlans=java.util.Map.of();
     private static VoxelShape cachedShape=Shapes.empty();
     private record Key(Identifier dimension,BlockPos pos,UUID block,long revision,DesignGeometry.Surface surface,InteractionHand hand,Object tool,int paint,boolean reverse,long selection){}
     private SelectionPreview(){}
@@ -47,7 +48,7 @@ public final class SelectionPreview {
     });}
     private static void feedback(Component message){Minecraft.getInstance().gui.hud.setOverlayMessage(message,false);overlayOwned=true;}
     private static void clearFeedback(){if(overlayOwned){Minecraft.getInstance().gui.hud.setOverlayMessage(Component.empty(),false);overlayOwned=false;}}
-    private static void invalidate(){cachedKey=null;cachedPlan=null;cachedShape=Shapes.empty();}
+    private static void invalidate(){cachedKey=null;cachedPlan=null;areaPlans=java.util.Map.of();cachedShape=Shapes.empty();}
     private static boolean key(int first,int second){var c=Minecraft.getInstance();return InputConstants.isKeyDown(c.getWindow(),first)||InputConstants.isKeyDown(c.getWindow(),second);}
     private static boolean control(){return key(GLFW.GLFW_KEY_LEFT_CONTROL,GLFW.GLFW_KEY_RIGHT_CONTROL);}
     private static boolean reverse(){return key(GLFW.GLFW_KEY_LEFT_SHIFT,GLFW.GLFW_KEY_RIGHT_SHIFT);}
@@ -97,12 +98,19 @@ public final class SelectionPreview {
         var d=be.design();var target=DesignGeometry.target(d,hit.getLocation().subtract(hit.getBlockPos().getX(),hit.getBlockPos().getY(),hit.getBlockPos().getZ()),hit.getDirection());if(target.isEmpty()){invalidate();return false;}
         int paint=held.getItem() instanceof BrushItem b&&b.valid(held)?b.content(held).paint():0;
         var key=new Key(c.level.dimension().identifier(),hit.getBlockPos(),be.editIdentity(),be.revision(),target.get(),hand,held.getItem(),paint,reverse(),selection==null?0:selection.selection());
-        if(key.equals(cachedKey))return true;
+        if(selection==null&&key.equals(cachedKey))return true;
         invalidate();
         try{
             if(held.getItem() instanceof BrushItem){
-                if(!PaintCatalog.validId(paint)||selection!=null&&(!selectionValid()||selection.hand()!=hand||!selection.pos().equals(hit.getBlockPos())))return false;
-                var faces=selection==null?List.of(target.get()):DesignOperations.area(d,new DesignGeometry.Surface(selection.cell(),Direction.values()[selection.face()%6],selection.face()>=6),target.get());
+                if(!PaintCatalog.validId(paint)||selection!=null&&(!selectionValid()||selection.hand()!=hand))return false;
+                if(selection!=null){
+                    areaPlans=net.nicomar.paintableblocks.operation.WorldPaintArea.plans(pos->{
+                        if(!c.level.hasChunkAt(pos)||!c.player.isWithinBlockInteractionRange(pos,0))throw new IllegalArgumentException("Unavailable");
+                        return c.level.getBlockEntity(pos) instanceof PaintableBlockEntity block&&block.valid()?block.design():null;
+                    },selection.pos(),new DesignGeometry.Surface(selection.cell(),Direction.values()[selection.face()%6],selection.face()>=6),hit.getBlockPos(),target.get(),paint);
+                    int cost=Math.toIntExact(areaPlans.values().stream().mapToLong(DesignOperations.Plan::units).sum());cachedPlan=new DesignOperations.Plan(d,d,List.of(),List.of(),cost);cachedKey=key;return true;
+                }
+                var faces=List.of(target.get());
                 cachedPlan=DesignOperations.paint(d,faces,paint);cachedShape=surfaces(d,cachedPlan.faces());
             }else{cachedPlan=DesignOperations.tool(d,target.get(),((EditingToolItem)held.getItem()).action(),hit.getDirection(),reverse());cachedShape=held.getItem() instanceof RotationWrenchItem?DesignGeometry.shape(cachedPlan.after()):shape(cachedPlan);}
             cachedKey=key;return true;
@@ -115,6 +123,10 @@ public final class SelectionPreview {
         boolean obstructed=false;
         if(held.getItem() instanceof RotationWrenchItem&&!shape.isEmpty()){var pos=event.getBlockPos();var worldShape=shape.move(pos.getX(),pos.getY(),pos.getZ());for(var collision:event.getLevel().getEntityCollisions(null,worldShape.bounds()))if(Shapes.joinIsNotEmpty(worldShape,collision,BooleanOp.AND)){obstructed=true;break;}}
         int color=insufficient||obstructed?0xffff5555:0xff55ddff;
+        for(var entry:areaPlans.entrySet()){
+            var pos=entry.getKey();var outline=surfaces(entry.getValue().before(),entry.getValue().faces());
+            event.addCustomRenderer((state,collector,poses,levelState)->{var camera=levelState.cameraRenderState.pos;poses.pushPose();poses.translate(pos.getX()-camera.x,pos.getY()-camera.y,pos.getZ()-camera.z);collector.order(1).submitShapeOutline(poses,outline,RenderTypes.lines(),color,2.5F,false);poses.popPose();return false;});
+        }
         event.addCustomRenderer((state,collector,poses,levelState)->{
             if(!shape.isEmpty()){var camera=levelState.cameraRenderState.pos;var pos=state.pos();poses.pushPose();poses.translate(pos.getX()-camera.x,pos.getY()-camera.y,pos.getZ()-camera.z);
             collector.order(1).submitShapeOutline(poses,shape,RenderTypes.lines(),color,2.5F,false);poses.popPose();}return true;

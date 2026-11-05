@@ -26,5 +26,12 @@ versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
 
+[[dependencies.${mod_id}]]
+modId="jade"
+type="optional"
+versionRange="[26.2.10,)"
+ordering="AFTER"
+side="CLIENT"
+
 [features.${mod_id}]
 javaVersion="[25,)"

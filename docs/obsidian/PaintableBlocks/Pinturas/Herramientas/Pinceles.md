@@ -34,3 +34,13 @@ La selección se cancela al cambiar de ítem, alejarse del bloque o cambiar su g
 Se implementan primero cada variante funcional, capacidad, identidad, consumo, carga/devolución, selección, cancelación y guardado. Después se generan su modelo 3D y textura definitiva de 16×16. La vista previa y la aplicación real comparten reglas, y el servidor valida los cambios.
 
 [[Modelos y Texturas]] · [[Criterios de División]]
+
+## Selección entre bloques
+
+Ctrl + clic derecho fija la primera cara lógica; el segundo clic derecho confirma el rectángulo coplanar previsualizado, incluso entre bloques de subdivisiones distintas. Ctrl + clic durante la selección cancela. El cristal inicia esta selección con el primer clic normal. Una selección de una sola cara sigue siendo posible marcándola dos veces.
+
+La selección adapta sus límites a las caras lógicas completas de cada bloque, no convierte su resolución ni rellena huecos. Se excluyen superficies que atraviesan varios planos bajo una misma clave de pintura, para no pintar fragmentos fuera del plano elegido. El ancho de celda puede variar entre bloques; las caras que exceden el rectángulo quedan excluidas.
+
+Límite: 256 posiciones y 32768 caras examinadas, todas dentro del alcance y chunks cargados. No se cargan chunks. Se valida el lote, permisos por posición, eventos y pintura disponible antes de aplicar; sin unidades suficientes no hay aplicación parcial. Los bloques ajenos quedan intactos. La vista previa suma el consumo real de las caras modificadas. Los límites acotan el coste de selección en cliente y servidor.
+
+Formato persistente 5 sin cambios y lectura de mundos 1–4 conservada. Protocolo 17 por la semántica compartida del área. Solo revisión estática; pruebas y juego sin ejecutar.

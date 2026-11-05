@@ -355,7 +355,7 @@
   "button.paintableblocks.withdraw_stack": "Retirar hasta 64",
   "message.paintableblocks.insufficient_paint": "Necesitas %s unidades; tienes %s",
   "message.paintableblocks.paint_cost": "Coste: %s u. · Disponibles: %s · Ctrl + clic: seleccionar área",
-  "message.paintableblocks.area_cost": "Área: %s u. · Disponibles: %s · Clic: confirmar · Ctrl + clic: cancelar",
+  "message.paintableblocks.area_cost": "Área entre bloques: %s unidades / %s disponibles · clic: aplicar · Ctrl+clic: cancelar",
   "message.paintableblocks.no_transfer": "Sin transferencia: comprueba pintura seleccionada, unidades y capacidad",
   "tooltip.paintableblocks.brush": "%s / %s unidades reales",
   "tooltip.paintableblocks.scraper": "%s / %s usos",
@@ -382,7 +382,7 @@
   "item.paintableblocks.netherite_brush": "Pincel de netherite",
   "item.paintableblocks.netherite_scraper": "Rasqueta de netherite",
   "block.paintableblocks.netherite_paint_bucket": "Cubo de pintura de netherite",
-  "message.paintableblocks.invalid_area": "Área inválida: elige otra esquina del mismo bloque y plano",
+  "message.paintableblocks.invalid_area": "Área no válida: usa caras del mismo plano, dentro de alcance y hasta 256 posiciones / 32768 caras",
   "block.paintableblocks.workbench": "Banco de bloques",
   "block.paintableblocks.cutter": "Cortadora de bloques",
   "block.paintableblocks.assembler": "Ensambladora de bloques",
@@ -518,6 +518,7 @@
   "message.paintableblocks.world_second_handle": "Completa el segundo marcador: clic para cotas o Shift+clic para uniones",
   "message.paintableblocks.world_invalid_points": "Marca dos puntos dentro de la selección con separación horizontal; no se ajustan automáticamente",
   "message.paintableblocks.world_lateral_first": "Marca el primer límite lateral; fuera de la franja quedará bloque completo",
-  "message.paintableblocks.world_lateral_second": "Marca el segundo límite lateral a otra posición (1/16)"
+  "message.paintableblocks.world_lateral_second": "Marca el segundo límite lateral a otra posición (1/16)",
+  "tooltip.paintableblocks.brush_area": "Ctrl+clic: inicio de área entre bloques; clic: confirmar. Cristal: dos clics."
 }
 

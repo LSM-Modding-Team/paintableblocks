@@ -35,5 +35,6 @@ public final class BrushItem extends Item {
         var c=content(stack);if(c==null||!valid(stack)){lines.accept(net.minecraft.network.chat.Component.translatable("message.paintableblocks.invalid_design"));return;}
         if(c.paint()>0)lines.accept(net.minecraft.network.chat.Component.translatable(net.nicomar.paintableblocks.paint.PaintCatalog.byId(c.paint()).translationKey()));
         lines.accept(net.minecraft.network.chat.Component.translatable("tooltip.paintableblocks.brush",c.units(),material.brushCapacity));
+        lines.accept(net.minecraft.network.chat.Component.translatable("tooltip.paintableblocks.brush_area"));
     }
 }
