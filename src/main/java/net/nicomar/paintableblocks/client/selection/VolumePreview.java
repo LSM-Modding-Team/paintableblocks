@@ -69,16 +69,14 @@ public final class VolumePreview {
         var s=state;if(s==null||!s.former()||c.player==null)return;
         if(e.getKey()==GLFW.GLFW_KEY_ENTER){if(s.phase()==VolumeEditing.READY)action(1,s.direction(),s.upper(),s.create(),1,1,1,s.resolution());return;}
         if(s.phase()==VolumeEditing.FIRST||s.phase()==VolumeEditing.RUNNING)return;
+        if(e.getKey()==GLFW.GLFW_KEY_F4||e.getKey()==GLFW.GLFW_KEY_F5||e.getKey()==GLFW.GLFW_KEY_F6){
+            if(s.phase()==VolumeEditing.READY){markers.clear();action(e.getKey()==GLFW.GLFW_KEY_F4?4:e.getKey()==GLFW.GLFW_KEY_F5?5:6,s.direction(),s.upper(),s.create(),1,1,1,s.resolution());}return;
+        }
         int direction=s.direction(),start=s.start(),end=s.end()<0?(s.vertical()?(direction%2==0?s.z1()-s.z0():s.x1()-s.x0()):s.y1()-s.y0()):s.end(),resolution=s.resolution();boolean vertical=s.vertical(),upper=s.upper(),create=s.create();
         switch(e.getKey()){
-            case GLFW.GLFW_KEY_F6 -> {vertical=!vertical;start=0;end=-1;}
             case GLFW.GLFW_KEY_F7 -> upper=!upper;
             case GLFW.GLFW_KEY_F8 -> {if(c.player.isCreative())create=!create;}
             case GLFW.GLFW_KEY_F9 -> resolution=net.nicomar.paintableblocks.balance.PaintingBalance.RESOLUTIONS.get((net.nicomar.paintableblocks.balance.PaintingBalance.RESOLUTIONS.indexOf(resolution)+1)%5);
-            case GLFW.GLFW_KEY_UP -> start++;
-            case GLFW.GLFW_KEY_DOWN -> start=Math.max(0,start-1);
-            case GLFW.GLFW_KEY_RIGHT -> end++;
-            case GLFW.GLFW_KEY_LEFT -> end=Math.max(0,end-1);
             default -> {return;}
         }
         int max=vertical?(direction%2==0?s.z1()-s.z0():s.x1()-s.x0()):s.y1()-s.y0();
@@ -112,6 +110,10 @@ public final class VolumePreview {
         }
         if(s==null)return;var r=region(s);var anchor=e.getBlockPos();
         VoxelShape box=Shapes.box(r.x0()/16.0-anchor.getX(),r.y0()/16.0-anchor.getY(),r.z0()/16.0-anchor.getZ(),r.x1()/16.0-anchor.getX(),r.y1()/16.0-anchor.getY(),r.z1()/16.0-anchor.getZ());
+        if(s.former()&&s.phase()!=VolumeEditing.FIRST){
+            var arrow=PreviewLines.direction(s,anchor);
+            e.addCustomRenderer((render,collector,poses,levelState)->{var camera=levelState.cameraRenderState.pos;poses.pushPose();poses.translate(anchor.getX()-camera.x,anchor.getY()-camera.y,anchor.getZ()-camera.z);collector.order(1).submitShapeOutline(poses,arrow,RenderTypes.lines(),0xff55ddff,3F,false);poses.popPose();return false;});
+        }
         int color=s.phase()==VolumeEditing.READY?0xff55ff88:0xffffcc55;
         e.addCustomRenderer((render,collector,poses,levelState)->{var camera=levelState.cameraRenderState.pos;poses.pushPose();poses.translate(anchor.getX()-camera.x,anchor.getY()-camera.y,anchor.getZ()-camera.z);collector.order(1).submitShapeOutline(poses,box,RenderTypes.lines(),color,2.5F,false);poses.popPose();return true;});
         for(var entry:PREVIEWS.entrySet()){

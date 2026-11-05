@@ -44,7 +44,7 @@ public final class VolumeEditing {
     private static final class Session {
         long id=++nextId,cursor,modified,ignored,expected;
         final boolean former;final InteractionHand hand;final int slot;final ItemStack tool;final net.minecraft.resources.Identifier dimension;
-        final BlockPos first;final BlockPos createAnchor;BlockPos last;VolumeRegion firstCell,region,selection;net.minecraft.world.phys.Vec3 pointA,joinA;VolumeCursor traversal;BlockPos writingPos,pendingPos;PlanWork pendingWork;
+        final BlockPos first;final BlockPos createAnchor;BlockPos last;VolumeRegion firstCell,region,selection;net.minecraft.world.phys.Vec3 pointA,joinA,profileStart,profileEnd;VolumeCursor traversal;BlockPos writingPos,pendingPos;PlanWork pendingWork;
         final net.nicomar.paintableblocks.performance.WorkCache<PlanKey,DesignOperations.Plan> plans=PLANS;
         final Set<ChunkKey> watches=new HashSet<>();long sentCursor=-1,sentModified=-1;int sentPhase=-1;int phase=FIRST,direction,resolution=1,start,end=-1;boolean vertical,combined,fullAtStart;int fullLength,otherLength;boolean bothEnds;boolean upper,create,invalid,writing;
         Session(ServerPlayer p,ModNetworking.Use r,VolumeRegion cell,boolean former){this.former=former;hand=r.hand();slot=r.slot();tool=p.getItemInHand(hand).copy();dimension=r.dimension();first=r.pos();createAnchor=first.relative(r.face());last=first;firstCell=cell;region=cell;selection=cell;}
@@ -111,24 +111,60 @@ public final class VolumeEditing {
                 double a=(s.direction%2==0?s.joinA.x:s.joinA.z)*16-origin,b=(s.direction%2==0?point.x:point.z)*16-origin;
                 int lo=Math.clamp((int)Math.min(a,b),0,span),hi=Math.clamp((int)Math.max(a,b),0,span);
                 s.fullAtStart=true;s.fullLength=s.direction<2?lo:span-hi;s.otherLength=s.direction<2?span-hi:lo;s.bothEnds=true;s.combined=true;s.joinA=null;
+                if(s.profileStart!=null&&s.profileEnd!=null){
+                    boolean x=s.direction%2==0;double first=(origin+(s.direction<2?lo:hi))/16.0,last=(origin+(s.direction<2?hi:lo))/16.0;
+                    var p0=s.profileStart;var p1=s.profileEnd;
+                    s.profileStart=new net.minecraft.world.phys.Vec3(x?first:p0.x,p0.y,x?p0.z:first);
+                    s.profileEnd=new net.minecraft.world.phys.Vec3(x?last:p1.x,p1.y,x?p1.z:last);
+                }
             }else{
                 if(s.pointA==null){s.joinA=null;s.pointA=point;s.phase=CONFIG;reply(p,s);message(p,"world_profile_second");return true;}
-                var delta=point.subtract(s.pointA);boolean x=Math.abs(delta.x)>=Math.abs(delta.z);s.direction=x?(delta.x>=0?0:2):(delta.z>=0?1:3);
-                int origin=s.vertical?(x?s.region.z0():s.region.x0()):s.region.y0(),span=s.vertical?(x?s.region.z1()-s.region.z0():s.region.x1()-s.region.x0()):s.region.y1()-s.region.y0();
-                s.start=Math.clamp((int)Math.round((s.vertical?(x?s.pointA.z:s.pointA.x):s.pointA.y)*16)-origin,0,span);s.end=Math.clamp((int)Math.round((s.vertical?(x?point.z:point.x):point.y)*16)-origin,0,span);
-                int runOrigin=x?s.region.x0():s.region.z0(),runSize=x?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();
-                int a=Math.clamp((int)Math.round((x?s.pointA.x:s.pointA.z)*16)-runOrigin,0,runSize),b=Math.clamp((int)Math.round((x?point.x:point.z)*16)-runOrigin,0,runSize);
-                s.fullAtStart=true;s.fullLength=s.direction<2?a:runSize-a;s.otherLength=s.direction<2?runSize-b:b;s.combined=true;s.bothEnds=true;s.pointA=null;
+                if(!profile(s,s.pointA,point,true)){message(p,"world_invalid_points");return true;}s.pointA=null;
             }
             int run=s.direction%2==0?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();s.fullLength=Math.min(s.fullLength,run);s.otherLength=Math.min(s.otherLength,run-s.fullLength);
             scan(p,s);return true;
         }
         var target=DesignGeometry.target(be.design(),hit.getLocation().subtract(r.pos().getX(),r.pos().getY(),r.pos().getZ()),hit.getDirection());if(target.isEmpty())return true;
         var corner=former?VolumeRegion.aim(r.pos(),hit.getLocation(),hit.getDirection()):VolumeRegion.cell(r.pos(),be.design(),target.get().cell());
-        if(s==null){s=new Session(p,r,corner,former);SESSIONS.put(p,s);watch(p,s);reply(p,s);message(p,"volume_first");return true;}
+        if(s==null){s=new Session(p,r,corner,former);SESSIONS.put(p,s);s.pointA=former?snap(hit.getLocation()):null;watch(p,s);reply(p,s);message(p,"volume_first");return true;}
         if(s.hand!=r.hand()||s.former!=former)return true;
         var region=s.firstCell.union(corner);if(!region.valid(former?16:256)){message(p,"volume_limit",former?16:256);return true;}
-        s.region=region;s.selection=region;watch(p,s);s.last=r.pos();scan(p,s);return true;
+        s.region=region;s.selection=region;watch(p,s);s.last=r.pos();
+        if(former){if(!profile(s,s.pointA,snap(hit.getLocation()),true)){s.phase=CONFIG;reply(p,s);message(p,"world_invalid_points");return true;}s.pointA=null;}
+        watch(p,s);s.last=r.pos();scan(p,s);return true;
+    }
+    private static net.minecraft.world.phys.Vec3 snap(net.minecraft.world.phys.Vec3 p){return new net.minecraft.world.phys.Vec3(Math.rint(p.x*16)/16,Math.rint(p.y*16)/16,Math.rint(p.z*16)/16);}
+    /** Store endpoint coordinates verbatim; scalar values are only the existing plane representation. */
+    private static boolean profile(Session s,net.minecraft.world.phys.Vec3 a,net.minecraft.world.phys.Vec3 b,boolean choose){
+        if(a==null||b==null||!s.region.contains(a)||!s.region.contains(b))return false;
+        var delta=b.subtract(a);int direction=choose?(Math.abs(delta.x)>=Math.abs(delta.z)?(delta.x>=0?0:2):(delta.z>=0?1:3)):s.direction;
+        boolean x=direction%2==0;double difference=x?delta.x:delta.z;if(Math.abs(difference)<1.0/32)return false;
+        int origin=s.vertical?(x?s.region.z0():s.region.x0()):s.region.y0();
+        int start=(int)Math.round((s.vertical?(x?a.z:a.x):a.y)*16)-origin,end=(int)Math.round((s.vertical?(x?b.z:b.x):b.y)*16)-origin;
+        int runOrigin=x?s.region.x0():s.region.z0(),runSize=x?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();
+        int first=(int)Math.round((x?a.x:a.z)*16)-runOrigin,last=(int)Math.round((x?b.x:b.z)*16)-runOrigin;
+        s.direction=direction;s.start=start;s.end=end;s.fullAtStart=true;s.fullLength=direction<2?first:runSize-first;s.otherLength=direction<2?runSize-last:last;s.combined=true;s.bothEnds=true;s.profileStart=a;s.profileEnd=b;return true;
+    }
+    private static net.minecraft.world.phys.Vec3 turn(net.minecraft.world.phys.Vec3 p,double x,double z){return new net.minecraft.world.phys.Vec3(x-(p.z-z),p.y,z+(p.x-x));}
+    private static void orient(ServerPlayer p,Session s,int action){
+        if(s.pointA!=null||s.joinA!=null||s.profileStart==null||s.profileEnd==null){message(p,"world_second_handle");return;}
+        if(action==4){
+            var a=s.profileStart;s.profileStart=s.profileEnd;s.profileEnd=a;s.direction=(s.direction+2)%4;
+            int v=s.start;s.start=s.end;s.end=v;v=s.fullLength;s.fullLength=s.otherLength;s.otherLength=v;
+        }else if(action==5){
+            var r=s.region;double x=Math.rint((r.x0()+r.x1())/2.0)/16,z=Math.rint((r.z0()+r.z1())/2.0)/16;
+            var lo=turn(new net.minecraft.world.phys.Vec3(r.x0()/16.0,r.y0()/16.0,r.z0()/16.0),x,z);
+            var hi=turn(new net.minecraft.world.phys.Vec3(r.x1()/16.0,r.y1()/16.0,r.z1()/16.0),x,z);
+            var rotated=new VolumeRegion((int)Math.round(Math.min(lo.x,hi.x)*16),r.y0(),(int)Math.round(Math.min(lo.z,hi.z)*16),(int)Math.round(Math.max(lo.x,hi.x)*16),r.y1(),(int)Math.round(Math.max(lo.z,hi.z)*16));
+            if(!rotated.valid(16)){message(p,"volume_limit",16);return;}
+            boolean flip=s.vertical&&s.direction%2==0;
+            s.region=rotated;s.selection=rotated;s.profileStart=turn(s.profileStart,x,z);s.profileEnd=turn(s.profileEnd,x,z);s.direction=(s.direction+1)%4;
+            if(flip){int span=s.direction%2==0?rotated.z1()-rotated.z0():rotated.x1()-rotated.x0();s.start=span-s.start;s.end=span-s.end;s.upper=!s.upper;}
+        }else{
+            s.vertical=!s.vertical;
+            if(!profile(s,s.profileStart,s.profileEnd,false)){s.vertical=!s.vertical;message(p,"world_invalid_points");return;}
+        }
+        watch(p,s);scan(p,s);
     }
     public static void action(Player player,ModNetworking.VolumeAction r){
         if(!(player instanceof ServerPlayer p))return;
@@ -137,6 +173,7 @@ public final class VolumeEditing {
         if(r.action()==2){stop(p,"volume_stopped");return;}
         if(s.invalid||!held(p,s)){stop(p,"volume_invalid");return;}
         if(r.action()==1){if(s.phase==READY)start(p,s);return;}
+        if(r.action()>=4&&r.action()<=6){if(s.former&&s.phase==READY)orient(p,s,r.action());return;}
         if(r.action()!=0||!s.former||s.phase==RUNNING||s.phase==FIRST||r.direction()<0||r.direction()>3||!net.nicomar.paintableblocks.balance.PaintingBalance.RESOLUTIONS.contains(r.resolution())||r.create()&&!p.isCreative())return;
         if(r.width()<1||r.width()>256||r.height()<1||r.height()>256||r.depth()<1||r.depth()>256)return;
         if(r.offsetX()<0||r.offsetX()>15||r.offsetY()<0||r.offsetY()>15||r.offsetZ()<0||r.offsetZ()>15)return;
@@ -152,9 +189,16 @@ public final class VolumeEditing {
         s.bothEnds=r.bothEnds();s.otherLength=r.otherLength();
         s.combined=r.combined();s.fullLength=r.fullLength();s.fullAtStart=r.fullAtStart();
         s.vertical=r.vertical();s.start=r.start();s.end=r.end();
+        boolean wasCreate=s.create;
         s.direction=r.direction();s.upper=r.upper();s.create=r.create();s.resolution=r.resolution();
-        if(s.create){var min=s.createAnchor;int x=min.getX()*16+r.offsetX(),y=min.getY()*16+r.offsetY(),z=min.getZ()*16+r.offsetZ();s.region=new VolumeRegion(x,y,z,x+r.width(),y+r.height(),z+r.depth());}
+        var previousRegion=s.region;
+        if(s.create&&wasCreate&&r.width()==s.region.x1()-s.region.x0()&&r.height()==s.region.y1()-s.region.y0()&&r.depth()==s.region.z1()-s.region.z0()&&r.offsetX()==Math.floorMod(s.region.x0(),16)&&r.offsetY()==Math.floorMod(s.region.y0(),16)&&r.offsetZ()==Math.floorMod(s.region.z0(),16)){} // Retain a world-rotated creative prism.
+        else if(s.create){var min=s.createAnchor;int x=min.getX()*16+r.offsetX(),y=min.getY()*16+r.offsetY(),z=min.getZ()*16+r.offsetZ();s.region=new VolumeRegion(x,y,z,x+r.width(),y+r.height(),z+r.depth());}
         else s.region=s.selection;
+        if(s.profileStart!=null&&s.profileEnd!=null){
+            var shift=new net.minecraft.world.phys.Vec3((s.region.x0()-previousRegion.x0())/16.0,(s.region.y0()-previousRegion.y0())/16.0,(s.region.z0()-previousRegion.z0())/16.0);
+            s.profileStart=s.profileStart.add(shift);s.profileEnd=s.profileEnd.add(shift);
+        }
         watch(p,s);scan(p,s);
     }
     private static boolean chunks(ServerPlayer p,Session s){var lo=s.region.min();var hi=s.region.max();for(int z=lo.getZ()>>4;z<=hi.getZ()>>4;z++)for(int x=lo.getX()>>4;x<=hi.getX()>>4;x++)if(!p.level().hasChunkAt(new BlockPos(x*16,lo.getY(),z*16)))return false;return true;}

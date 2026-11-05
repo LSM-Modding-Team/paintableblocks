@@ -1,5 +1,12 @@
 # Registro de cambios
 
+## 2026-11-04 — Extremos directos y orientación del perfil
+
+- Los dos primeros clics fijan inicio, final y volumen. La dirección se deduce de su desplazamiento horizontal dominante (empate X); otro par sustituye el perfil sin ajuste silencioso de puntos fuera del volumen. Las cotas siguen existiendo como representación interna compatible, sin controles de flechas en el flujo mundial.
+- F4 intercambia extremos y sentido, F5 gira perfil y volumen 90° sin deformación alrededor del centro ajustado a 1/16, F6 usa los mismos puntos en modo horizontal/vertical y F7 conserva el control independiente del lado sólido. Flecha mundial del perfil y su sentido. Las uniones y el anclaje creativo se mantienen al cambiar controles.
+- Formato de diseño 4 y lectura 1–3 conservados; protocolo 15 para la nueva semántica de acciones. No se modifican diseños guardados por cambiar la interacción.
+- Revisión estática y diff únicamente; sin compilación, scripts, pruebas ni Minecraft. Commit online en `26.2`, sin commits locales.
+
 ## 2026-11-04 — Formador directo en el mundo y precisión independiente
 
 - Retirada la apertura automática de la pantalla del formador. Dos clics delimitan celdas mundiales de 1/16, otros dos fijan cotas/dirección, Shift + clic marca dos uniones y Ctrl + clic/Enter confirma. Esc/Retroceso cancela. F6 cambia plano horizontal/vertical, F7 lado sólido, F8 creación creativa, F9 subdivisión de creación y flechas ajustan cotas a 1/16. Se conserva Shift + usar al aire para deshacer.

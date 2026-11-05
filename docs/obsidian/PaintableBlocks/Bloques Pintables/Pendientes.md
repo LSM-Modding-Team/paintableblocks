@@ -86,9 +86,9 @@ Persistencia de diseños 4 con lectura 1–3. Protocolo 13. Contratos preparados
 
 ## Interacción directa en el mundo
 
-El flujo principal no abre pantallas. Se apuntan dos esquinas en cuadrícula mundial de 1/16, independiente de la subdivisión lógica del bloque. Luego dos clics fijan las cotas y dirección de la inclinación; Shift + clic en dos puntos fija sus uniones. Ctrl + clic o Enter confirma únicamente después de revisión del servidor. Esc o Retroceso cancela. Mientras falta el segundo marcador no se puede confirmar.
+El flujo principal no abre pantallas. Se apuntan dos puntos en cuadrícula mundial de 1/16, independiente de la subdivisión lógica del bloque. Definen a la vez volumen, inicio y final del perfil; se conservan literalmente y determinan el sentido según el desplazamiento horizontal dominante (empate: X). Otro par de clics reemplaza el perfil dentro de la selección; Shift + clic en dos puntos fija sus uniones. Ctrl + clic o Enter confirma únicamente después de revisión del servidor. Esc o Retroceso cancela. Mientras falta el segundo marcador no se puede confirmar.
 
-F6 alterna plano horizontal/vertical, F7 invierte el lado sólido, F8 alterna creación creativa/transformación y F9 cambia la subdivisión de las nuevas piezas. Las flechas ajustan cotas a 1/16. Los valores se limitan al volumen seleccionado. Crear conserva el anclaje adyacente a la cara inicial y la exigencia de aire sin fluido; transformar solo retira material.
+F6 alterna plano horizontal/vertical, F7 invierte el lado sólido, F8 alterna creación creativa/transformación y F9 cambia la subdivisión de las nuevas piezas. No hay ajuste manual de cotas con flechas: se calculan desde los puntos. Los puntos fuera del volumen y los perfiles sin separación horizontal se rechazan, sin moverlos silenciosamente. F4 intercambia inicio/final conservando la forma; F5 gira perfil y volumen 90° alrededor del centro ajustado a un nodo de 1/16, sin deformarlos. La flecha mundial muestra el sentido resultante. F6 reinterpreta los mismos puntos en el otro plano. Crear conserva el anclaje adyacente a la cara inicial y la exigencia de aire sin fluido; transformar solo retira material.
 
 Se muestra cuadrícula, celda apuntada y marcadores en el mundo, resultado verde, referencia anterior roja e incompatibilidades rojas. La preparación cubre la selección progresivamente sin cargar chunks. Presupuestos de dibujo pueden simplificar el detalle con aviso, sin reducir la operación real.
 
@@ -98,7 +98,7 @@ Un bloque 1×1, 2×2, 4×4 u 8×8 admite cortes y uniones a 1/16 sin conversión
 
 La restricción de un plano existente distinto sigue siendo una incompatibilidad geométrica, no una exigencia de cuadrícula 16×16. Los recortes previos se conservan y no se rellenan al transformar.
 
-Formato 4 con lectura 1–3 y protocolo 14. Las notas anteriores que exigían cuadrícula 16×16 para las uniones quedan sustituidas por esta ampliación. Código y contratos preparados, sin compilación ni comprobación en juego.
+Formato 4 con lectura 1–3 y protocolo 15. Las notas anteriores que exigían cuadrícula 16×16 para las uniones quedan sustituidas por esta ampliación. Código y contratos preparados, sin compilación ni comprobación en juego.
 
 ## Subdivisión y transformación
 
