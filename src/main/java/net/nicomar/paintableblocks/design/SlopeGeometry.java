@@ -20,12 +20,21 @@ public final class SlopeGeometry {
     private static List<List<Vec3>> buildFragments(BlockDesign d,DesignGeometry.Surface s){
         int c=s.cell(),n=d.resolution();double[] lo={d.x(c)/(double)n,d.y(c)/(double)n,d.z(c)/(double)n},hi={lo[0]+1.0/n,lo[1]+1.0/n,lo[2]+1.0/n};
         if(d.slope()!=null){var a=d.slope().point(lo[0],lo[1],lo[2]);var b=d.slope().point(hi[0],hi[1],hi[2]);lo=new double[]{a.x,a.y,a.z};hi=new double[]{b.x,b.y,b.z};}
-        var points=new TreeSet<Double>();int axis=d.slope()==null?-1:d.slope().window().get(0);
-        if(axis>=0){points.add(lo[axis]);points.add(hi[axis]);for(int i=1;i<=2;i++){double v=d.slope().window().get(i)/16.0;if(v>lo[axis]+1e-10&&v<hi[axis]-1e-10)points.add(v);}}
-        else {var p=buildPiece(d,s,lo,hi);return area(p)>1e-12?List.of(List.copyOf(p)):List.of();}
-        var cuts=new ArrayList<>(points);var out=new ArrayList<List<Vec3>>();
-        for(int i=0;i+1<cuts.size();i++){var low=lo.clone();var high=hi.clone();low[axis]=cuts.get(i);high[axis]=cuts.get(i+1);var p=buildPiece(d,s,low,high);if(area(p)>1e-12)out.add(List.copyOf(p));}return List.copyOf(out);
+        var pieces=new ArrayList<double[][]>();pieces.add(new double[][]{lo,hi});
+        if(d.slope()!=null)for(int w=0;w<d.slope().window().size();w+=3){
+            int axis=d.slope().window().get(w);if(axis<0)continue;
+            for(int edge=1;edge<=2;edge++){
+                double cut=d.slope().window().get(w+edge)/16.0;var next=new ArrayList<double[][]>();
+                for(var piece:pieces){
+                    if(cut<=piece[0][axis]+1e-10||cut>=piece[1][axis]-1e-10){next.add(piece);continue;}
+                    var low=piece[0].clone();var high=piece[1].clone();high[axis]=cut;next.add(new double[][]{low,high});
+                    low=piece[0].clone();high=piece[1].clone();low[axis]=cut;next.add(new double[][]{low,high});
+                }pieces=next;
+            }
+        }
+        var out=new ArrayList<List<Vec3>>();for(var piece:pieces){var p=buildPiece(d,s,piece[0],piece[1]);if(area(p)>1e-12)out.add(List.copyOf(p));}return List.copyOf(out);
     }
+
     private static List<Vec3> buildPiece(BlockDesign d,DesignGeometry.Surface s,double[] lo,double[] hi){
         boolean cutting=d.slope()==null||d.slope().cuts(new Vec3((lo[0]+hi[0])/2,(lo[1]+hi[1])/2,(lo[2]+hi[2])/2));
         if(!s.slope()){

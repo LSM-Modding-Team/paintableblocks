@@ -24,7 +24,7 @@ import net.nicomar.paintableblocks.blockentity.PaintableBlockEntity;
 public final class VolumePreview {
     private static ModNetworking.VolumeState state;
     private static Object item;private static int slot;
-    private record PreviewKey(VolumeRegion region,boolean former,boolean create,int direction,boolean upper,BlockDesign.GeometryKey geometry,int orientation,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength){}
+    private record PreviewKey(VolumeRegion region,boolean former,boolean create,int direction,boolean upper,BlockDesign.GeometryKey geometry,int orientation,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength,int lateralLow,int lateralHigh){}
     private record Preview(PreviewKey key,PreviewLines shape,PreviewLines before,boolean rejected){}
     private static final java.util.Map<net.minecraft.core.BlockPos,Preview> PREVIEWS=new java.util.HashMap<>();
     private static long feedbackTick;
@@ -69,6 +69,9 @@ public final class VolumePreview {
         var s=state;if(s==null||!s.former()||c.player==null)return;
         if(e.getKey()==GLFW.GLFW_KEY_ENTER){if(s.phase()==VolumeEditing.READY)action(1,s.direction(),s.upper(),s.create(),1,1,1,s.resolution());return;}
         if(s.phase()==VolumeEditing.FIRST||s.phase()==VolumeEditing.RUNNING)return;
+        if(e.getKey()==GLFW.GLFW_KEY_F10||e.getKey()==GLFW.GLFW_KEY_F11){
+            if(s.phase()!=VolumeEditing.FIRST&&s.phase()!=VolumeEditing.RUNNING&&s.phase()!=VolumeEditing.SCANNING){markers.clear();action(e.getKey()==GLFW.GLFW_KEY_F10?7:8,s.direction(),s.upper(),s.create(),1,1,1,s.resolution());}return;
+        }
         if(e.getKey()==GLFW.GLFW_KEY_F4||e.getKey()==GLFW.GLFW_KEY_F5||e.getKey()==GLFW.GLFW_KEY_F6){
             if(s.phase()==VolumeEditing.READY){markers.clear();action(e.getKey()==GLFW.GLFW_KEY_F4?4:e.getKey()==GLFW.GLFW_KEY_F5?5:6,s.direction(),s.upper(),s.create(),1,1,1,s.resolution());}return;
         }
@@ -124,7 +127,7 @@ public final class VolumePreview {
     }
     private static void prepare(){
         var c=Minecraft.getInstance();var s=state;if(s==null)return;var r=region(s);
-        String config=s.id()+"|"+r+"|"+s.direction()+"|"+s.upper()+"|"+s.create()+"|"+s.resolution()+"|"+s.vertical()+"|"+s.start()+"|"+s.end()+"|"+s.combined()+"|"+s.fullLength()+"|"+s.fullAtStart()+"|"+s.bothEnds()+"|"+s.otherLength();
+        String config=s.id()+"|"+r+"|"+s.direction()+"|"+s.upper()+"|"+s.create()+"|"+s.resolution()+"|"+s.vertical()+"|"+s.start()+"|"+s.end()+"|"+s.combined()+"|"+s.fullLength()+"|"+s.fullAtStart()+"|"+s.bothEnds()+"|"+s.otherLength()+"|"+s.lateralLow()+"|"+s.lateralHigh();
         if(!config.equals(previewConfig)){previewConfig=config;previewCursor=0;previewVisited=0;PREVIEWS.clear();}
         long deadline=System.nanoTime()+1_000_000;int work=16,scanned=0;boolean missing=false;
         while(scanned++<64&&work>0&&System.nanoTime()<deadline){
@@ -133,11 +136,11 @@ public final class VolumePreview {
             BlockDesign d;
             if(s.create()){if(!c.level.getBlockState(pos).isAir()){PREVIEWS.remove(pos);continue;}d=BlockDesign.full(s.resolution());}
             else{if(!(c.level.getBlockEntity(pos) instanceof PaintableBlockEntity be)||!be.valid()){PREVIEWS.remove(pos);continue;}d=be.design();}
-            var key=new PreviewKey(r,s.former(),s.create(),s.direction(),s.upper(),d.geometryKey(),d.orientation(),s.vertical(),s.start(),s.end(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength());
+            var key=new PreviewKey(r,s.former(),s.create(),s.direction(),s.upper(),d.geometryKey(),d.orientation(),s.vertical(),s.start(),s.end(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength(),s.lateralLow(),s.lateralHigh());
             var cached=PREVIEWS.get(pos);if(cached!=null&&cached.key().equals(key))continue;PREVIEWS.remove(pos);work--;
             try{
                 var clean=d.withoutPaint();if(s.bothEnds())clean=r.doubleSeed(pos,clean);
-                var shape=s.former()?new DesignOutlineShape(clean.withSlope(r.doublePlane(pos,clean,s.direction(),s.upper(),s.vertical(),s.start(),s.end(),s.create(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength()))):SelectionPreview.cells(r.hammer(pos,clean));
+                var shape=s.former()?new DesignOutlineShape(clean.withSlope(r.lateralPlane(pos,clean,r.doublePlane(pos,clean,s.direction(),s.upper(),s.vertical(),s.start(),s.end(),s.create(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength()),s.direction(),s.vertical(),s.lateralLow(),s.lateralHigh()))):SelectionPreview.cells(r.hammer(pos,clean));
                 int detail=Math.max(8,(int)(8192/r.size()));
                 PREVIEWS.put(pos,new Preview(key,PreviewLines.capture(shape).limited(detail),PreviewLines.capture(new DesignOutlineShape(d)).limited(detail),false));
             }catch(IllegalArgumentException bad){

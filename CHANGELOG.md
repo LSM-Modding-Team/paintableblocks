@@ -1,5 +1,14 @@
 # Registro de cambios
 
+## 2026-11-04 — Pendiente en una franja lateral
+
+- F10 selecciona dos límites transversales a 1/16 sin modificar extremos/cotas; F11 cancela o recupera ancho completo. Fuera de la franja se conserva material y pintura, admitiendo bloque completo a uno o ambos lados.
+- Segunda ventana de corte y fragmentación por ambos ejes para renderizado, paredes de unión, pintura, colisión, selección y contactos. Se conserva la resolución lógica. Previsualización, flecha, cachés y preparación del servidor incorporan la franja.
+- Giro transporta la franja; inversión conserva su posición. Cambiar el eje del perfil o el modo horizontal/vertical recupera ancho completo para evitar reinterpretar silenciosamente un límite en otro eje.
+- Formato persistente 5 con lectura 1–4, ventanas antiguas sin cambios de forma. Formato compacto de red 2 y protocolo 16; actualización conjunta de cliente/servidor.
+- Solo revisión estática y diff; sin compilar ni ejecutar Java, Gradle, scripts, pruebas o Minecraft. Publicación online en `26.2`, sin commits locales.
+
+
 ## 2026-11-04 — Extremos directos y orientación del perfil
 
 - Los dos primeros clics fijan inicio, final y volumen. La dirección se deduce de su desplazamiento horizontal dominante (empate X); otro par sustituye el perfil sin ajuste silencioso de puntos fuera del volumen. Las cotas siguen existiendo como representación interna compatible, sin controles de flechas en el flujo mundial.

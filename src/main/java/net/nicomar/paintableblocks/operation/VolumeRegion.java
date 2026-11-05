@@ -106,6 +106,18 @@ public record VolumeRegion(int x0,int y0,int z0,int x1,int y1,int z1) {
         var bounds=bounded?java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)):d.slope()==null?SlopePlane.FULL:d.slope().rotated(d.orientation()).bounds();
         return new SlopePlane(plane.a(),plane.b(),plane.c(),plane.offset(),bounds,java.util.List.of(x?0:2,Math.clamp(lo-origin,0,16),Math.clamp(hi-origin,0,16))).rotated(DesignOrientation.inverse(d.orientation()));
     }
+    /** The second window bounds the extrusion axis; material outside remains complete. */
+    public SlopePlane lateralPlane(BlockPos pos,BlockDesign d,SlopePlane local,int direction,boolean vertical,int low,int high){
+        if(high<0)return local;
+        int axis=vertical?1:direction%2==0?2:0;
+        int origin=axis==1?y0:axis==2?z0:x0,span=axis==1?y1-y0:axis==2?z1-z0:x1-x0;
+        if(low<0||high<=low||high>span)throw new IllegalArgumentException("Invalid lateral interval");
+        var plane=local.rotated(d.orientation());var window=new java.util.ArrayList<>(plane.window().subList(0,3));
+        if(window.getFirst()<0){window.set(0,direction%2==0?0:2);window.set(1,0);window.set(2,16);}
+        int block=(axis==1?pos.getY():axis==2?pos.getZ():pos.getX())*16;
+        window.add(axis);window.add(Math.clamp(origin+low-block,0,16));window.add(Math.clamp(origin+high-block,0,16));
+        return new SlopePlane(plane.a(),plane.b(),plane.c(),plane.offset(),plane.bounds(),window).rotated(DesignOrientation.inverse(d.orientation()));
+    }
     public SlopePlane creationPlane(BlockPos pos,BlockDesign d,int direction,boolean upper){
         var p=plane(pos,d,direction,upper);
         return new SlopePlane(p.a(),p.b(),p.c(),p.offset(),java.util.List.of(Math.max(0,x0-pos.getX()*16),Math.max(0,y0-pos.getY()*16),Math.max(0,z0-pos.getZ()*16),Math.min(16,x1-pos.getX()*16),Math.min(16,y1-pos.getY()*16),Math.min(16,z1-pos.getZ()*16)));

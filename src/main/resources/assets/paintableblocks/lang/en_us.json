@@ -512,10 +512,12 @@
   "tooltip.paintableblocks.undo": "Shift + use in air: undo last operation (durability is not refunded)",
   "message.paintableblocks.world_first": "Mark the profile end point (1/16 grid)",
   "message.paintableblocks.world_ready": "%s pieces · click: replace endpoints · Shift+click: joins · Ctrl+click/Enter: confirm",
-  "message.paintableblocks.world_controls": "F4: reverse direction · F5: rotate 90° · F6: vertical · F7: solid side · F8: create · F9: subdivision · Esc: cancel",
+  "message.paintableblocks.world_controls": "F4: reverse direction · F5: rotate 90° · F6: vertical · F7: solid side · F8: create · F9: subdivision · Esc: cancel · F10: lateral band · F11: full width",
   "message.paintableblocks.world_join_second": "Mark the second join with Shift + click",
   "message.paintableblocks.world_profile_second": "Mark the end of the incline with a click",
   "message.paintableblocks.world_second_handle": "Complete the second marker: click for levels or Shift+click for joins",
-  "message.paintableblocks.world_invalid_points": "Mark two points inside the selection with horizontal separation; points are never clamped"
+  "message.paintableblocks.world_invalid_points": "Mark two points inside the selection with horizontal separation; points are never clamped",
+  "message.paintableblocks.world_lateral_first": "Mark the first lateral boundary; material outside the band stays complete",
+  "message.paintableblocks.world_lateral_second": "Mark the second lateral boundary at a different position (1/16)"
 }
 

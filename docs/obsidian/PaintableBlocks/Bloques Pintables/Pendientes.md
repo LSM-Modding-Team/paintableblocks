@@ -98,7 +98,15 @@ Un bloque 1×1, 2×2, 4×4 u 8×8 admite cortes y uniones a 1/16 sin conversión
 
 La restricción de un plano existente distinto sigue siendo una incompatibilidad geométrica, no una exigencia de cuadrícula 16×16. Los recortes previos se conservan y no se rellenan al transformar.
 
-Formato 4 con lectura 1–3 y protocolo 15. Las notas anteriores que exigían cuadrícula 16×16 para las uniones quedan sustituidas por esta ampliación. Código y contratos preparados, sin compilación ni comprobación en juego.
+### Franja lateral independiente
+
+F10 inicia la selección de dos límites laterales mediante clics, a precisión de 1/16. Su orden no importa; deben estar dentro del volumen y separados. Solo se recorta entre ellos: el resto conserva el material original completo y pintable. F11 cancela la selección lateral o restablece ancho completo. Los puntos del perfil siguen definiendo cotas y recorrido, sin alterar el ancho lateral.
+
+En modo horizontal la franja delimita el ancho transversal X/Z; en modo vertical delimita la extrusión Y. Se combina con ambos extremos completos. El giro de 90° transporta también la franja; invertir sentido conserva su posición. Al cambiar el eje del perfil o alternar horizontal/vertical se restablece el ancho completo, porque cambia el eje transversal; se marca de nuevo con F10. Fuera de la franja no se añade material previamente ausente al transformar.
+
+Caras interiores de unión, pintura, colisión a 1/16 y ray tracing consideran ambas ventanas de corte, sin convertir subdivisiones. La flecha se centra sobre la franja. Las versiones previas sin ventana lateral conservan su forma.
+
+Formato 5 con lectura 1–4 y protocolo 16. Las notas anteriores que exigían cuadrícula 16×16 para las uniones quedan sustituidas por esta ampliación. Código y contratos preparados, sin compilación ni comprobación en juego.
 
 ## Subdivisión y transformación
 

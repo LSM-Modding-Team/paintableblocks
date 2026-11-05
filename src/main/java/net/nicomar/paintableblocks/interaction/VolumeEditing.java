@@ -33,7 +33,7 @@ public final class VolumeEditing {
     private static final Map<ServerPlayer,Session> SESSIONS=new LinkedHashMap<>();
     private record ChunkKey(Level level,int x,int z){}
     private static final Map<ChunkKey,Set<ServerPlayer>> WATCHERS=new HashMap<>();
-    private record PlanKey(VolumeRegion region,BlockPos pos,BlockDesign design,int direction,boolean upper,boolean former,boolean create,int resolution,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength){}
+    private record PlanKey(VolumeRegion region,BlockPos pos,BlockDesign design,int direction,boolean upper,boolean former,boolean create,int resolution,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength,int lateralLow,int lateralHigh){}
 
     private static final net.nicomar.paintableblocks.performance.WorkCache<PlanKey,DesignOperations.Plan> PLANS=new net.nicomar.paintableblocks.performance.WorkCache<>("volume-plans",1024,262144);
     private static long nextId;
@@ -44,14 +44,14 @@ public final class VolumeEditing {
     private static final class Session {
         long id=++nextId,cursor,modified,ignored,expected;
         final boolean former;final InteractionHand hand;final int slot;final ItemStack tool;final net.minecraft.resources.Identifier dimension;
-        final BlockPos first;final BlockPos createAnchor;BlockPos last;VolumeRegion firstCell,region,selection;net.minecraft.world.phys.Vec3 pointA,joinA,profileStart,profileEnd;VolumeCursor traversal;BlockPos writingPos,pendingPos;PlanWork pendingWork;
+        final BlockPos first;final BlockPos createAnchor;BlockPos last;VolumeRegion firstCell,region,selection;net.minecraft.world.phys.Vec3 pointA,joinA,lateralA,profileStart,profileEnd;VolumeCursor traversal;BlockPos writingPos,pendingPos;PlanWork pendingWork;
         final net.nicomar.paintableblocks.performance.WorkCache<PlanKey,DesignOperations.Plan> plans=PLANS;
-        final Set<ChunkKey> watches=new HashSet<>();long sentCursor=-1,sentModified=-1;int sentPhase=-1;int phase=FIRST,direction,resolution=1,start,end=-1;boolean vertical,combined,fullAtStart;int fullLength,otherLength;boolean bothEnds;boolean upper,create,invalid,writing;
+        final Set<ChunkKey> watches=new HashSet<>();long sentCursor=-1,sentModified=-1;int sentPhase=-1;int phase=FIRST,direction,resolution=1,start,end=-1;int lateralLow,lateralHigh=-1;boolean pickingLateral;boolean vertical,combined,fullAtStart;int fullLength,otherLength;boolean bothEnds;boolean upper,create,invalid,writing;
         Session(ServerPlayer p,ModNetworking.Use r,VolumeRegion cell,boolean former){this.former=former;hand=r.hand();slot=r.slot();tool=p.getItemInHand(hand).copy();dimension=r.dimension();first=r.pos();createAnchor=first.relative(r.face());last=first;firstCell=cell;region=cell;selection=cell;}
     }
     private static final class PlanWork {
         final Session session;final BlockPos pos;final BlockDesign before;final BlockDesign.ClipTask clip;final BitSet removed=new BitSet();int cell;
-        PlanWork(Session s,BlockPos pos,BlockDesign before){session=s;this.pos=pos;this.before=before;if(s.bothEnds)before=s.region.doubleSeed(pos,before);clip=s.former?before.clipTask(s.region.doublePlane(pos,before,s.direction,s.upper,s.vertical,s.start,s.end,s.create,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength)):null;}
+        PlanWork(Session s,BlockPos pos,BlockDesign before){session=s;this.pos=pos;this.before=before;if(s.bothEnds)before=s.region.doubleSeed(pos,before);clip=s.former?before.clipTask(s.region.lateralPlane(pos,before,s.region.doublePlane(pos,before,s.direction,s.upper,s.vertical,s.start,s.end,s.create,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh)):null;}
         DesignOperations.Plan advance(){
             BlockDesign after;
             if(clip!=null){if(!clip.advance(128))return null;after=clip.result();}
@@ -59,7 +59,7 @@ public final class VolumeEditing {
             return new DesignOperations.Plan(session.create?before.remove(all(before.resolution())):before,after,removed.stream().boxed().toList(),List.of(),0);
         }
     }
-    private static PlanKey key(Session s,BlockPos pos,BlockDesign design){return new PlanKey(s.region,pos,design,s.direction,s.upper,s.former,s.create,s.resolution,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength);}
+    private static PlanKey key(Session s,BlockPos pos,BlockDesign design){return new PlanKey(s.region,pos,design,s.direction,s.upper,s.former,s.create,s.resolution,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength,s.lateralLow,s.lateralHigh);}
     private VolumeEditing(){}
     public static void register(){NeoForge.EVENT_BUS.addListener(VolumeEditing::tick);NeoForge.EVENT_BUS.addListener(VolumeEditing::unload);NeoForge.EVENT_BUS.addListener(VolumeEditing::placed);NeoForge.EVENT_BUS.addListener(VolumeEditing::broken);NeoForge.EVENT_BUS.addListener(VolumeEditing::stopped);}
     /** Observe only positions in the selected region; schedule chunk-worker callbacks on the server thread. */
@@ -81,7 +81,7 @@ public final class VolumeEditing {
     private static boolean held(ServerPlayer p,Session s){return p.isAlive()&&!p.isSpectator()&&p.mayBuild()&&!p.isUsingItem()&&p.containerMenu==p.inventoryMenu&&p.level().dimension().identifier().equals(s.dimension)&&(s.hand!=InteractionHand.MAIN_HAND||p.getInventory().getSelectedSlot()==s.slot)&&(ItemStack.isSameItemSameComponents(s.tool,p.getItemInHand(s.hand))||(s.phase==RUNNING&&s.modified==s.expected&&s.tool.isEmpty()&&p.getItemInHand(s.hand).isEmpty()));}
     public static boolean allowed(ServerPlayer p,BlockPos pos,InteractionHand hand){return p.isAlive()&&!p.isSpectator()&&p.mayBuild()&&p.level().hasChunkAt(pos)&&!p.level().isOutsideBuildHeight(pos)&&p.level().getWorldBorder().isWithinBounds(pos)&&p.mayInteract(p.level(),pos)&&p.level().mayInteract(p,pos)&&p.mayUseItemAt(pos,Direction.UP,p.getItemInHand(hand));}
     private static void message(ServerPlayer p,String key,Object... args){p.sendOverlayMessage(Component.translatable("message.paintableblocks."+key,args));}
-    private static void reply(ServerPlayer p,Session s){if(s.sentPhase==s.phase&&s.sentCursor==s.cursor&&s.sentModified==s.modified)return;s.sentPhase=s.phase;s.sentCursor=s.cursor;s.sentModified=s.modified;var r=s.region;PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeState(s.id,s.phase,s.former,s.hand,s.dimension,s.first,s.last,r.x0(),r.y0(),r.z0(),r.x1(),r.y1(),r.z1(),s.direction,s.upper,s.create,s.resolution,s.cursor,s.modified,s.ignored,s.expected,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength));}
+    private static void reply(ServerPlayer p,Session s){if(s.sentPhase==s.phase&&s.sentCursor==s.cursor&&s.sentModified==s.modified)return;s.sentPhase=s.phase;s.sentCursor=s.cursor;s.sentModified=s.modified;var r=s.region;PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeState(s.id,s.phase,s.former,s.hand,s.dimension,s.first,s.last,r.x0(),r.y0(),r.z0(),r.x1(),r.y1(),r.z1(),s.direction,s.upper,s.create,s.resolution,s.cursor,s.modified,s.ignored,s.expected,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength,s.lateralLow,s.lateralHigh));}
     private static String classify(IllegalArgumentException e){String m=String.valueOf(e.getMessage());if(m.contains("16")||m.contains("aligned"))return "grid_mismatch";if(m.contains("slope plane"))return "plane_conflict";if(m.contains("empty positions"))return "occupied_destination";if(m.contains("Entity"))return "entity_collision";return "volume_conflict";}
     private static void reject(ServerPlayer p,Session s,String reason){
         PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeNotice(reason,s.pendingPos==null?s.first:s.pendingPos));
@@ -104,6 +104,14 @@ public final class VolumeEditing {
         if(former&&s!=null&&(s.phase==CONFIG||s.phase==READY)){
             if(r.control()){if(s.phase==READY)start(p,s);return true;}
             var point=new net.minecraft.world.phys.Vec3(Math.rint(hit.getLocation().x*16)/16,Math.rint(hit.getLocation().y*16)/16,Math.rint(hit.getLocation().z*16)/16);
+            if(s.pickingLateral){
+                if(!s.region.contains(point)){message(p,"world_invalid_points");return true;}
+                if(s.lateralA==null){s.pointA=null;s.joinA=null;s.lateralA=point;s.phase=CONFIG;reply(p,s);message(p,"world_lateral_second");return true;}
+                int axis=s.vertical?1:s.direction%2==0?2:0,origin=axis==1?s.region.y0():axis==2?s.region.z0():s.region.x0();
+                int a=(int)Math.round((axis==1?s.lateralA.y:axis==2?s.lateralA.z:s.lateralA.x)*16)-origin,b=(int)Math.round((axis==1?point.y:axis==2?point.z:point.x)*16)-origin;
+                if(a==b){message(p,"world_lateral_second");return true;}
+                s.lateralLow=Math.min(a,b);s.lateralHigh=Math.max(a,b);s.lateralA=null;s.pickingLateral=false;scan(p,s);return true;
+            }
             if(r.reverse()){
                 if(s.joinA==null){s.pointA=null;s.joinA=point;s.phase=CONFIG;reply(p,s);message(p,"world_join_second");return true;}
                 int span=s.direction%2==0?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();
@@ -143,6 +151,7 @@ public final class VolumeEditing {
         int start=(int)Math.round((s.vertical?(x?a.z:a.x):a.y)*16)-origin,end=(int)Math.round((s.vertical?(x?b.z:b.x):b.y)*16)-origin;
         int runOrigin=x?s.region.x0():s.region.z0(),runSize=x?s.region.x1()-s.region.x0():s.region.z1()-s.region.z0();
         int first=(int)Math.round((x?a.x:a.z)*16)-runOrigin,last=(int)Math.round((x?b.x:b.z)*16)-runOrigin;
+        if(s.direction%2!=direction%2){s.lateralLow=0;s.lateralHigh=-1;}
         s.direction=direction;s.start=start;s.end=end;s.fullAtStart=true;s.fullLength=direction<2?first:runSize-first;s.otherLength=direction<2?runSize-last:last;s.combined=true;s.bothEnds=true;s.profileStart=a;s.profileEnd=b;return true;
     }
     private static net.minecraft.world.phys.Vec3 turn(net.minecraft.world.phys.Vec3 p,double x,double z){return new net.minecraft.world.phys.Vec3(x-(p.z-z),p.y,z+(p.x-x));}
@@ -157,10 +166,12 @@ public final class VolumeEditing {
             var hi=turn(new net.minecraft.world.phys.Vec3(r.x1()/16.0,r.y1()/16.0,r.z1()/16.0),x,z);
             var rotated=new VolumeRegion((int)Math.round(Math.min(lo.x,hi.x)*16),r.y0(),(int)Math.round(Math.min(lo.z,hi.z)*16),(int)Math.round(Math.max(lo.x,hi.x)*16),r.y1(),(int)Math.round(Math.max(lo.z,hi.z)*16));
             if(!rotated.valid(16)){message(p,"volume_limit",16);return;}
+            if(!s.vertical&&s.direction%2==0&&s.lateralHigh>=0){int span=r.z1()-r.z0(),low=s.lateralLow;s.lateralLow=span-s.lateralHigh;s.lateralHigh=span-low;}
             boolean flip=s.vertical&&s.direction%2==0;
             s.region=rotated;s.selection=rotated;s.profileStart=turn(s.profileStart,x,z);s.profileEnd=turn(s.profileEnd,x,z);s.direction=(s.direction+1)%4;
             if(flip){int span=s.direction%2==0?rotated.z1()-rotated.z0():rotated.x1()-rotated.x0();s.start=span-s.start;s.end=span-s.end;s.upper=!s.upper;}
         }else{
+            s.lateralLow=0;s.lateralHigh=-1;
             s.vertical=!s.vertical;
             if(!profile(s,s.profileStart,s.profileEnd,false)){s.vertical=!s.vertical;message(p,"world_invalid_points");return;}
         }
@@ -173,8 +184,14 @@ public final class VolumeEditing {
         if(r.action()==2){stop(p,"volume_stopped");return;}
         if(s.invalid||!held(p,s)){stop(p,"volume_invalid");return;}
         if(r.action()==1){if(s.phase==READY)start(p,s);return;}
+        if(r.action()==7||r.action()==8){
+            if(!s.former||s.phase==RUNNING||s.phase==FIRST||s.phase==SCANNING)return;
+            s.pointA=null;s.joinA=null;s.lateralA=null;s.pickingLateral=r.action()==7;
+            if(s.pickingLateral){s.phase=CONFIG;s.sentPhase=-1;reply(p,s);message(p,"world_lateral_first");}
+            else{s.lateralLow=0;s.lateralHigh=-1;scan(p,s);}return;
+        }
         if(r.action()>=4&&r.action()<=6){if(s.former&&s.phase==READY)orient(p,s,r.action());return;}
-        if(r.action()!=0||!s.former||s.phase==RUNNING||s.phase==FIRST||r.direction()<0||r.direction()>3||!net.nicomar.paintableblocks.balance.PaintingBalance.RESOLUTIONS.contains(r.resolution())||r.create()&&!p.isCreative())return;
+        if(r.action()!=0||s.pickingLateral||!s.former||s.phase==RUNNING||s.phase==FIRST||r.direction()<0||r.direction()>3||!net.nicomar.paintableblocks.balance.PaintingBalance.RESOLUTIONS.contains(r.resolution())||r.create()&&!p.isCreative())return;
         if(r.width()<1||r.width()>256||r.height()<1||r.height()>256||r.depth()<1||r.depth()>256)return;
         if(r.offsetX()<0||r.offsetX()>15||r.offsetY()<0||r.offsetY()>15||r.offsetZ()<0||r.offsetZ()>15)return;
         int dependent=r.vertical()?(r.direction()%2==0?r.depth():r.width()):r.height();
@@ -203,7 +220,7 @@ public final class VolumeEditing {
     }
     private static boolean chunks(ServerPlayer p,Session s){var lo=s.region.min();var hi=s.region.max();for(int z=lo.getZ()>>4;z<=hi.getZ()>>4;z++)for(int x=lo.getX()>>4;x<=hi.getX()>>4;x++)if(!p.level().hasChunkAt(new BlockPos(x*16,lo.getY(),z*16)))return false;return true;}
     private static void scan(ServerPlayer p,Session s){if(!chunks(p,s)){stop(p,"volume_unloaded");return;}s.pendingPos=null;s.pendingWork=null;s.sentPhase=-1;s.phase=SCANNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;s.ignored=0;s.expected=0;reply(p,s);message(p,"volume_warning");}
-    private static void start(ServerPlayer p,Session s){if(s.pointA!=null||s.joinA!=null){message(p,"world_second_handle");return;}if(s.invalid||!held(p,s)||!chunks(p,s)){stop(p,"volume_invalid");return;}
+    private static void start(ServerPlayer p,Session s){if(s.pointA!=null||s.joinA!=null||s.pickingLateral){message(p,"world_second_handle");return;}if(s.invalid||!held(p,s)||!chunks(p,s)){stop(p,"volume_invalid");return;}
         var tool=p.getItemInHand(s.hand);if(s.former&&!p.isCreative()&&tool.getMaxDamage()-tool.getDamageValue()<s.expected){message(p,"volume_durability",s.expected);return;}
         if(s.former&&s.expected>0)SlopeUndo.begin(p);
         s.pendingPos=null;s.pendingWork=null;s.phase=RUNNING;s.traversal=new VolumeCursor(s.region,s.create);s.cursor=0;s.modified=0;reply(p,s);
@@ -219,11 +236,11 @@ public final class VolumeEditing {
         if(!s.create&&p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be){
             if(!be.valid())throw new IllegalArgumentException("Invalid design");var d=be.design();
             if(!s.former)return s.region.hammer(pos,d);
-            var after=(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,false,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength));return new DesignOperations.Plan(d,after,List.of(),List.of(),0);
+            var after=(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.lateralPlane(pos,d,s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,false,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh));return new DesignOperations.Plan(d,after,List.of(),List.of(),0);
         }
         if(s.create){
             if(!p.level().getBlockState(pos).isAir()||!p.level().getFluidState(pos).isEmpty())throw new IllegalArgumentException("Creation requires empty positions");
-            var d=BlockDesign.full(s.resolution);var saved=s.plans.getIfPresent(key(s,pos,d));var after=saved==null?(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,true,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength)):saved.after();
+            var d=BlockDesign.full(s.resolution);var saved=s.plans.getIfPresent(key(s,pos,d));var after=saved==null?(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.lateralPlane(pos,d,s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,true,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh)):saved.after();
             if(after.empty())return null;
             var shape=DesignGeometry.shape(after).move(pos.getX(),pos.getY(),pos.getZ());if(!shape.isEmpty())for(var collision:p.level().getEntityCollisions(null,shape.bounds()))if(Shapes.joinIsNotEmpty(shape,collision,BooleanOp.AND))throw new IllegalArgumentException("Entity blocks creation");
             return new DesignOperations.Plan(d.remove(all(d.resolution())),after,List.of(),List.of(),0);

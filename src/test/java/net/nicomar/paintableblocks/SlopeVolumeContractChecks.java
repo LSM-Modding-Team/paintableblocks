@@ -144,7 +144,29 @@ public final class SlopeVolumeContractChecks {
         var cell=VolumeRegion.aim(new BlockPos(-1,0,0),point,Direction.SOUTH);
         check(cell.x1()-cell.x0()==1&&cell.y1()-cell.y0()==1&&cell.z1()-cell.z0()==1,"Interaction always selects a sixteenth even at negative coordinates");
     }
+    private static void lateralBands(){
+        var region=VolumeRegion.block(BlockPos.ZERO);
+        for(int n:List.of(1,2,4,8,16)){
+            var base=BlockDesign.full(n);var original=region.doublePlane(BlockPos.ZERO,base,0,false,false,0,16,true,true,0,true,true,0);
+            var plane=region.lateralPlane(BlockPos.ZERO,base,original,0,false,4,12);var d=base.withSlope(plane);
+            check(d.resolution()==n,"Lateral bands preserve logical subdivision");
+            for(double z:new double[]{.125,.5,.875}){
+                var hit=new DesignOutlineShape(d).clip(new Vec3(.5,2,z),new Vec3(.5,-1,z),BlockPos.ZERO);
+                check(hit!=null&&Math.abs(hit.getLocation().y-(z==.5?.5:1))<1e-8,"Only the central lateral band is inclined");
+            }
+            var wall=new DesignOutlineShape(d).clip(new Vec3(.5,.75,.5),new Vec3(.5,.75,0),BlockPos.ZERO);
+            check(wall!=null&&Math.abs(wall.getLocation().z-.25)<1e-8,"Lateral join wall is ray traceable");
+            var json=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,d).getOrThrow();check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,json).getOrThrow().equals(d),"Lateral window survives save/load");
+            for(int rotation=0;rotation<24;rotation++){
+                var point=new Vec3(.5,.75,.5);var rotated=plane.rotated(rotation);
+                check(rotated.cuts(DesignOrientation.rotate(rotation,point))==plane.cuts(point),"Band follows piece rotation");
+            }
+            var legacy=BlockDesign.CODEC.encodeStart(JsonOps.INSTANCE,base.withSlope(original)).getOrThrow().getAsJsonObject();legacy.addProperty("version",4);
+            check(BlockDesign.CODEC.parse(JsonOps.INSTANCE,legacy).getOrThrow().equals(base.withSlope(original)),"Format four keeps its geometry");
+        }
+    }
     public static void run(){
+        lateralBands();
         coarseWorldInteraction();
         independentJoin();
         normalization();

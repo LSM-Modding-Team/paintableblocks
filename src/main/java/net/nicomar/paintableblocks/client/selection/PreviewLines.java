@@ -27,6 +27,7 @@ final class PreviewLines extends VoxelShape {
         double dependent=(s.vertical()?(x?s.z0():s.x0()):s.y0())/16.0;
         double start=dependent+s.start()/16.0,end=dependent+(s.end()<0?(s.vertical()?(x?s.z1()-s.z0():s.x1()-s.x0()):s.y1()-s.y0()):s.end())/16.0;
         double middleY=(s.y0()+s.y1())/32.0,middleX=(s.x0()+s.x1())/32.0,middleZ=(s.z0()+s.z1())/32.0;
+        if(s.lateralHigh()>=0){double mid=(s.lateralLow()+s.lateralHigh())/32.0;if(s.vertical())middleY=s.y0()/16.0+mid;else if(x)middleZ=s.z0()/16.0+mid;else middleX=s.x0()/16.0+mid;}
         var p=new net.minecraft.world.phys.Vec3(x?a:s.vertical()?start:middleX,s.vertical()?middleY:start,x?(s.vertical()?start:middleZ):a).subtract(anchor.getX(),anchor.getY(),anchor.getZ());
         var q=new net.minecraft.world.phys.Vec3(x?b:s.vertical()?end:middleX,s.vertical()?middleY:end,x?(s.vertical()?end:middleZ):b).subtract(anchor.getX(),anchor.getY(),anchor.getZ());
         var along=q.subtract(p);if(along.lengthSqr()<1e-12)return new PreviewLines(List.of(),false);
