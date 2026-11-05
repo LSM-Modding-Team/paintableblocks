@@ -18,6 +18,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.nicomar.paintableblocks.interaction.ServerInteractions;
 import net.nicomar.paintableblocks.blockentity.PaintableBlockEntity;
 import net.nicomar.paintableblocks.item.BrushItem;
+import net.nicomar.paintableblocks.registry.ModContent;
 
 public final class ModNetworking {
     public static final UUID NO_BLOCK=new UUID(0,0);
@@ -34,18 +35,20 @@ public final class ModNetworking {
         @Override public Type<Use> type(){return TYPE;}
         public static Use capture(Player p,InteractionHand hand,BlockHitResult hit,long request,long selection,boolean control,boolean reverse,boolean cancel){
             var held=p.getItemInHand(hand);int paint=held.getItem() instanceof BrushItem b&&b.valid(held)?b.content(held).paint():0;
+            if(p.isCreative()&&held.getItem() instanceof net.nicomar.paintableblocks.item.PaintItem)paint=held.getOrDefault(ModContent.PAINT_ID.get(),0);
             var entity=p.level().getBlockEntity(hit.getBlockPos());var block=entity instanceof PaintableBlockEntity be?be.editIdentity():NO_BLOCK;
             long revision=entity instanceof PaintableBlockEntity be?be.revision():0;
             return new Use(request,selection,hand,hand==InteractionHand.MAIN_HAND?p.getInventory().getSelectedSlot():-1,p.level().dimension().identifier(),hit.getBlockPos().immutable(),hit.getLocation(),hit.getDirection(),BuiltInRegistries.ITEM.getKey(held.getItem()),paint,block,revision,control,reverse,cancel);
         }
     }
     public record Selection(long request,long selection,boolean active,Identifier dimension,InteractionHand hand,int slot,Identifier item,int paint,
-            BlockPos pos,UUID block,long revision,int cell,int face) implements CustomPacketPayload {
+            BlockPos pos,UUID block,long revision,int cell,int face,boolean ready,int x0,int y0,int z0,int x1,int y1,int z1) implements CustomPacketPayload {
+        public Selection(long request,long selection,boolean active,Identifier dimension,InteractionHand hand,int slot,Identifier item,int paint,BlockPos pos,UUID block,long revision,int cell,int face){this(request,selection,active,dimension,hand,slot,item,paint,pos,block,revision,cell,face,false,0,0,0,1,1,1);}
         public static final Type<Selection> TYPE=new Type<>(Identifier.fromNamespaceAndPath("paintableblocks","selection"));
         public static final StreamCodec<RegistryFriendlyByteBuf,Selection> CODEC=StreamCodec.of((b,v)->{
             b.writeLong(v.request);b.writeLong(v.selection);b.writeBoolean(v.active);b.writeIdentifier(v.dimension);b.writeEnum(v.hand);b.writeVarInt(v.slot);b.writeIdentifier(v.item);b.writeVarInt(v.paint);
-            b.writeBlockPos(v.pos);b.writeUUID(v.block);b.writeLong(v.revision);b.writeVarInt(v.cell);b.writeVarInt(v.face);
-        },b->new Selection(b.readLong(),b.readLong(),b.readBoolean(),b.readIdentifier(),b.readEnum(InteractionHand.class),b.readVarInt(),b.readIdentifier(),b.readVarInt(),b.readBlockPos(),b.readUUID(),b.readLong(),b.readVarInt(),b.readVarInt()));
+            b.writeBlockPos(v.pos);b.writeUUID(v.block);b.writeLong(v.revision);b.writeVarInt(v.cell);b.writeVarInt(v.face);b.writeBoolean(v.ready);b.writeInt(v.x0);b.writeInt(v.y0);b.writeInt(v.z0);b.writeInt(v.x1);b.writeInt(v.y1);b.writeInt(v.z1);
+        },b->new Selection(b.readLong(),b.readLong(),b.readBoolean(),b.readIdentifier(),b.readEnum(InteractionHand.class),b.readVarInt(),b.readIdentifier(),b.readVarInt(),b.readBlockPos(),b.readUUID(),b.readLong(),b.readVarInt(),b.readVarInt(),b.readBoolean(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readInt(),b.readInt()));
         @Override public Type<Selection> type(){return TYPE;}
     }
     /** Explicit int codec avoids depending on native menu-button ID width. */
@@ -100,7 +103,7 @@ public final class ModNetworking {
         @Override public Type<DesignSync> type(){return TYPE;}
     }
     public static void register(RegisterPayloadHandlersEvent event){
-        var registrar=event.registrar("17");
+        var registrar=event.registrar("18");
         registrar.playToServer(Use.TYPE,Use.CODEC,(v,ctx)->ServerInteractions.use(ctx.player(),v));
         registrar.playToClient(Selection.TYPE,Selection.CODEC);
         registrar.playToClient(VolumeState.TYPE,VolumeState.CODEC);

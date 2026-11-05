@@ -1,5 +1,14 @@
 # Registro de cambios
 
+## 2026-11-05 — Envolvente de pintura creativa
+
+- Ítems de pintura en creativo: dos esquinas adaptadas a la subdivisión, sin restricción de plano/orientación, previsualización de volumen y tercer clic de confirmación; Ctrl + clic cancela. Hasta 2048 posiciones y 262144 celdas de borde examinadas, sin cargar chunks ni consumo.
+- Solo caras completas coincidentes con los seis límites. Incluye caras ocultas por bloques exteriores y entre celdas ocupadas en el borde; excluye caras interiores, cortes nuevos y pendientes no coincidentes con límites axiales. No convierte diseños.
+- Validación de modo, ítem, permisos, eventos y estado del lote antes de aplicar. Extremos dentro del alcance al marcar, sin cancelar por alejarse del primero si sigue cargado y válido.
+- Formato 6 admite guardar pintura en caras ocultas; lectura 1–5, IDs y datos existentes conservados. Protocolo 18 para el estado de volumen fijado. El pincel conserva su flujo de superficie.
+- Contratos de envolvente, caras ocultas, guardado y límites escritos e integrados, sin ejecutar. Solo revisión estática/diff, sin compilación, Java, Gradle, scripts, pruebas ni Minecraft. Commit online en `26.2`, sin commits locales.
+
+
 ## 2026-11-05 — Pintura entre bloques y presentación en Jade
 
 - Selector rectangular coplanar compartido entre cliente y servidor, con celdas lógicas completas y subdivisiones mezcladas. Ctrl + clic inicia área del pincel y clic confirma; cristal inicia con clic normal. Ctrl + clic cancela. No se rellenan huecos ni se convierten diseños.

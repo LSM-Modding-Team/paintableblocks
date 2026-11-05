@@ -38,13 +38,14 @@ import net.nicomar.paintableblocks.event.PaintableBlockEditEvent;
 /** Intent snapshots prevent stale clicks. Results, reach, permissions and inventory remain authoritative. */
 public final class ServerInteractions {
     private record Pending(long id,BlockPos pos,Identifier dimension,UUID block,long revision,DesignGeometry.Surface first,InteractionHand hand,int slot,Identifier item,int paint){}
+    private static final Map<Player,net.nicomar.paintableblocks.operation.VolumeRegion> SHELLS=new WeakHashMap<>();
     private record Choice(Identifier dimension,BlockPos pos,int paint){}
     private static final Map<Player,Pending> PENDING=new WeakHashMap<>();
     private static final Map<Player,Choice> CHOICES=new WeakHashMap<>();
     private static final Map<Player,Long> LAST_USE=new WeakHashMap<>(),LAST_REQUEST=new WeakHashMap<>();
     private ServerInteractions(){}
     public static void register(){NeoForge.EVENT_BUS.addListener(ServerInteractions::tick);}
-    public static boolean tool(ItemStack stack){return stack.getItem() instanceof EditingToolItem||stack.getItem() instanceof BrushItem;}
+    public static boolean tool(ItemStack stack){return stack.getItem() instanceof EditingToolItem||stack.getItem() instanceof BrushItem||stack.getItem() instanceof PaintItem;}
     public static boolean relevant(Player p,BlockPos pos){return p.level().hasChunkAt(pos)&&(p.level().getBlockEntity(pos) instanceof PaintableBlockEntity||p.level().getBlockEntity(pos) instanceof PaintBucketBlockEntity);}
     public static boolean allowed(Player p,BlockPos pos){
         return p instanceof ServerPlayer s&&p.isAlive()&&!p.isSpectator()&&p.mayBuild()&&s.level().hasChunkAt(pos)
@@ -71,14 +72,16 @@ public final class ServerInteractions {
     }
     private static boolean heldMatches(Player p,InteractionHand hand,int slot,Identifier item,int paint){
         var held=p.getItemInHand(hand);if(!BuiltInRegistries.ITEM.getKey(held.getItem()).equals(item)||hand==InteractionHand.MAIN_HAND&&p.getInventory().getSelectedSlot()!=slot)return false;
+        if(held.getItem() instanceof PaintItem)return p.isCreative()&&PaintCatalog.validId(paint)&&held.getOrDefault(ModContent.PAINT_ID.get(),0)==paint;
         return held.getItem() instanceof BrushItem b?b.valid(held)&&b.content(held).paint()==paint:tool(held)&&paint==0;
     }
     private static boolean pendingValid(ServerPlayer p,Pending s){
-        return s.dimension.equals(p.level().dimension().identifier())&&heldMatches(p,s.hand,s.slot,s.item,s.paint)&&allowed(p,s.pos)
+        return s.dimension.equals(p.level().dimension().identifier())&&heldMatches(p,s.hand,s.slot,s.item,s.paint)&&(p.getItemInHand(s.hand).getItem() instanceof PaintItem?VolumeEditing.allowed(p,s.pos,s.hand):allowed(p,s.pos))
                 &&p.level().getBlockEntity(s.pos) instanceof PaintableBlockEntity be&&be.valid()&&be.editIdentity().equals(s.block)&&be.revision()==s.revision;
     }
     private static void reply(ServerPlayer p,long request){
-        var s=PENDING.get(p);
+        var s=PENDING.get(p);if(s==null)SHELLS.remove(p);
+        if(s!=null&&SHELLS.containsKey(p)){var v=SHELLS.get(p);ModNetworking.selection(p,new ModNetworking.Selection(request,s.id,true,s.dimension,s.hand,s.slot,s.item,s.paint,s.pos,s.block,s.revision,s.first.cell(),s.first.face().ordinal()+(s.first.slope()?6:0),true,v.x0(),v.y0(),v.z0(),v.x1(),v.y1(),v.z1()));return;}
         ModNetworking.selection(p,s==null?new ModNetworking.Selection(request,0,false,p.level().dimension().identifier(),InteractionHand.MAIN_HAND,0,Identifier.parse("minecraft:air"),0,BlockPos.ZERO,ModNetworking.NO_BLOCK,0,0,0):
                 new ModNetworking.Selection(request,s.id,true,s.dimension,s.hand,s.slot,s.item,s.paint,s.pos,s.block,s.revision,s.first.cell(),s.first.face().ordinal()+(s.first.slope()?6:0)));
     }
@@ -122,6 +125,16 @@ public final class ServerInteractions {
         var expected=DesignGeometry.target(before,r.point().subtract(pos.getX(),pos.getY(),pos.getZ()),r.face());
         if(surface.isEmpty()||!surface.equals(expected))return;
         DesignOperations.Plan plan;
+        if(held.getItem() instanceof PaintItem){
+            if(!p.isCreative()||!PaintCatalog.validId(r.paint()))return;
+            if(pending==null){SHELLS.remove(p);PENDING.put(p,new Pending(r.request(),pos.immutable(),r.dimension(),be.editIdentity(),be.revision(),surface.get(),r.hand(),r.slot(),r.item(),r.paint()));return;}
+            if(!SHELLS.containsKey(p)){
+                var first=(PaintableBlockEntity)p.level().getBlockEntity(pending.pos);
+                var region=net.nicomar.paintableblocks.operation.VolumeRegion.cell(pending.pos,first.design(),pending.first.cell()).union(net.nicomar.paintableblocks.operation.VolumeRegion.cell(pos,before,surface.get().cell()));
+                if(region.size()>2048){p.sendOverlayMessage(Component.translatable("message.paintableblocks.shell_limit"));return;}SHELLS.put(p,region);return;
+            }
+            paintArea(p,r,pending,surface.get(),r.paint());return;
+        }
         if(held.getItem() instanceof BrushItem brush){
             var content=brush.content(held);int id=content.paint();
             if(!PaintCatalog.validId(id)||!p.isCreative()&&!PaintCatalog.byId(id).survivalAvailable())return;
@@ -148,11 +161,23 @@ public final class ServerInteractions {
     }
     private static void paintArea(ServerPlayer p,ModNetworking.Use r,Pending pending,DesignGeometry.Surface end,int paint){
         Map<BlockPos,DesignOperations.Plan> plans;
-        try{plans=net.nicomar.paintableblocks.operation.WorldPaintArea.plans(pos->{
+        boolean shell=p.isCreative()&&p.getItemInHand(r.hand()).getItem() instanceof PaintItem&&SHELLS.containsKey(p);
+        try{plans=shell?net.nicomar.paintableblocks.operation.CreativePaintShell.plans(pos->{
+            if(!VolumeEditing.allowed(p,pos,r.hand()))throw new IllegalArgumentException("Unavailable");
+            return p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be&&be.valid()?be.design():null;
+        },SHELLS.get(p),paint):net.nicomar.paintableblocks.operation.WorldPaintArea.plans(pos->{
             if(!allowed(p,pos)||!p.mayUseItemAt(pos,r.face(),p.getItemInHand(r.hand())))throw new IllegalArgumentException("Area is unavailable");
             return p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be&&be.valid()?be.design():null;
         },pending.pos,pending.first,r.pos(),end,paint);}catch(IllegalArgumentException invalid){p.sendOverlayMessage(Component.translatable("message.paintableblocks.invalid_area"));return;}
-        long units=plans.values().stream().mapToLong(DesignOperations.Plan::units).sum();var held=p.getItemInHand(r.hand());if(!(held.getItem() instanceof BrushItem brush)||!brush.valid(held))return;
+        long units=plans.values().stream().mapToLong(DesignOperations.Plan::units).sum();var held=p.getItemInHand(r.hand());
+        if(shell){
+            for(var e:plans.entrySet())if(e.getValue().changes()&&NeoForge.EVENT_BUS.post(new PaintableBlockEditEvent(p.level(),e.getKey(),p.level().getBlockState(e.getKey()),p,r.hand(),e.getValue())).isCanceled())return;
+            if(!pendingValid(p,pending)||!matchesRequest(p,r)||!p.isCreative()||p.isUsingItem()||p.containerMenu!=p.inventoryMenu)return;
+            for(var e:plans.entrySet())if(!VolumeEditing.allowed(p,e.getKey(),r.hand())||!(p.level().getBlockEntity(e.getKey()) instanceof PaintableBlockEntity be)||!be.valid()||!be.design().equals(e.getValue().before()))return;
+            for(var e:plans.entrySet())if(e.getValue().changes()&&p.level().getBlockEntity(e.getKey()) instanceof PaintableBlockEntity be)be.setDesign(e.getValue().after());
+            PENDING.remove(p);SHELLS.remove(p);return;
+        }
+        if(!(held.getItem() instanceof BrushItem brush)||!brush.valid(held))return;
         if(!p.isCreative()&&units>brush.content(held).units()){p.sendOverlayMessage(Component.translatable("message.paintableblocks.insufficient_paint",units,brush.content(held).units()));return;}
         for(var e:plans.entrySet())if(e.getValue().changes()&&NeoForge.EVENT_BUS.post(new PaintableBlockEditEvent(p.level(),e.getKey(),p.level().getBlockState(e.getKey()),p,r.hand(),e.getValue())).isCanceled())return;
         if(!pendingValid(p,pending)||!matchesRequest(p,r)||p.isUsingItem()||p.containerMenu!=p.inventoryMenu)return;

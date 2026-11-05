@@ -519,6 +519,9 @@
   "message.paintableblocks.world_invalid_points": "Marca dos puntos dentro de la selección con separación horizontal; no se ajustan automáticamente",
   "message.paintableblocks.world_lateral_first": "Marca el primer límite lateral; fuera de la franja quedará bloque completo",
   "message.paintableblocks.world_lateral_second": "Marca el segundo límite lateral a otra posición (1/16)",
-  "tooltip.paintableblocks.brush_area": "Ctrl+clic: inicio de área entre bloques; clic: confirmar. Cristal: dos clics."
+  "tooltip.paintableblocks.brush_area": "Ctrl+clic: inicio de área entre bloques; clic: confirmar. Cristal: dos clics.",
+  "message.paintableblocks.shell_select": "Pintura creativa: dos esquinas · hasta 2048 posiciones · Ctrl+clic: cancelar",
+  "message.paintableblocks.shell_ready": "Volumen fijado: clic derecho sobre bloque pintable para confirmar · Ctrl+clic: cancelar",
+  "message.paintableblocks.shell_limit": "Límite creativo: 2048 posiciones y 262144 celdas de borde examinadas"
 }
 

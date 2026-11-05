@@ -56,10 +56,10 @@ public final class SelectionPreview {
     private static boolean formerActive(){var p=Minecraft.getInstance().player;return p!=null&&(p.getMainHandItem().getItem() instanceof SlopeFormerItem||!ServerInteractions.tool(p.getMainHandItem())&&p.getOffhandItem().getItem() instanceof SlopeFormerItem);}
     private static boolean selectionValid(){
         var c=Minecraft.getInstance();var s=selection;if(s==null)return true;
-        if(c.player==null||c.level==null||!s.dimension().equals(c.level.dimension().identifier())||!c.level.hasChunkAt(s.pos())||!c.player.isWithinBlockInteractionRange(s.pos(),0)||s.face()<0||s.face()>=12)return false;
+        if(c.player==null||c.level==null||!s.dimension().equals(c.level.dimension().identifier())||!c.level.hasChunkAt(s.pos())||(!c.player.isCreative()||!(c.player.getItemInHand(s.hand()).getItem() instanceof PaintItem))&&!c.player.isWithinBlockInteractionRange(s.pos(),0)||s.face()<0||s.face()>=12)return false;
         var held=c.player.getItemInHand(s.hand());
         return BuiltInRegistries.ITEM.getKey(held.getItem()).equals(s.item())&&(s.hand()!=InteractionHand.MAIN_HAND||c.player.getInventory().getSelectedSlot()==s.slot())
-                &&held.getItem() instanceof BrushItem brush&&brush.valid(held)&&brush.content(held).paint()==s.paint()
+                &&(held.getItem() instanceof BrushItem brush&&brush.valid(held)&&brush.content(held).paint()==s.paint()||c.player.isCreative()&&held.getItem() instanceof PaintItem&&held.getOrDefault(ModContent.PAINT_ID.get(),0)==s.paint())
                 &&c.level.getBlockEntity(s.pos()) instanceof PaintableBlockEntity be&&be.valid()&&be.editIdentity().equals(s.block())&&be.revision()==s.revision()
                 &&s.cell()>=0&&s.cell()<be.design().resolution()*be.design().resolution()*be.design().resolution();
     }
@@ -76,7 +76,7 @@ public final class SelectionPreview {
         if(!(c.hitResult instanceof BlockHitResult hit)||hit.getType()!=HitResult.Type.BLOCK||!ServerInteractions.relevant(c.player,hit.getBlockPos()))return;
         var hand=e.getHand();
         if(hand==InteractionHand.OFF_HAND&&ServerInteractions.tool(c.player.getMainHandItem())){e.setCanceled(true);e.setSwingHand(false);return;}
-        if(!ServerInteractions.tool(c.player.getItemInHand(hand)))return;
+        if(!ServerInteractions.tool(c.player.getItemInHand(hand))||c.player.getItemInHand(hand).getItem() instanceof PaintItem&&!c.player.isCreative())return;
         e.setCanceled(true);e.setSwingHand(false);lastSent=++nextRequest;
         ClientPacketDistributor.sendToServer(ModNetworking.Use.capture(c.player,hand,hit,lastSent,selection==null?0:selection.selection(),control(),reverse(),false));
     }
@@ -90,17 +90,29 @@ public final class SelectionPreview {
         if(!ServerInteractions.tool(c.player.getItemInHand(activeHand()))&&(held.is(ModContent.GLOVES.get())||held.is(ModContent.TONGS.get()))){invalidate();feedback(Component.translatable(c.player.isCreative()?"message.paintableblocks.creative_copy":held.is(ModContent.GLOVES.get())?"message.paintableblocks.keep_design":"message.paintableblocks.keep_shape"));return;}
         if(!prepare(hit,be)){if(selection!=null)feedback(Component.translatable("message.paintableblocks.invalid_area"));else clearFeedback();return;}
         var tool=c.player.getItemInHand(activeHand());
+        if(tool.getItem() instanceof PaintItem&&c.player.isCreative()){feedback(Component.translatable(selection!=null&&selection.ready()?"message.paintableblocks.shell_ready":"message.paintableblocks.shell_select"));return;}
         if(tool.getItem() instanceof BrushItem brush&&brush.valid(tool))feedback(Component.translatable(selection==null?"message.paintableblocks.paint_cost":"message.paintableblocks.area_cost",cachedPlan.units(),brush.content(tool).units()));else clearFeedback();
     }
     private static boolean prepare(BlockHitResult hit,PaintableBlockEntity be){
         var c=Minecraft.getInstance();var hand=activeHand();var held=c.player.getItemInHand(hand);
         if(!be.valid()||!ServerInteractions.tool(held)){invalidate();return false;}
         var d=be.design();var target=DesignGeometry.target(d,hit.getLocation().subtract(hit.getBlockPos().getX(),hit.getBlockPos().getY(),hit.getBlockPos().getZ()),hit.getDirection());if(target.isEmpty()){invalidate();return false;}
-        int paint=held.getItem() instanceof BrushItem b&&b.valid(held)?b.content(held).paint():0;
+        int paint=held.getItem() instanceof BrushItem b&&b.valid(held)?b.content(held).paint():held.getItem() instanceof PaintItem&&c.player.isCreative()?held.getOrDefault(ModContent.PAINT_ID.get(),0):0;
         var key=new Key(c.level.dimension().identifier(),hit.getBlockPos(),be.editIdentity(),be.revision(),target.get(),hand,held.getItem(),paint,reverse(),selection==null?0:selection.selection());
         if(selection==null&&key.equals(cachedKey))return true;
         invalidate();
         try{
+            if(held.getItem() instanceof PaintItem){
+                if(!c.player.isCreative()||!PaintCatalog.validId(paint))return false;
+                var region=net.nicomar.paintableblocks.operation.VolumeRegion.cell(hit.getBlockPos(),d,target.get().cell());
+                if(selection!=null){
+                    if(selection.ready())region=new net.nicomar.paintableblocks.operation.VolumeRegion(selection.x0(),selection.y0(),selection.z0(),selection.x1(),selection.y1(),selection.z1());
+                    else{var first=(PaintableBlockEntity)c.level.getBlockEntity(selection.pos());region=region.union(net.nicomar.paintableblocks.operation.VolumeRegion.cell(selection.pos(),first.design(),selection.cell()));}
+                }
+                if(region.size()>2048)throw new IllegalArgumentException("Shell limit");
+                var pos=hit.getBlockPos();cachedShape=Shapes.box(region.x0()/16.0-pos.getX(),region.y0()/16.0-pos.getY(),region.z0()/16.0-pos.getZ(),region.x1()/16.0-pos.getX(),region.y1()/16.0-pos.getY(),region.z1()/16.0-pos.getZ());
+                cachedPlan=new DesignOperations.Plan(d,d,List.of(),List.of(),0);cachedKey=key;return true;
+            }
             if(held.getItem() instanceof BrushItem){
                 if(!PaintCatalog.validId(paint)||selection!=null&&(!selectionValid()||selection.hand()!=hand))return false;
                 if(selection!=null){

@@ -519,6 +519,9 @@
   "message.paintableblocks.world_invalid_points": "Mark two points inside the selection with horizontal separation; points are never clamped",
   "message.paintableblocks.world_lateral_first": "Mark the first lateral boundary; material outside the band stays complete",
   "message.paintableblocks.world_lateral_second": "Mark the second lateral boundary at a different position (1/16)",
-  "tooltip.paintableblocks.brush_area": "Ctrl+click: start world area; click: confirm. Glass: two clicks."
+  "tooltip.paintableblocks.brush_area": "Ctrl+click: start world area; click: confirm. Glass: two clicks.",
+  "message.paintableblocks.shell_select": "Creative paint: two corners · up to 2048 positions · Ctrl+click: cancel",
+  "message.paintableblocks.shell_ready": "Volume locked: right-click a paintable block to confirm · Ctrl+click: cancel",
+  "message.paintableblocks.shell_limit": "Creative limit: 2048 positions and 262144 boundary cells examined"
 }
 

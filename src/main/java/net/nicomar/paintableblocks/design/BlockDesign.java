@@ -14,7 +14,7 @@ import net.nicomar.paintableblocks.paint.PaintCatalog;
 
 /** Immutable and canonical. Paint is stored only on exposed local faces; 0 means original texture. */
 public final class BlockDesign {
-    public static final int VERSION = 5;
+    public static final int VERSION = 6;
     private record Face(int key, int paint) {
         private static final Codec<Face> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.INT.fieldOf("key").forGetter(Face::key), Codec.INT.fieldOf("paint").forGetter(Face::paint)).apply(i, Face::new));
@@ -63,7 +63,7 @@ public final class BlockDesign {
         TreeMap<Integer,Integer> sorted = new TreeMap<>();
         for(var e:paints.entrySet()) {
             int key=e.getKey(), paint=e.getValue();
-            if(!trusted&&(key<0 || key>=SLOPE_KEY+resolution*resolution*resolution || !PaintCatalog.validId(paint) || !validSurfaceKey(key))) {
+            if(!trusted&&(key<0 || key>=SLOPE_KEY+resolution*resolution*resolution || !PaintCatalog.validId(paint) || !storedSurfaceKey(key))) {
                 throw new IllegalArgumentException("Paint must identify a valid exposed face");
             }
             sorted.put(key,paint);
@@ -118,6 +118,7 @@ public final class BlockDesign {
     public boolean occupied(int x,int y,int z){return x>=0 && y>=0 && z>=0 && x<resolution && y<resolution && z<resolution && occupied(index(x,y,z));}
     public boolean exposed(int cell,Direction face){return occupied(cell)&&(slope!=null&&slope.window().get(0)>=0||!occupied(x(cell)+face.getStepX(),y(cell)+face.getStepY(),z(cell)+face.getStepZ()))
             &&(slope==null||SlopeGeometry.surfaceArea(this,new DesignGeometry.Surface(cell,face))>1e-12);}
+    public boolean storedSurfaceKey(int key){return key>=SLOPE_KEY?validSurfaceKey(key):key>=0&&key<resolution*resolution*resolution*6&&occupied(key/6);}
     public boolean validSurfaceKey(int key){return key>=SLOPE_KEY?occupied(key-SLOPE_KEY)&&slope!=null&&SlopeGeometry.surfaceArea(this,new DesignGeometry.Surface(key-SLOPE_KEY,slope.dominant(),true))>1e-12:
             key>=0&&key<resolution*resolution*resolution*6&&exposed(key/6,Direction.values()[key%6]);}
     public int paint(DesignGeometry.Surface s){return paints.getOrDefault(s.key(),0);}
@@ -132,9 +133,13 @@ public final class BlockDesign {
     }
     public BlockDesign paint(int cell,Direction face,int paint){return paintFaces(Map.of(cell*6+face.ordinal(),paint));}
     public BlockDesign paintFaces(Map<Integer,Integer> changes){
+        for(int key:changes.keySet())if(!validSurfaceKey(key))throw new IllegalArgumentException("Invalid changed paint surface");
+        return paintStoredFaces(changes);
+    }
+    public BlockDesign paintStoredFaces(Map<Integer,Integer> changes){
         boolean changed=false;
         for(var e:changes.entrySet()){
-            if(!validSurfaceKey(e.getKey())||e.getValue()!=0&&!PaintCatalog.validId(e.getValue()))throw new IllegalArgumentException("Invalid changed paint surface");
+            if(!storedSurfaceKey(e.getKey())||e.getValue()!=0&&!PaintCatalog.validId(e.getValue()))throw new IllegalArgumentException("Invalid changed paint surface");
             if(paints.getOrDefault(e.getKey(),0).intValue()!=e.getValue())changed=true;
         }
         if(!changed)return this;TreeMap<Integer,Integer> next=new TreeMap<>(paints);
@@ -174,7 +179,7 @@ public final class BlockDesign {
             if(!geometryDone)return false;
             if(!changed&&plane.bounds().equals(SlopePlane.FULL)){result=BlockDesign.this;return true;}
             if(bare==null){bare=new BlockDesign(resolution,bits,Map.of(),orientation,plane,true);paintIterator=paints.entrySet().iterator();}
-            while(budget-->0&&paintIterator.hasNext()){var e=paintIterator.next();if(bare.validSurfaceKey(e.getKey())){kept.put(e.getKey(),e.getValue());hash+=e.getKey().hashCode()^e.getValue().hashCode();}}
+            while(budget-->0&&paintIterator.hasNext()){var e=paintIterator.next();if(bare.storedSurfaceKey(e.getKey())){kept.put(e.getKey(),e.getValue());hash+=e.getKey().hashCode()^e.getValue().hashCode();}}
             if(paintIterator.hasNext())return false;result=new BlockDesign(bare,kept,orientation,hash);return true;
         }
         public BlockDesign result(){if(result==null)throw new IllegalStateException("Unfinished clip task");return result;}
