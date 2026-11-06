@@ -24,7 +24,7 @@ public final class CreativeTabs {
     public static final DeferredHolder<CreativeModeTab,CreativeModeTab> TOOLS=TABS.register("tools",()->CreativeModeTab.builder(CreativeModeTab.Row.TOP,1)
             .withTabsBefore(net.minecraft.resources.ResourceKey.create(Registries.CREATIVE_MODE_TAB,Identifier.fromNamespaceAndPath("paintableblocks","blocks")))
             .title(Component.translatable("tab.paintableblocks.tools")).icon(()->new ItemStack(ModContent.EDITORS.getFirst().get())).displayItems((parameters,out)->{
-                for(var i:ModContent.EDITORS)out.accept(i.get());out.accept(ModContent.SLOPE_FORMER.get());out.accept(ModContent.TONGS.get());out.accept(ModContent.GLOVES.get());
+                for(var i:ModContent.EDITORS)out.accept(i.get());out.accept(ModContent.SLOPE_FORMER.get());out.accept(ModContent.STAIR_FORMER.get());out.accept(ModContent.TONGS.get());out.accept(ModContent.GLOVES.get());
                 for(var i:ModContent.BRUSHES.values())out.accept(i.get());for(var i:ModContent.SCRAPERS.values())out.accept(i.get());for(var i:ModContent.BUCKET_ITEMS.values())out.accept(i.get());
             }).build());
     public static final DeferredHolder<CreativeModeTab,CreativeModeTab> PAINTS=TABS.register("vanilla_paints",()->CreativeModeTab.builder(CreativeModeTab.Row.TOP,2)

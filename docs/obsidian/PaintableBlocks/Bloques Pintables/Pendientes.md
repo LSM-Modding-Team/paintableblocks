@@ -148,3 +148,15 @@ Guantes y Ctrl + clic central copian **una pieza individual**, no toda la rampa.
 ## Estado y evidencia
 
 Implementación y decisiones: [Pendientes y volúmenes](../../../technical/slopes-and-volumes.md). No se ha compilado ni ejecutado Java/Minecraft; las reglas no equivalen a comportamiento probado.
+
+## Formador de escaleras
+
+Herramienta independiente, en la pestaña de herramientas, con durabilidad 4096 y receta de tres lingotes de hierro, un palo y un diamante. Comparte selección mundial por extremos, giro, inversión, lado sólido, modo horizontal/vertical, creación creativa, uniones completas, franja lateral, confirmación y deshacer.
+
+F9/RePág aumenta y AvPág reduce el número máximo de peldaños, inicialmente cuatro, entre 1 y 256. El número efectivo no supera longitud ni desnivel disponibles en unidades de 1/16. Se distribuye el recorrido mediante división entera y se redondean las alturas a 1/16, repartiendo el resto; las huellas se anclan al sentido positivo del eje mundial para que intercambiar inicio/final conserve exactamente la forma. Los extremos definen el rango de alturas; los saltos ocurren sobre límites de huella. Un perfil plano genera una plataforma. No hay un modo separado de altura/profundidad: se calculan desde extremos y número de peldaños para mantener un único flujo de edición.
+
+Los peldaños son ocupación axial normal, no planos oblicuos aproximados. Solo se retira material al transformar. Las piezas modificadas pasan a 16×16 mediante sustitución protegida del tipo de bloque, conservando pinturas de caras que existían; las caras nuevas quedan sin pintar. Si no se retira material, no hay conversión ni desgaste. El deshacer conserva tipo de bloque y datos anteriores. Los diseños con cortes oblicuos previos se rechazan para evitar rellenarlos o deformarlos al rasterizar.
+
+Recursos: modelo 3D de cabeza escalonada y mango, caras exteriores sin duplicados y materiales propios existentes de 16×16; no se modifica `unpainted.png`. Receta y desbloqueo incluidos.
+
+Formato persistente 6, lectura 1–5 sin cambios: las escaleras son diseños ordinarios. Protocolo 19 por tipo de herramienta y número de peldaños en la sesión. Solo revisión estática, sin compilación ni ejecución.

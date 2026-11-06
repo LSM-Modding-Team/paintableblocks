@@ -33,7 +33,7 @@ public final class VolumeEditing {
     private static final Map<ServerPlayer,Session> SESSIONS=new LinkedHashMap<>();
     private record ChunkKey(Level level,int x,int z){}
     private static final Map<ChunkKey,Set<ServerPlayer>> WATCHERS=new HashMap<>();
-    private record PlanKey(VolumeRegion region,BlockPos pos,BlockDesign design,int direction,boolean upper,boolean former,boolean create,int resolution,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength,int lateralLow,int lateralHigh){}
+    private record PlanKey(VolumeRegion region,BlockPos pos,BlockDesign design,int direction,boolean upper,boolean former,boolean create,int resolution,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength,int lateralLow,int lateralHigh,boolean stairs,int stairCount){}
 
     private static final net.nicomar.paintableblocks.performance.WorkCache<PlanKey,DesignOperations.Plan> PLANS=new net.nicomar.paintableblocks.performance.WorkCache<>("volume-plans",1024,262144);
     private static long nextId;
@@ -43,23 +43,24 @@ public final class VolumeEditing {
     private static final long NANOS=3_000_000;
     private static final class Session {
         long id=++nextId,cursor,modified,ignored,expected;
-        final boolean former;final InteractionHand hand;final int slot;final ItemStack tool;final net.minecraft.resources.Identifier dimension;
+        final boolean stairs;int stairCount=4;final boolean former;final InteractionHand hand;final int slot;final ItemStack tool;final net.minecraft.resources.Identifier dimension;
         final BlockPos first;final BlockPos createAnchor;BlockPos last;VolumeRegion firstCell,region,selection;net.minecraft.world.phys.Vec3 pointA,joinA,lateralA,profileStart,profileEnd;VolumeCursor traversal;BlockPos writingPos,pendingPos;PlanWork pendingWork;
         final net.nicomar.paintableblocks.performance.WorkCache<PlanKey,DesignOperations.Plan> plans=PLANS;
         final Set<ChunkKey> watches=new HashSet<>();long sentCursor=-1,sentModified=-1;int sentPhase=-1;int phase=FIRST,direction,resolution=1,start,end=-1;int lateralLow,lateralHigh=-1;boolean pickingLateral;boolean vertical,combined,fullAtStart;int fullLength,otherLength;boolean bothEnds;boolean upper,create,invalid,writing;
-        Session(ServerPlayer p,ModNetworking.Use r,VolumeRegion cell,boolean former){this.former=former;hand=r.hand();slot=r.slot();tool=p.getItemInHand(hand).copy();dimension=r.dimension();first=r.pos();createAnchor=first.relative(r.face());last=first;firstCell=cell;region=cell;selection=cell;}
+        Session(ServerPlayer p,ModNetworking.Use r,VolumeRegion cell,boolean former){this.former=former;stairs=p.getItemInHand(r.hand()).getItem() instanceof StairFormerItem;if(stairs)resolution=16;hand=r.hand();slot=r.slot();tool=p.getItemInHand(hand).copy();dimension=r.dimension();first=r.pos();createAnchor=first.relative(r.face());last=first;firstCell=cell;region=cell;selection=cell;}
     }
     private static final class PlanWork {
         final Session session;final BlockPos pos;final BlockDesign before;final BlockDesign.ClipTask clip;final BitSet removed=new BitSet();int cell;
-        PlanWork(Session s,BlockPos pos,BlockDesign before){session=s;this.pos=pos;this.before=before;if(s.bothEnds)before=s.region.doubleSeed(pos,before);clip=s.former?before.clipTask(s.region.lateralPlane(pos,before,s.region.doublePlane(pos,before,s.direction,s.upper,s.vertical,s.start,s.end,s.create,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh)):null;}
+        PlanWork(Session s,BlockPos pos,BlockDesign before){session=s;this.pos=pos;this.before=before;if(s.bothEnds)before=s.region.doubleSeed(pos,before);clip=s.former&&!s.stairs?before.clipTask(s.region.lateralPlane(pos,before,s.region.doublePlane(pos,before,s.direction,s.upper,s.vertical,s.start,s.end,s.create,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh)):null;}
         DesignOperations.Plan advance(){
             BlockDesign after;
+            if(session.stairs){after=stair(session,pos,before);return new DesignOperations.Plan(session.create?before.remove(all(before.resolution())):before,after,List.of(),List.of(),0);}
             if(clip!=null){if(!clip.advance(128))return null;after=clip.result();}
             else{int n=before.resolution(),end=Math.min(n*n*n,cell+128);for(;cell<end;cell++)if(n!=1&&before.occupied(cell)){var point=new net.minecraft.world.phys.Vec3((before.x(cell)+.5)/n,(before.y(cell)+.5)/n,(before.z(cell)+.5)/n);if(before.slope()!=null)point=before.slope().point(point.x,point.y,point.z);var center=DesignOrientation.rotate(before.orientation(),point).add(pos.getX(),pos.getY(),pos.getZ());if(session.region.contains(center))removed.set(cell);}if(cell<n*n*n)return null;after=before.remove(removed);}
             return new DesignOperations.Plan(session.create?before.remove(all(before.resolution())):before,after,removed.stream().boxed().toList(),List.of(),0);
         }
     }
-    private static PlanKey key(Session s,BlockPos pos,BlockDesign design){return new PlanKey(s.region,pos,design,s.direction,s.upper,s.former,s.create,s.resolution,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength,s.lateralLow,s.lateralHigh);}
+    private static PlanKey key(Session s,BlockPos pos,BlockDesign design){return new PlanKey(s.region,pos,design,s.direction,s.upper,s.former,s.create,s.resolution,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength,s.lateralLow,s.lateralHigh,s.stairs,s.stairCount);}
     private VolumeEditing(){}
     public static void register(){NeoForge.EVENT_BUS.addListener(VolumeEditing::tick);NeoForge.EVENT_BUS.addListener(VolumeEditing::unload);NeoForge.EVENT_BUS.addListener(VolumeEditing::placed);NeoForge.EVENT_BUS.addListener(VolumeEditing::broken);NeoForge.EVENT_BUS.addListener(VolumeEditing::stopped);}
     /** Observe only positions in the selected region; schedule chunk-worker callbacks on the server thread. */
@@ -81,8 +82,8 @@ public final class VolumeEditing {
     private static boolean held(ServerPlayer p,Session s){return p.isAlive()&&!p.isSpectator()&&p.mayBuild()&&!p.isUsingItem()&&p.containerMenu==p.inventoryMenu&&p.level().dimension().identifier().equals(s.dimension)&&(s.hand!=InteractionHand.MAIN_HAND||p.getInventory().getSelectedSlot()==s.slot)&&(ItemStack.isSameItemSameComponents(s.tool,p.getItemInHand(s.hand))||(s.phase==RUNNING&&s.modified==s.expected&&s.tool.isEmpty()&&p.getItemInHand(s.hand).isEmpty()));}
     public static boolean allowed(ServerPlayer p,BlockPos pos,InteractionHand hand){return p.isAlive()&&!p.isSpectator()&&p.mayBuild()&&p.level().hasChunkAt(pos)&&!p.level().isOutsideBuildHeight(pos)&&p.level().getWorldBorder().isWithinBounds(pos)&&p.mayInteract(p.level(),pos)&&p.level().mayInteract(p,pos)&&p.mayUseItemAt(pos,Direction.UP,p.getItemInHand(hand));}
     private static void message(ServerPlayer p,String key,Object... args){p.sendOverlayMessage(Component.translatable("message.paintableblocks."+key,args));}
-    private static void reply(ServerPlayer p,Session s){if(s.sentPhase==s.phase&&s.sentCursor==s.cursor&&s.sentModified==s.modified)return;s.sentPhase=s.phase;s.sentCursor=s.cursor;s.sentModified=s.modified;var r=s.region;PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeState(s.id,s.phase,s.former,s.hand,s.dimension,s.first,s.last,r.x0(),r.y0(),r.z0(),r.x1(),r.y1(),r.z1(),s.direction,s.upper,s.create,s.resolution,s.cursor,s.modified,s.ignored,s.expected,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength,s.lateralLow,s.lateralHigh));}
-    private static String classify(IllegalArgumentException e){String m=String.valueOf(e.getMessage());if(m.contains("16")||m.contains("aligned"))return "grid_mismatch";if(m.contains("slope plane"))return "plane_conflict";if(m.contains("empty positions"))return "occupied_destination";if(m.contains("Entity"))return "entity_collision";return "volume_conflict";}
+    private static void reply(ServerPlayer p,Session s){if(s.sentPhase==s.phase&&s.sentCursor==s.cursor&&s.sentModified==s.modified)return;s.sentPhase=s.phase;s.sentCursor=s.cursor;s.sentModified=s.modified;var r=s.region;PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeState(s.id,s.phase,s.former,s.hand,s.dimension,s.first,s.last,r.x0(),r.y0(),r.z0(),r.x1(),r.y1(),r.z1(),s.direction,s.upper,s.create,s.resolution,s.cursor,s.modified,s.ignored,s.expected,s.vertical,s.start,s.end,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength,s.lateralLow,s.lateralHigh,s.stairs,s.stairCount));}
+    private static String classify(IllegalArgumentException e){String m=String.valueOf(e.getMessage());if(m.contains("Stairs require"))return "stairs_oblique";if(m.contains("16")||m.contains("aligned"))return "grid_mismatch";if(m.contains("slope plane"))return "plane_conflict";if(m.contains("empty positions"))return "occupied_destination";if(m.contains("Entity"))return "entity_collision";return "volume_conflict";}
     private static void reject(ServerPlayer p,Session s,String reason){
         PacketDistributor.sendToPlayer(p,new ModNetworking.VolumeNotice(reason,s.pendingPos==null?s.first:s.pendingPos));
         if(s.former&&s.phase!=RUNNING){s.phase=CONFIG;s.cursor=0;s.expected=0;reply(p,s);message(p,reason,s.modified);}else stop(p,reason);
@@ -184,6 +185,7 @@ public final class VolumeEditing {
         if(r.action()==2){stop(p,"volume_stopped");return;}
         if(s.invalid||!held(p,s)){stop(p,"volume_invalid");return;}
         if(r.action()==1){if(s.phase==READY)start(p,s);return;}
+        if(r.action()==9){if(s.stairs&&s.phase==READY){s.stairCount=Math.clamp(r.width(),1,256);scan(p,s);}return;}
         if(r.action()==7||r.action()==8){
             if(!s.former||s.phase==RUNNING||s.phase==FIRST||s.phase==SCANNING)return;
             s.pointA=null;s.joinA=null;s.lateralA=null;s.pickingLateral=r.action()==7;
@@ -207,7 +209,7 @@ public final class VolumeEditing {
         s.combined=r.combined();s.fullLength=r.fullLength();s.fullAtStart=r.fullAtStart();
         s.vertical=r.vertical();s.start=r.start();s.end=r.end();
         boolean wasCreate=s.create;
-        s.direction=r.direction();s.upper=r.upper();s.create=r.create();s.resolution=r.resolution();
+        s.direction=r.direction();s.upper=r.upper();s.create=r.create();s.resolution=s.stairs?16:r.resolution();
         var previousRegion=s.region;
         if(s.create&&wasCreate&&r.width()==s.region.x1()-s.region.x0()&&r.height()==s.region.y1()-s.region.y0()&&r.depth()==s.region.z1()-s.region.z0()&&r.offsetX()==Math.floorMod(s.region.x0(),16)&&r.offsetY()==Math.floorMod(s.region.y0(),16)&&r.offsetZ()==Math.floorMod(s.region.z0(),16)){} // Retain a world-rotated creative prism.
         else if(s.create){var min=s.createAnchor;int x=min.getX()*16+r.offsetX(),y=min.getY()*16+r.offsetY(),z=min.getZ()*16+r.offsetZ();s.region=new VolumeRegion(x,y,z,x+r.width(),y+r.height(),z+r.depth());}
@@ -232,15 +234,16 @@ public final class VolumeEditing {
         if(s.create||!(p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be)||!be.valid())return computePlan(p,s,pos);
         return s.plans.get(key,()->computePlan(p,s,pos),plan->plan.cells().size()+plan.before().paints().size()+plan.after().paints().size()+64);
     }
+    private static BlockDesign stair(Session s,BlockPos pos,BlockDesign d){return StairGeometry.form(s.region,pos,d,s.direction,s.upper,s.vertical,s.start,s.end,s.create,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength,s.lateralLow,s.lateralHigh,s.stairCount);}
     private static DesignOperations.Plan computePlan(ServerPlayer p,Session s,BlockPos pos){
         if(!s.create&&p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be){
             if(!be.valid())throw new IllegalArgumentException("Invalid design");var d=be.design();
             if(!s.former)return s.region.hammer(pos,d);
-            var after=(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.lateralPlane(pos,d,s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,false,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh));return new DesignOperations.Plan(d,after,List.of(),List.of(),0);
+            var after=s.stairs?stair(s,pos,d):(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.lateralPlane(pos,d,s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,false,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh));return new DesignOperations.Plan(d,after,List.of(),List.of(),0);
         }
         if(s.create){
             if(!p.level().getBlockState(pos).isAir()||!p.level().getFluidState(pos).isEmpty())throw new IllegalArgumentException("Creation requires empty positions");
-            var d=BlockDesign.full(s.resolution);var saved=s.plans.getIfPresent(key(s,pos,d));var after=saved==null?(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.lateralPlane(pos,d,s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,true,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh)):saved.after();
+            var d=BlockDesign.full(s.resolution);var saved=s.plans.getIfPresent(key(s,pos,d));var after=saved==null?s.stairs?stair(s,pos,d):(s.bothEnds?s.region.doubleSeed(pos,d):d).withSlope(s.region.lateralPlane(pos,d,s.region.doublePlane(pos,d,s.direction,s.upper,s.vertical,s.start,s.end,true,s.combined,s.fullLength,s.fullAtStart,s.bothEnds,s.otherLength),s.direction,s.vertical,s.lateralLow,s.lateralHigh)):saved.after();
             if(after.empty())return null;
             var shape=DesignGeometry.shape(after).move(pos.getX(),pos.getY(),pos.getZ());if(!shape.isEmpty())for(var collision:p.level().getEntityCollisions(null,shape.bounds()))if(Shapes.joinIsNotEmpty(shape,collision,BooleanOp.AND))throw new IllegalArgumentException("Entity blocks creation");
             return new DesignOperations.Plan(d.remove(all(d.resolution())),after,List.of(),List.of(),0);
@@ -251,8 +254,8 @@ public final class VolumeEditing {
         checkingEvents=true;try{return checkEvents(p,s,pos,plan);}finally{checkingEvents=false;}
     }
     private static boolean checkEvents(ServerPlayer p,Session s,BlockPos pos,DesignOperations.Plan plan){
-        if(s.create){
-            var intended=ModContent.block(s.resolution).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(plan.after()));
+        if(s.create||plan.before().resolution()!=plan.after().resolution()){
+            var intended=ModContent.block(plan.after().resolution()).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(plan.after()));
             var snapshot=net.neoforged.neoforge.common.util.BlockSnapshot.create(p.level().dimension(),p.level(),pos);
             var event=new net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent(snapshot,p.level().getBlockState(pos.below()),p){
                 @Override public net.minecraft.world.level.block.state.BlockState getPlacedBlock(){return intended;}
@@ -290,8 +293,9 @@ public final class VolumeEditing {
                 s.writing=true;s.writingPos=pos;
                 try{
                     var beforeState=p.level().getBlockState(pos);var beforeEntity=p.level().getBlockEntity(pos);var beforeTag=beforeEntity==null?null:beforeEntity.saveWithoutMetadata(p.level().registryAccess());
-                    if(p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be)be.setDesign(plan.after());
-                    else{var state=ModContent.block(s.resolution).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(plan.after()));try(var placing=PlacementDesign.enter(pos,plan.after())){if(!p.level().setBlock(pos,state,Block.UPDATE_ALL)){stop(p,"volume_conflict");return;}}}
+                    if(plan.after().empty())p.level().removeBlock(pos,false);
+                    else if(p.level().getBlockEntity(pos) instanceof PaintableBlockEntity be&&plan.before().resolution()==plan.after().resolution())be.setDesign(plan.after());
+                    else{var state=ModContent.block(plan.after().resolution()).defaultBlockState().setValue(PaintableBlock.CUT,!plan.after().complete()).setValue(PaintableBlock.LIGHT_PASS,PaintableBlock.lightPass(plan.after()));try(var placing=PlacementDesign.enter(pos,plan.after())){if(!p.level().setBlock(pos,state,Block.UPDATE_ALL)){stop(p,"volume_conflict");return;}}}
                     if(s.former)SlopeUndo.record(p,pos,beforeState,beforeTag,plan.before());
                     s.modified++;
                     if(s.former&&!p.isCreative()){var held=p.getItemInHand(s.hand);int damage=held.getDamageValue()+1;if(damage>=held.getMaxDamage()){held.shrink(1);s.tool.shrink(1);}else{held.setDamageValue(damage);s.tool.setDamageValue(damage);}}

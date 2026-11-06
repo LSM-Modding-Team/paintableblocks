@@ -65,6 +65,7 @@ public final class ModContent {
                     Set.copyOf(BLOCKS.values().stream().map(DeferredBlock::get).toList())));
     public static final DeferredHolder<MapCodec<? extends Block>,MapCodec<PaintableBlock>> PAINTABLE_TYPE =
             ModRegistries.BLOCK_TYPES.register("paintable",()->PaintableBlock.CODEC);
+    public static final DeferredItem<StairFormerItem> STAIR_FORMER=ModRegistries.ITEMS.registerItem("stair_former",StairFormerItem::new,()->new Item.Properties().durability(4096));
     public static final DeferredItem<SlopeFormerItem> SLOPE_FORMER=ModRegistries.ITEMS.registerItem("slope_former",SlopeFormerItem::new,()->new Item.Properties().durability(4096));
     public static final DeferredItem<TongsItem> TONGS = ModRegistries.ITEMS.registerItem("tongs",TongsItem::new,()->new Item.Properties().stacksTo(1));
     public static final DeferredItem<GlovesItem> GLOVES = ModRegistries.ITEMS.registerItem("gloves",GlovesItem::new,()->new Item.Properties().stacksTo(1));

@@ -1,5 +1,14 @@
 # Registro de cambios
 
+## 2026-11-05 — Formador de escaleras
+
+- Nueva herramienta con durabilidad 4096, receta, desbloqueo, pestaña creativa y modelo 3D escalonado con texturas existentes de 16×16. Solo caras exteriores, sin modificar `unpainted.png`.
+- Reutiliza extremos, giro, inversión, lado sólido, modo vertical, creación, uniones, franja lateral, confirmación y deshacer. F9/RePág/AvPág ajustan máximo de peldaños 1–256; reparto de restos y alturas a 1/16.
+- Las piezas modificadas se convierten a ocupación axial 16×16 mediante sustitución protegida. Conserva huecos y pinturas de caras previas; caras nuevas sin pintar. Sin retirada de material conserva diseño y desgaste. Rechaza cortes oblicuos previos para evitar añadir material al rasterizar.
+- Formato persistente 6 y lectura 1–5 sin cambios; protocolo 19. Contratos de huellas, pinturas, guardado, franja y piezas incompatibles escritos e integrados, sin ejecutar.
+- Solo revisión estática/diff; sin compilación, Java, Gradle, scripts, pruebas ni Minecraft. Publicación online en `26.2`, sin commits locales.
+
+
 ## 2026-11-05 — Envolvente de pintura creativa
 
 - Ítems de pintura en creativo: dos esquinas adaptadas a la subdivisión, sin restricción de plano/orientación, previsualización de volumen y tercer clic de confirmación; Ctrl + clic cancela. Hasta 2048 posiciones y 262144 celdas de borde examinadas, sin cargar chunks ni consumo.

@@ -522,6 +522,9 @@
   "tooltip.paintableblocks.brush_area": "Ctrl+clic: inicio de área entre bloques; clic: confirmar. Cristal: dos clics.",
   "message.paintableblocks.shell_select": "Pintura creativa: dos esquinas · hasta 2048 posiciones · Ctrl+clic: cancelar",
   "message.paintableblocks.shell_ready": "Volumen fijado: clic derecho sobre bloque pintable para confirmar · Ctrl+clic: cancelar",
-  "message.paintableblocks.shell_limit": "Límite creativo: 2048 posiciones y 262144 celdas de borde examinadas"
+  "message.paintableblocks.shell_limit": "Límite creativo: 2048 posiciones y 262144 celdas de borde examinadas",
+  "item.paintableblocks.stair_former": "Formador de escaleras",
+  "message.paintableblocks.stair_steps": "Peldaños: máximo %s · F9/RePág: + · AvPág: − · precisión 1/16",
+  "message.paintableblocks.stairs_oblique": "El formador de escaleras requiere piezas sin cortes oblicuos previos"
 }
 

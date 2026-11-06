@@ -24,7 +24,7 @@ import net.nicomar.paintableblocks.blockentity.PaintableBlockEntity;
 public final class VolumePreview {
     private static ModNetworking.VolumeState state;
     private static Object item;private static int slot;
-    private record PreviewKey(VolumeRegion region,boolean former,boolean create,int direction,boolean upper,BlockDesign.GeometryKey geometry,int orientation,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength,int lateralLow,int lateralHigh){}
+    private record PreviewKey(VolumeRegion region,boolean former,boolean create,int direction,boolean upper,BlockDesign.GeometryKey geometry,int orientation,boolean vertical,int start,int end,boolean combined,int fullLength,boolean fullAtStart,boolean bothEnds,int otherLength,int lateralLow,int lateralHigh,boolean stairs,int stairCount){}
     private record Preview(PreviewKey key,PreviewLines shape,PreviewLines before,boolean rejected){}
     private static final java.util.Map<net.minecraft.core.BlockPos,Preview> PREVIEWS=new java.util.HashMap<>();
     private static long feedbackTick;
@@ -69,6 +69,9 @@ public final class VolumePreview {
         var s=state;if(s==null||!s.former()||c.player==null)return;
         if(e.getKey()==GLFW.GLFW_KEY_ENTER){if(s.phase()==VolumeEditing.READY)action(1,s.direction(),s.upper(),s.create(),1,1,1,s.resolution());return;}
         if(s.phase()==VolumeEditing.FIRST||s.phase()==VolumeEditing.RUNNING)return;
+        if(s.stairs()&&(e.getKey()==GLFW.GLFW_KEY_F9||e.getKey()==GLFW.GLFW_KEY_PAGE_UP||e.getKey()==GLFW.GLFW_KEY_PAGE_DOWN)){
+            if(s.phase()==VolumeEditing.READY)action(9,s.direction(),s.upper(),s.create(),Math.clamp(s.stairCount()+(e.getKey()==GLFW.GLFW_KEY_PAGE_DOWN?-1:1),1,256),1,1,16);return;
+        }
         if(e.getKey()==GLFW.GLFW_KEY_F10||e.getKey()==GLFW.GLFW_KEY_F11){
             if(s.phase()!=VolumeEditing.FIRST&&s.phase()!=VolumeEditing.RUNNING&&s.phase()!=VolumeEditing.SCANNING){markers.clear();action(e.getKey()==GLFW.GLFW_KEY_F10?7:8,s.direction(),s.upper(),s.create(),1,1,1,s.resolution());}return;
         }
@@ -96,6 +99,7 @@ public final class VolumePreview {
                     Component.translatable("message.paintableblocks.volume_progress",state.reviewed(),region(state).size(),state.modified(),state.ignored());
             boolean simplified=PREVIEWS.values().stream().anyMatch(v->v.shape().simplified||v.shape().count()>8192/Math.max(1,PREVIEWS.size()));
             if(notice!=null)text=Component.translatable("message.paintableblocks."+notice.reason()).append(" "+notice.pos().toShortString());
+            if(state.stairs())text=text.copy().append(" ").append(Component.translatable("message.paintableblocks.stair_steps",state.stairCount()));
             c.gui.hud.setOverlayMessage(text.copy().append(" ").append(Component.translatable(state.former()?"message.paintableblocks.world_controls":"message.paintableblocks.volume_warning_short")).append(simplified?Component.translatable("message.paintableblocks.preview_simplified"):Component.empty()).append(previewPending?Component.translatable("message.paintableblocks.preview_loading"):Component.empty()),false);
         }
     }
@@ -127,7 +131,7 @@ public final class VolumePreview {
     }
     private static void prepare(){
         var c=Minecraft.getInstance();var s=state;if(s==null)return;var r=region(s);
-        String config=s.id()+"|"+r+"|"+s.direction()+"|"+s.upper()+"|"+s.create()+"|"+s.resolution()+"|"+s.vertical()+"|"+s.start()+"|"+s.end()+"|"+s.combined()+"|"+s.fullLength()+"|"+s.fullAtStart()+"|"+s.bothEnds()+"|"+s.otherLength()+"|"+s.lateralLow()+"|"+s.lateralHigh();
+        String config=s.id()+"|"+r+"|"+s.direction()+"|"+s.upper()+"|"+s.create()+"|"+s.resolution()+"|"+s.vertical()+"|"+s.start()+"|"+s.end()+"|"+s.combined()+"|"+s.fullLength()+"|"+s.fullAtStart()+"|"+s.bothEnds()+"|"+s.otherLength()+"|"+s.lateralLow()+"|"+s.lateralHigh()+"|"+s.stairs()+"|"+s.stairCount();
         if(!config.equals(previewConfig)){previewConfig=config;previewCursor=0;previewVisited=0;PREVIEWS.clear();}
         long deadline=System.nanoTime()+1_000_000;int work=16,scanned=0;boolean missing=false;
         while(scanned++<64&&work>0&&System.nanoTime()<deadline){
@@ -136,11 +140,11 @@ public final class VolumePreview {
             BlockDesign d;
             if(s.create()){if(!c.level.getBlockState(pos).isAir()){PREVIEWS.remove(pos);continue;}d=BlockDesign.full(s.resolution());}
             else{if(!(c.level.getBlockEntity(pos) instanceof PaintableBlockEntity be)||!be.valid()){PREVIEWS.remove(pos);continue;}d=be.design();}
-            var key=new PreviewKey(r,s.former(),s.create(),s.direction(),s.upper(),d.geometryKey(),d.orientation(),s.vertical(),s.start(),s.end(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength(),s.lateralLow(),s.lateralHigh());
+            var key=new PreviewKey(r,s.former(),s.create(),s.direction(),s.upper(),d.geometryKey(),d.orientation(),s.vertical(),s.start(),s.end(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength(),s.lateralLow(),s.lateralHigh(),s.stairs(),s.stairCount());
             var cached=PREVIEWS.get(pos);if(cached!=null&&cached.key().equals(key))continue;PREVIEWS.remove(pos);work--;
             try{
                 var clean=d.withoutPaint();if(s.bothEnds())clean=r.doubleSeed(pos,clean);
-                var shape=s.former()?new DesignOutlineShape(clean.withSlope(r.lateralPlane(pos,clean,r.doublePlane(pos,clean,s.direction(),s.upper(),s.vertical(),s.start(),s.end(),s.create(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength()),s.direction(),s.vertical(),s.lateralLow(),s.lateralHigh()))):SelectionPreview.cells(r.hammer(pos,clean));
+                var shape=s.stairs()?new DesignOutlineShape(net.nicomar.paintableblocks.operation.StairGeometry.form(r,pos,clean,s.direction(),s.upper(),s.vertical(),s.start(),s.end(),s.create(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength(),s.lateralLow(),s.lateralHigh(),s.stairCount())):s.former()?new DesignOutlineShape(clean.withSlope(r.lateralPlane(pos,clean,r.doublePlane(pos,clean,s.direction(),s.upper(),s.vertical(),s.start(),s.end(),s.create(),s.combined(),s.fullLength(),s.fullAtStart(),s.bothEnds(),s.otherLength()),s.direction(),s.vertical(),s.lateralLow(),s.lateralHigh()))):SelectionPreview.cells(r.hammer(pos,clean));
                 int detail=Math.max(8,(int)(8192/r.size()));
                 PREVIEWS.put(pos,new Preview(key,PreviewLines.capture(shape).limited(detail),PreviewLines.capture(new DesignOutlineShape(d)).limited(detail),false));
             }catch(IllegalArgumentException bad){
